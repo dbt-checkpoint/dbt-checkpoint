@@ -1,0 +1,15 @@
+-   id: dbt-run
+    name: dbt run
+    description: Executes compiled sql model files
+    entry: dbt-run
+    language: python
+-   id: dbt-compile
+    name: dbt compile
+    description: Generates executable SQL from source model, test, and analysis files.
+    entry: dbt-compile
+    language: python
+-   id: dbt-test
+    name: dbt test
+    description: Runs tests on data in deployed models.
+    entry: dbt-test
+    language: python

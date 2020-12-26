@@ -1,0 +1,43 @@
+
+repos:
+-   repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+      - id: black
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-docstring-first
+    -   id: check-added-large-files
+    -   id: debug-statements
+    -   id: name-tests-test
+        args: ['--django']
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.4
+    hooks:
+    -   id: flake8
+        args: ['--max-line-length=88']
+-   repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v1.5.4
+    hooks:
+    -   id: autopep8
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.3.6
+    hooks:
+    -   id: reorder-python-imports
+        args: [--py3-plus]
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.0.1
+    hooks:
+    -   id: add-trailing-comma
+        args: [--py36-plus]
+-   repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v1.16.0
+    hooks:
+    -   id: setup-cfg-fmt
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.790
+    hooks:
+    -   id: mypy

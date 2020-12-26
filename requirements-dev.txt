@@ -1,0 +1,3 @@
+covdefaults
+coverage
+pytest
