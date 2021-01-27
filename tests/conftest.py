@@ -1,0 +1,210 @@
+import json
+
+import pytest
+
+from pre_commit_dbt.utils import cmd_output
+
+MANIFEST = {
+    "nodes": {
+        "model.with_schema": {"patch_path": "/path/exists"},
+        "model.without_schema": {"patch_path": ""},
+        "model.with_description": {"description": "test description"},
+        "model.without_description": {"description": ""},
+        "model.with_columns": {"columns": {"test": {"name": "test"}}},
+        "model.without_columns": {},
+        "model.with_meta": {"meta": {"foo": "test", "bar": "test"}},
+        "model.with_meta_foo": {"meta": {"foo": "test"}},
+        "model.without_meta": {},
+        "model.with_tags": {"tags": ["foo", "bar"]},
+        "model.with_tags_foo": {"tags": ["foo"]},
+        "model.with_tags_empty": {"tags": []},
+        "model.without_tags": {},
+        "model.test.catalog_cols": {
+            "database": "test",
+            "schema": "test",
+            "alias": "test",
+            "name": "catalog_cols",
+            "columns": {
+                "col1": {"name": "col1", "description": "test"},
+                "col2": {"name": "col2", "description": "test"},
+            },
+        },
+        "model.test.partial_catalog_cols": {
+            "name": "partial_catalog_cols",
+            "columns": {
+                "col1": {"name": "col1", "description": "test"},
+            },
+        },
+        "model.test.only_model_cols": {
+            "name": "only_model_cols",
+            "columns": {
+                "col1": {"name": "col1", "description": "test"},
+                "col2": {"name": "col2", "description": "test"},
+            },
+        },
+        "model.test.without_catalog": {
+            "name": "without_catalog",
+            "database": "test",
+            "schema": "test",
+            "alias": "test",
+            "columns": {
+                "col1": {"name": "col1", "description": "test"},
+                "col2": {"name": "col2", "description": "test"},
+            },
+        },
+        "model.test.only_catalog_cols": {"name": "only_catalog_cols", "columns": {}},
+        "model.with_column_description": {
+            "columns": {
+                "test1": {"name": "test1", "description": "test"},
+                "test2": {"name": "test2", "description": "test"},
+            }
+        },
+        "model.with_some_column_description": {
+            "columns": {
+                "test1": {"name": "test1", "description": "test"},
+                "test2": {"name": "test2"},
+            }
+        },
+        "model.without_columns_description": {
+            "columns": {"test1": {"name": "test1"}, "test2": {"name": "test2"}}
+        },
+        "model.same_col_desc_1": {
+            "columns": {
+                "test1": {"name": "test1", "description": "test"},
+                "test2": {"name": "test2", "description": "test"},
+            }
+        },
+        "model.same_col_desc_2": {
+            "columns": {
+                "test1": {"name": "test1", "description": "test"},
+                "test2": {"name": "test2"},
+            }
+        },
+        "model.same_col_desc_3": {
+            "columns": {
+                "test1": {"name": "test1", "description": "test1"},
+                "test2": {"name": "test2", "description": "test2"},
+            }
+        },
+        "test.test1": {"tags": ["schema"], "test_metadata": {"name": "unique"}},
+        "test.test2": {"tags": ["data"]},
+        "model.with_test1": {},
+        "model.with_test2": {},
+        "model.without_test": {},
+        "model.replaced_model": {"alias": "replaced_model"},
+        "model.ref1": {"name": "ref1"},
+        "model.ref2": {"name": "ref2"},
+    },
+    "sources": {
+        "source.source1.table1": {
+            "database": "prod",
+            "schema": "source1",
+            "source_name": "source1",
+            "name": "table1",
+        },
+        "source.source1.table2": {
+            "database": "prod",
+            "schema": "source1",
+            "source_name": "source1",
+            "name": "table2",
+        },
+        "source.src.src1": {
+            "database": "prod",
+            "schema": "source1",
+            "source_name": "src",
+            "name": "src1",
+        },
+        "source.src.src2": {
+            "database": "prod",
+            "schema": "source1",
+            "source_name": "src",
+            "name": "src2",
+        },
+        "source.prod.source1.src3": {
+            "database": "prod",
+            "schema": "source1",
+            "source_name": "source1",
+            "name": "src3",
+        },
+        "source.dev2.source1.src3": {
+            "database": "dev2",
+            "schema": "source1",
+            "source_name": "source1",
+            "name": "src3",
+        },
+    },
+    "child_map": {
+        "source.test.test1": ["test.test1", "test.test2", "model.with_schema"],
+        "source.test.test2": ["test.test1"],
+        "source.test.test3": [],
+        "model.with_test1": ["test.test1", "test.test2", "model.with_schema"],
+        "model.with_test2": ["test.test1"],
+        "model.without_test": [],
+    },
+}
+
+CATALOG = {
+    "nodes": {
+        "model.test.catalog_cols": {
+            "metadata": {},
+            "columns": {
+                "COL1": {"type": "TEXT", "index": 1, "name": "COL1"},
+                "COL2": {"type": "TEXT", "index": 2, "name": "COL1"},
+            },
+        },
+        "model.test.partial_catalog_cols": {
+            "metadata": {},
+            "columns": {"COL2": {"type": "TEXT", "index": 2, "name": "COL1"}},
+        },
+        "model.test.only_catalog_cols": {
+            "metadata": {},
+            "columns": {
+                "COL1": {"type": "TEXT", "index": 1, "name": "COL1"},
+                "COL2": {"type": "TEXT", "index": 2, "name": "COL1"},
+            },
+        },
+        "model.test.only_model_cols": {"metadata": {}, "columns": {}},
+    },
+    "sources": {
+        "source.test.ff.with_catalog_columns": {},
+        "source.test.aa.catalog.with_catalog_columns": {
+            "metadata": {},
+            "columns": {
+                "COL1": {"type": "TEXT", "index": 1, "name": "COL1"},
+                "COL2": {"type": "TEXT", "index": 2, "name": "COL1"},
+            },
+        },
+        "source.test.ff.catalog.without_catalog_columns": {
+            "metadata": {},
+            "columns": {},
+        },
+    },
+}
+
+
+@pytest.fixture(scope="function")
+def manifest_path_str(tmpdir):
+    json_manifest = json.dumps(MANIFEST)
+    file = tmpdir.mkdir("target").join("manifest.json")
+    file.write(json_manifest)
+    yield str(file)
+
+
+@pytest.fixture(scope="function")
+def manifest():
+    yield MANIFEST
+
+
+@pytest.fixture(scope="function")
+def catalog_path_str(tmpdir):
+    json_catalog = json.dumps(CATALOG)
+    file = tmpdir.mkdir("target_catalog").join("catalog.json")
+    file.write(json_catalog)
+    yield str(file)
+
+
+@pytest.fixture(scope="function")
+def temp_git_dir(tmpdir):
+    git_dir = tmpdir.join("gits")
+    cmd_output("git", "init", "--", str(git_dir))
+    yield git_dir

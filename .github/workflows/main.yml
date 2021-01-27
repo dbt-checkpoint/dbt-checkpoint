@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - "ubuntu-py37"
+          - "ubuntu-py38"
+          - "ubuntu-py39"
+        include:
+          - name: "ubuntu-py37"
+            python: "3.7"
+            os: ubuntu-latest
+            tox_env: "py37"
+          - name: "ubuntu-py38"
+            python: "3.8"
+            os: ubuntu-latest
+            tox_env: "py38"
+          - name: "ubuntu-py39"
+            python: "3.9"
+            os: ubuntu-latest
+            tox_env: "py39"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox virtualenv
+    - name: Test build
+      run: "tox -e ${{ matrix.tox_env }}"
+    - name: Test build with coverage
+      run: "tox -e cov-report"
+    - name: Send coverage report to codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+
+  package:
+    name: "Build & verify package"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.8"
+
+      - name: "Install build, check-wheel-content, and twine"
+        run: "python -m pip install build twine check-wheel-contents"
+      - name: "Build package"
+        run: "python -m build --sdist --wheel ."
+      - name: "List result"
+        run: "ls -l dist"
+      - name: "Check wheel contents"
+        run: "check-wheel-contents dist/*.whl"
+      - name: "Check long_description"
+        run: "python -m twine check dist/*"
+
+  install-dev:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    name: "Verify dev env"
+    runs-on: "${{ matrix.os }}"
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.8"
+      - name: "Install in dev mode"
+        run: "python -m pip install -e .[dev]"
+      - name: "Import package"
+        run: "python -c 'import pre_commit_dbt; print(pre_commit_dbt.__version__)'"

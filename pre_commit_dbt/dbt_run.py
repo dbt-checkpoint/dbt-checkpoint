@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Sequence
 
 from pre_commit_dbt.utils import add_dbt_cmd_args
+from pre_commit_dbt.utils import add_dbt_cmd_model_args
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import paths_to_dbt_models
 from pre_commit_dbt.utils import run_dbt_cmd
@@ -27,6 +28,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_filenames_args(parser)
     add_dbt_cmd_args(parser)
+    add_dbt_cmd_model_args(parser)
 
     args = parser.parse_args(argv)
 
