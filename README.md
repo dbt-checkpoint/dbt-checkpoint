@@ -93,20 +93,20 @@ pip install pre-commit
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.0
- hooks:
- - id: check-script-semicolon
- - id: check-script-has-no-table-name
- - id: dbt-test
- - id: dbt-docs-generate
- - id: check-model-has-all-columns
- name: Check columns - core
- files: ^models/core
- - id: check-model-has-all-columns
- name: Check columns - mart
- files: ^models/mart
- - id: check-model-columns-have-desc
- files: ^models/mart
+  rev: v0.1.0
+  hooks:
+  - id: check-script-semicolon
+  - id: check-script-has-no-table-name
+  - id: dbt-test
+  - id: dbt-docs-generate
+  - id: check-model-has-all-columns
+    name: Check columns - core
+    files: ^models/core
+  - id: check-model-has-all-columns
+    name: Check columns - mart
+    files: ^models/mart
+  - id: check-model-columns-have-desc
+    files: ^models/mart
 ```
 3. Optionally, run `pre-commit install` to set up the git hook scripts. With this, `pre-commit` will run automatically on `git commit`! You can also manually run `pre-commit run` after you `stage` all files you want to run. Or `pre-commit run --all-files` to run the hooks against all of the files (not only `staged`).
 
