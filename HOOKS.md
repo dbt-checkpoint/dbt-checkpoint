@@ -34,7 +34,7 @@
 Modifiers:
  * [`generate-missing-sources`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
  * [`generate-model-properties-file`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-model-properties-file): Generate model properties file.
- * [`unify-column-descriptions`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#unify-column-descriptions): Unify column descriptions across all models.
+ * [`unify-column-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#unify-column-description): Unify column descriptions across all models.
  * [`replace-script-table-names`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#replace-script-table-names): Replace table names with `source()` or `ref()` macros in the script.
  * [`remove-script-semicolon`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#remove-script-semicolon): Remove the semicolon at the end of the script.
 
@@ -237,7 +237,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-model-has-meta-keys
- args: ['--meta-keys', 'foo', 'bar', "--"]
+   args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -326,8 +326,8 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.0
  hooks:
- - id: check-model-has-tests-by-type
- args: ["--tests", "unique=1", "data=1", "--"]
+ - id: check-model-has-tests-by-name
+   args: ["--tests", "unique=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -368,8 +368,8 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.0
  hooks:
- - id: check-model-has-tests-by-name
- args: ["--tests", "schema=1", "data=1", "--"]
+ - id: check-model-has-tests-by-type
+   args: ["--tests", "schema=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -411,7 +411,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-model-has-tests
- args: ["--test-cnt", "2", "--"]
+   args: ["--test-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -453,7 +453,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-model-tags
- args: ["--tags", "foo", "bar", "--"]
+   args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -698,7 +698,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-source-has-freshness
- args: ["--freshness", "error_after", "warn_after", "--"]
+   args: ["--freshness", "error_after", "warn_after", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -769,7 +769,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-source-has-meta-keys
- args: ['--meta-keys', 'foo', 'bar', "--"]
+   args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -807,8 +807,8 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.0
  hooks:
- - id: check-source-has-tests-by-type
- args: ["--tests", "unique=1", "data=1", "--"]
+ - id: check-source-has-tests-by-name
+   args: ["--tests", "unique=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -847,8 +847,8 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.0
  hooks:
- - id: check-source-has-tests-by-name
- args: ["--tests", "schema=1", "data=1", "--"]
+ - id: check-source-has-tests-by-type
+   args: ["--tests", "schema=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -888,7 +888,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-source-has-tests
- args: ["--tests", "2", "--"]
+   args: ["--tests", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -928,7 +928,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: check-source-tags
- args: ["--tags", "foo", "bar", "--"]
+   args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -969,7 +969,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: generate-missing-sources
- args: ["--schema-file", "models/schema.yml", "--"]
+   args: ["--schema-file", "models/schema.yml", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1009,7 +1009,7 @@ Unfortunately, this hook breaks your formatting.
 
 -----
 
-### `unify-column-descriptions`
+### `unify-column-description`
 
 Unify column descriptions across all models.
 
@@ -1023,8 +1023,8 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.0
  hooks:
- - id: generate-missing-sources
- args: ["--ignore", "foo", "--"]
+ - id: unify-column-description
+   args: ["--ignore", "foo", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1070,7 +1070,6 @@ repos:
  rev: v0.1.0
  hooks:
  - id: replace-script-table-names
- args: ["--ignore", "foo", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1115,8 +1114,8 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.0
  hooks:
- - id: replace-script-table-names
- args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
+ - id: generate-model-properties-file
+   args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1202,8 +1201,8 @@ Run the` dbt compile` command. Generates executable SQL from source model, test,
 
 #### Arguments
 
-`--global-flags`: Global dbt flags applicable to all subcommands.</br>
-`--cmd-flags`: Command-specific dbt flags.</br>
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
 `--model-postfix`: Postfix dbt selector, for selecting children.
 
@@ -1214,7 +1213,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: dbt-compile
- args: ["--model-prefix". "+", "--"]
+   args: ["--model-prefix". "+", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1256,8 +1255,8 @@ Run `dbt run` command. Executes compiled SQL model files.
 
 #### Arguments
 
-`--global-flags`: Global dbt flags applicable to all subcommands.</br>
-`--cmd-flags`: Command-specific dbt flags.</br>
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
 `--model-postfix`: Postfix dbt selector, for selecting children.
 
@@ -1268,7 +1267,7 @@ repos:
  rev: v0.1.0
  hooks:
  - id: dbt-run
- args: ["--model-prefix". "+", "--"]
+   args: ["--model-prefix". "+", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1280,8 +1279,8 @@ Run `dbt test` command. Runs tests on data in deployed models.
 
 #### Arguments
 
-`--global-flags`: Global dbt flags applicable to all subcommands.</br>
-`--cmd-flags`: Command-specific dbt flags.</br>
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
 `--model-postfix`: Postfix dbt selector, for selecting children.
 
@@ -1292,10 +1291,9 @@ repos:
  rev: v0.1.0
  hooks:
  - id: dbt-test
- args: ["--model-prefix", "+", "--"]
+   args: ["--model-prefix", "+", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
 
 -----
-

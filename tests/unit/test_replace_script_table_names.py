@@ -8,11 +8,11 @@ from pre_commit_dbt.replace_script_table_names import main
 TESTS = (  # type: ignore
     (
         """
-    SELECT * FROM replaced_model
+    SELECT *, bb.replaced_model, replaced_model.aa FROM replaced_model
     """,
         1,
         """
-    SELECT * FROM {{ ref('replaced_model') }}
+    SELECT *, bb.replaced_model, replaced_model.aa FROM {{ ref('replaced_model') }}
     """,
         True,
     ),

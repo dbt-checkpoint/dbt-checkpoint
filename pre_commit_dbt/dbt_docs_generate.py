@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Sequence
 
 from pre_commit_dbt.utils import add_dbt_cmd_args
+from pre_commit_dbt.utils import get_flags
 from pre_commit_dbt.utils import run_dbt_cmd
 
 
@@ -11,8 +12,8 @@ def docs_generate_cmd(
     global_flags: Optional[Sequence[str]] = None,
     cmd_flags: Optional[Sequence[str]] = None,
 ) -> List[str]:
-    global_flags = global_flags or []
-    cmd_flags = cmd_flags or []
+    global_flags = get_flags(global_flags)
+    cmd_flags = get_flags(cmd_flags)
     cmd = ["dbt", *global_flags, "docs", "generate", *cmd_flags]
     return cmd
 

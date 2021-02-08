@@ -34,20 +34,20 @@ def test_dbt_test_error():
         (["/aa/bb/cc.txt"], None, None, ["dbt", "test", "-m", "cc"]),
         (
             ["/aa/bb/cc.txt"],
-            ["--debug", "--no-write-json"],
+            ["++debug", "++no-write-json"],
             None,
             ["dbt", "--debug", "--no-write-json", "test", "-m", "cc"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
-            ["-t", "prod"],
+            ["+t", "prod"],
             ["dbt", "test", "-m", "cc", "-t", "prod"],
         ),
         (
             ["/aa/bb/cc.txt"],
             "",
-            ["-t", "prod"],
+            ["+t", "prod"],
             ["dbt", "test", "-m", "cc", "-t", "prod"],
         ),
     ],
