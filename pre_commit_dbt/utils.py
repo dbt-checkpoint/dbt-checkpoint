@@ -118,6 +118,13 @@ def get_models(
             yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
 
 
+def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
+    if flags:
+        return [flag.replace("+", "-") for flag in flags if flag]
+    else:
+        return []
+
+
 def get_model_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[ModelSchema, None, None]:
@@ -250,12 +257,12 @@ def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:
     parser.add_argument(
         "--global-flags",
         nargs="*",
-        help="Global dbt flags applicable to all subcommands.",
+        help="Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.",
     )
     parser.add_argument(
         "--cmd-flags",
         nargs="*",
-        help="Command-specific dbt flags.",
+        help="Command-specific dbt flags. Instead of dash `-` please use `+`.",
     )
 
 

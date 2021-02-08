@@ -65,7 +65,7 @@ If this is the case, `pre-commit-dbt` is here to help you!
 Modifiers:
  * [`generate-missing-sources`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
  * [`generate-model-properties-file`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-model-properties-file): Generate model properties file.
- * [`unify-column-descriptions`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#unify-column-descriptions): Unify column descriptions across all models.
+ * [`unify-column-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#unify-column-description): Unify column descriptions across all models.
  * [`replace-script-table-names`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#replace-script-table-names): Replace table names with `source()` or `ref()` macros in the script.
  * [`remove-script-semicolon`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#remove-script-semicolon): Remove the semicolon at the end of the script.
 

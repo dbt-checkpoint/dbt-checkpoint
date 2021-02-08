@@ -6,6 +6,7 @@ from typing import Sequence
 from pre_commit_dbt.utils import add_dbt_cmd_args
 from pre_commit_dbt.utils import add_dbt_cmd_model_args
 from pre_commit_dbt.utils import add_filenames_args
+from pre_commit_dbt.utils import get_flags
 from pre_commit_dbt.utils import paths_to_dbt_models
 from pre_commit_dbt.utils import run_dbt_cmd
 
@@ -17,8 +18,8 @@ def prepare_cmd(
     prefix: str = "",
     postfix: str = "",
 ) -> List[str]:
-    global_flags = global_flags or []
-    cmd_flags = cmd_flags or []
+    global_flags = get_flags(global_flags)
+    cmd_flags = get_flags(cmd_flags)
     dbt_models = paths_to_dbt_models(paths, prefix, postfix)
     cmd = ["dbt", *global_flags, "run", "-m", *dbt_models, *cmd_flags]
     return cmd
