@@ -93,7 +93,7 @@ pip install pre-commit
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
-  rev: v0.1.0
+  rev: v0.1.1
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
