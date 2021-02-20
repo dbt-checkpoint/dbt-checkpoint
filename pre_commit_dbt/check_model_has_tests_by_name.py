@@ -24,7 +24,6 @@ def check_test_cnt(
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
-    import pdb; pdb.set_trace()
 
     for model in models:
         tests = list(get_tests(manifest=manifest, obj=model))
@@ -52,7 +51,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_filenames_args(parser)
     add_manifest_args(parser)
-
     parser.add_argument(
         "--tests",
         metavar="KEY=VALUE",
