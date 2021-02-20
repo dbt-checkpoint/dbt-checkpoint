@@ -24,6 +24,7 @@ def check_test_cnt(
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
+    import pdb; pdb.set_trace()
 
     for model in models:
         tests = list(get_tests(manifest=manifest, obj=model))
@@ -32,6 +33,8 @@ def check_test_cnt(
             sorted(tests, key=lambda x: x.test_name), lambda x: x.test_name
         )
         test_dict = {key: list(value) for key, value in grouped}
+        import pdb; pdb.set_trace()
+
         for required_test, required_cnt in required_tests.items():
             test = test_dict.get(required_test, [])
             test_cnt = len(test)
@@ -64,7 +67,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
 
     args = parser.parse_args(argv)
-
     try:
         manifest = get_json(args.manifest)
     except JsonOpenError as e:
@@ -72,6 +74,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     required_tests = {}
+    import pdb; pdb.set_trace()
 
     for test_type, cnt in args.tests.items():
         try:

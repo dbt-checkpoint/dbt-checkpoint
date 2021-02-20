@@ -27,7 +27,6 @@ def check_test_cnt(
 
     for model in models:
         tests = list(get_tests(manifest=manifest, obj=model))
-
         grouped = groupby(
             sorted(tests, key=lambda x: x.test_name), lambda x: x.test_name
         )
