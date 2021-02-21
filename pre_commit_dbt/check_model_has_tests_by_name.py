@@ -16,7 +16,7 @@ from pre_commit_dbt.utils import ParseDict
 
 
 def check_test_cnt(
-    paths: Sequence[str], manifest: Dict[str, Any], test_group: Dict[str, int], test_cnt: int
+    paths: Sequence[str], manifest: Dict[str, Any], required_tests: Dict[str, int]
 ) -> int:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
@@ -32,16 +32,16 @@ def check_test_cnt(
             sorted(tests, key=lambda x: x.test_name), lambda x: x.test_name
         )
         test_dict = {key: list(value) for key, value in grouped}
-        required_test_count = 0
-        for test in test_group:
-            if test_dict.get(test):
-              required_test_count += 1
-        if required_test_count != test_cnt:
-            print(
-                f"{model.model_name}: "
-                f"has only {required_test_count} test(s) from {test_group}.",
-            )
-            status_code = 1
+        for required_test, required_cnt in required_tests.items():
+            test = test_dict.get(required_test, [])
+            test_cnt = len(test)
+            if not test or required_cnt > test_cnt:
+                status_code = 1
+                print(
+                    f"{model.model_name}: "
+                    f"has only {test_cnt} {required_test} tests, but "
+                    f"{required_cnt} are required.",
+                )
     return status_code
 
 
@@ -49,17 +49,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_filenames_args(parser)
     add_manifest_args(parser)
+
     parser.add_argument(
         "--tests",
+        metavar="KEY=VALUE",
         nargs="+",
         required=True,
-        help="List of acceptable tests.",
-    )
-    parser.add_argument(
-        "--test-cnt",
-        type=int,
-        default=1,
-        help="Minimum number of tests required.",
+        help="Set a number of key-value pairs."
+        " Key is name of test and value is required "
+        "minimal number of tests eg. --test unique=1 not_null=2"
+        "(do not put spaces before or after the = sign)."
+        "",
+        action=ParseDict,
     )
 
     args = parser.parse_args(argv)
@@ -70,13 +71,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Unable to load manifest file ({e})")
         return 1
 
-    try:
-        test_cnt = int(args.test_cnt)
-    except ValueError:
-        parser.error(f"Unable to cast {test_cnt} to int.")
+    required_tests = {}
+
+    for test_type, cnt in args.tests.items():
+        try:
+            test_cnt = int(cnt)
+        except ValueError:
+            parser.error(f"Unable to cast {cnt} to int.")
+        required_tests[test_type] = test_cnt
 
     return check_test_cnt(
-        paths=args.filenames, manifest=manifest, test_group=args.tests, test_cnt=args.test_cnt
+        paths=args.filenames, manifest=manifest, required_tests=required_tests
     )
 
 
