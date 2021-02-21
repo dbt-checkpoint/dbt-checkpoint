@@ -36,7 +36,7 @@ def check_test_cnt(
         for test in test_group:
             if test_dict.get(test):
               required_test_count += 1
-        if required_test_count != test_cnt:
+        if required_test_count < test_cnt:
             print(
                 f"{model.model_name}: "
                 f"has only {required_test_count} test(s) from {test_group}.",

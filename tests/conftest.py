@@ -92,7 +92,6 @@ MANIFEST = {
         "model.with_test1": {},
         "model.with_test2": {},
         "model.with_test3": {},
-
         "model.without_test": {},
         "model.replaced_model": {"alias": "replaced_model"},
         "model.ref1": {"name": "ref1"},
