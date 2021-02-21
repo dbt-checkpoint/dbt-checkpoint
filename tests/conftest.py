@@ -136,7 +136,6 @@ MANIFEST = {
     "child_map": {
         "source.test.test1": ["test.test1", "test.test2", "model.with_schema"],
         "source.test.test2": ["test.test1"],
-        "source.test.test3": [],
         "model.with_test1": ["test.test1", "test.test2", "model.with_schema"],
         "model.with_test2": ["test.test1"],
         "model.without_test": [],
