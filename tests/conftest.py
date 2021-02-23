@@ -88,8 +88,10 @@ MANIFEST = {
         },
         "test.test1": {"tags": ["schema"], "test_metadata": {"name": "unique"}},
         "test.test2": {"tags": ["data"]},
+        "test.test3": {"tags": ["schema"], "test_metadata": {"name": "unique_where"}},
         "model.with_test1": {},
         "model.with_test2": {},
+        "model.with_test3": {},
         "model.without_test": {},
         "model.replaced_model": {"alias": "replaced_model"},
         "model.ref1": {"name": "ref1"},
@@ -139,6 +141,7 @@ MANIFEST = {
         "source.test.test3": [],
         "model.with_test1": ["test.test1", "test.test2", "model.with_schema"],
         "model.with_test2": ["test.test1"],
+        "model.with_test3": ["test.test1", "test.test3"],
         "model.without_test": [],
     },
 }
