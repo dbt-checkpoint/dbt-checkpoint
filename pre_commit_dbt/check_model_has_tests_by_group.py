@@ -12,7 +12,6 @@ from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import get_tests
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import ParseDict
 
 
 def check_test_cnt(
@@ -69,11 +68,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
-
-    try:
-        test_cnt = int(args.test_cnt)
-    except ValueError:
-        parser.error(f"Unable to cast {test_cnt} to int.")
 
     return check_test_cnt(
         paths=args.filenames, manifest=manifest, test_group=args.tests, test_cnt=args.test_cnt
