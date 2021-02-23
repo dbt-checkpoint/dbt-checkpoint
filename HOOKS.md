@@ -412,7 +412,7 @@ repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v0.1.1
  hooks:
- - id: check-model-has-tests-by-type
+ - id: check-model-has-tests-by-group
    args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
 ```
 
