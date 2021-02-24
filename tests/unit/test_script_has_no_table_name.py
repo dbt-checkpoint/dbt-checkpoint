@@ -110,6 +110,63 @@ TESTS = (  # type: ignore
         0,
         {},
     ),
+    (
+        """
+    with source as (
+        select * from {{ source('aws_lambda', 'purchase_orders') }}
+    ),
+
+    flattened as (
+        select * from source, lateral flatten(line_items)
+    )
+    """,
+        0,
+        {},
+    ),
+    (
+        """
+    {# This is a test of the check-script-has-no-table-name hook, from pre-commit-dbt
+
+    We would expect the hook to ignore this text because it is in a jinja comment block
+    and not actually a join to any other table.
+
+    #}
+    with source as (
+        select * from {{ source('aa', 'bb') }}
+    )
+    SELECT * FROM source
+    """,
+        0,
+        {},
+    ),
+    (
+        """
+    /* This is a test of the check-script-has-no-table-name hook, from pre-commit-dbt
+
+    We would expect the hook to ignore this text because it is in a jinja comment block
+    and not actually a join to any other table.
+
+    */
+    with source as (
+        select * from {{ source('aa', 'bb') }}
+    )
+    SELECT * FROM source
+    """,
+        0,
+        {},
+    ),
+    (
+        """
+    -- join to other
+    -- from aaa
+    with source as (
+        select * from {{ source('aa', 'bb') }}
+    )
+    SELECT * FROM source
+    """,
+        0,
+        {},
+    ),
 )
 
 
