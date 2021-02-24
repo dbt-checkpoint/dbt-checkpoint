@@ -9,7 +9,9 @@ from typing import Tuple
 
 from pre_commit_dbt.utils import add_filenames_args
 
-REGEX_COMMENTS = r"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/|[ \t]*--.*)"
+REGEX_COMMENTS = (
+    r"((\/\*|\{#)([^*]|[\r\n]|([\*#]+([^*\/#]|[\r\n])))*(\*+\/|#\})|[ \t]*--.*)"
+)
 REGEX_SPLIT = r"[\s]+"
 IGNORE_WORDS = ["", "(", "{{"]  # pragma: no mutate
 
@@ -43,7 +45,7 @@ def has_table_name(sql: str, filename: str) -> Tuple[int, Set[str]]:
 
     for prev, cur, nxt in prev_cur_next_iter(sql_split):
         if prev in ["from", "join"] and cur not in IGNORE_WORDS:
-            tables.add(cur.lower() if cur else cur)
+            tables.add(cur.lower().strip().replace(",", "") if cur else cur)
         if (
             cur.lower() == "as" and nxt and nxt[0] == "(" and prev not in IGNORE_WORDS
         ):  # pragma: no mutate
