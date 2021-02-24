@@ -15,7 +15,10 @@ from pre_commit_dbt.utils import JsonOpenError
 
 
 def check_test_cnt(
-    paths: Sequence[str], manifest: Dict[str, Any], test_group: Dict[str, int], test_cnt: int
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    test_group: Dict[str, int],
+    test_cnt: int,
 ) -> int:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
@@ -34,7 +37,7 @@ def check_test_cnt(
         required_test_count = 0
         for test in test_group:
             if test_dict.get(test):
-              required_test_count += 1
+                required_test_count += 1
         if required_test_count < test_cnt:
             print(
                 f"{model.model_name}: "
@@ -70,7 +73,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     return check_test_cnt(
-        paths=args.filenames, manifest=manifest, test_group=args.tests, test_cnt=args.test_cnt
+        paths=args.filenames,
+        manifest=manifest,
+        test_group=args.tests,
+        test_cnt=args.test_cnt,
     )
 
 

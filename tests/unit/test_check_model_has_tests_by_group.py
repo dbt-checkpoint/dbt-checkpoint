@@ -7,14 +7,34 @@ from pre_commit_dbt.check_model_has_tests_by_group import main
 # Input args, valid manifest, expected return value
 TESTS = (
     (["aa/bb/with_test1.sql"], ["--tests", "unique", "--test-cnt", "1"], True, 0),
-    (["aa/bb/with_test3.sql"],["--tests", "unique", "unique_where", "--test-cnt", "1"], True, 0),
-    (["aa/bb/with_test3.sql"], ["--tests", "unique", "unique_where", "--test-cnt", "2"], True, 0),
-    (["aa/bb/with_test1.sql"], ["--tests", "unique", "unique_where", "--test-cnt", "2"], True, 1),
+    (
+        ["aa/bb/with_test3.sql"],
+        ["--tests", "unique", "unique_where", "--test-cnt", "1"],
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/with_test3.sql"],
+        ["--tests", "unique", "unique_where", "--test-cnt", "2"],
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/with_test1.sql"],
+        ["--tests", "unique", "unique_where", "--test-cnt", "2"],
+        True,
+        1,
+    ),
     (["aa/bb/with_test1.sql"], ["--tests", "unique", "--test-cnt", "2"], True, 1),
     (["aa/bb/with_test3.sql"], ["--tests", "unique", "--test-cnt", "1"], False, 1),
 )
 
-ERROR_TESTS = ((["aa/bb/with_test1.sql"], ["--tests", "unique", "unique_where", "--test-cnt", "foo"]),)
+ERROR_TESTS = (
+    (
+        ["aa/bb/with_test1.sql"],
+        ["--tests", "unique", "unique_where", "--test-cnt", "foo"],
+    ),
+)
 
 
 @pytest.mark.parametrize(
