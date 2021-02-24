@@ -5,6 +5,7 @@ import pytest
 from pre_commit_dbt.utils import CalledProcessError
 from pre_commit_dbt.utils import cmd_output
 from pre_commit_dbt.utils import get_filenames
+from pre_commit_dbt.utils import get_model_schemas
 from pre_commit_dbt.utils import Model
 from pre_commit_dbt.utils import ModelSchema
 from pre_commit_dbt.utils import obj_in_child
@@ -57,3 +58,19 @@ def test_obj_in_child(obj, child_name, result):
 def test_get_filenames():
     result = get_filenames(["aa/bb/cc.sql", "bb/ee.sql"])
     assert result == {"cc": Path("aa/bb/cc.sql"), "ee": Path("bb/ee.sql")}
+
+
+def test_get_model_schemas(tmpdir):
+    sub = tmpdir.mkdir("sub")
+    file = sub.join("schema.yml")
+    file.write(
+        """
+version: 2
+
+models:
+    name: aaa
+    description: bbb
+    """
+    )
+    result = get_model_schemas([file], {"aa"})
+    assert list(result) == []

@@ -131,14 +131,15 @@ def get_model_schemas(
     for yml_file in yml_files:
         schema = yaml.safe_load(yml_file.open())
         for model in schema.get("models", []):
-            model_name = model.get("name")
-            if model_name in filenames or all_schemas:
-                yield ModelSchema(
-                    model_name=model_name,
-                    file=yml_file,
-                    filename=yml_file.stem,
-                    schema=model,
-                )
+            if isinstance(model, dict) and model.get("name"):
+                model_name = model.get("name", "")
+                if model_name in filenames or all_schemas:
+                    yield ModelSchema(
+                        model_name=model_name,
+                        file=yml_file,
+                        filename=yml_file.stem,
+                        schema=model,
+                    )
 
 
 def get_source_schemas(
@@ -257,7 +258,8 @@ def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:
     parser.add_argument(
         "--global-flags",
         nargs="*",
-        help="Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.",
+        help="""Global dbt flags applicable to all subcommands.
+        Instead of dash `-` please use `+`.""",
     )
     parser.add_argument(
         "--cmd-flags",
