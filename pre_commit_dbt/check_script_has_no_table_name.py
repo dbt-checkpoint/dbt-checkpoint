@@ -47,11 +47,8 @@ def has_table_name(sql: str, filename: str) -> Tuple[int, Set[str]]:
         if prev in ["from", "join"] and cur not in IGNORE_WORDS:
             tables.add(cur.lower().strip().replace(",", "") if cur else cur)
         if (
-            cur.lower() == "as"  # pragma: no mutate
-            and nxt  # pragma: no mutate
-            and nxt[0] == "("  # pragma: no mutate
-            and prev not in IGNORE_WORDS
-        ):
+            cur.lower() == "as" and nxt and nxt[0] == "(" and prev not in IGNORE_WORDS
+        ):  # pragma: no mutate
             cte.add(prev.lower() if prev else prev)
 
     table_names = tables.difference(cte)
