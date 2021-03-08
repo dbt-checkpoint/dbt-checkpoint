@@ -96,6 +96,7 @@ MANIFEST = {
         "model.replaced_model": {"alias": "replaced_model"},
         "model.ref1": {"name": "ref1"},
         "model.ref2": {"name": "ref2"},
+        "model.parent_child": {"name": "parent_child"},
     },
     "sources": {
         "source.source1.table1": {
@@ -143,6 +144,21 @@ MANIFEST = {
         "model.with_test2": ["test.test1"],
         "model.with_test3": ["test.test1", "test.test3"],
         "model.without_test": [],
+        "model.parent_child": [
+            "source.src.src2",
+            "source.src.src1",
+            "model.ref1",
+            "model.without_tags",
+            "bbb.ccc.ddd",
+        ],
+    },
+    "parent_map": {
+        "model.parent_child": [
+            "model.ref2",
+            "model.replaced_model",
+            "ccc.ccc.ddd",
+            "ddd.ccc.ddd",
+        ]
     },
 }
 

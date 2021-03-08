@@ -10,9 +10,10 @@ from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
-from pre_commit_dbt.utils import get_tests
+from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import ParseDict
+from pre_commit_dbt.utils import Test
 
 
 def check_test_cnt(
@@ -26,7 +27,15 @@ def check_test_cnt(
     models = get_models(manifest, filenames)
 
     for model in models:
-        tests = list(get_tests(manifest=manifest, obj=model))
+        childs = list(
+            get_parent_childs(
+                manifest=manifest,
+                obj=model,
+                manifest_node="child_map",
+                node_types=["test"],
+            )
+        )
+        tests = [test for test in childs if isinstance(test, Test)]
         grouped = groupby(
             sorted(tests, key=lambda x: x.test_type), lambda x: x.test_type
         )

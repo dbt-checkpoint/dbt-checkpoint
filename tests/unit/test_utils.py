@@ -8,7 +8,7 @@ from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_model_schemas
 from pre_commit_dbt.utils import Model
 from pre_commit_dbt.utils import ModelSchema
-from pre_commit_dbt.utils import obj_in_child
+from pre_commit_dbt.utils import obj_in_deps
 from pre_commit_dbt.utils import paths_to_dbt_models
 from pre_commit_dbt.utils import SourceSchema
 
@@ -52,7 +52,7 @@ def test_paths_to_dbt_models_default():
     ],
 )
 def test_obj_in_child(obj, child_name, result):
-    assert obj_in_child(obj, child_name) == result
+    assert obj_in_deps(obj, child_name) == result
 
 
 def test_get_filenames():

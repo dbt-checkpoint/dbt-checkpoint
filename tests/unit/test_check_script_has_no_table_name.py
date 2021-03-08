@@ -87,7 +87,7 @@ TESTS = (  # type: ignore
     (
         """
     WITH AA AS (
-        SELECT * FROM {{ source('aa') }}
+        SELECT *, BB as CC FROM {{ source('aa') }}
     )
     -- SELECT * FROM GG
     SELECT * FROM AA
