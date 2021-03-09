@@ -8,8 +8,8 @@ from typing import Sequence
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import get_source_schemas
-from pre_commit_dbt.utils import get_tests
 from pre_commit_dbt.utils import JsonOpenError
 
 
@@ -23,7 +23,14 @@ def check_test_cnt(
     schemas = get_source_schemas(ymls)
 
     for schema in schemas:
-        tests = list(get_tests(manifest=manifest, obj=schema))
+        tests = list(
+            get_parent_childs(
+                manifest=manifest,
+                obj=schema,
+                manifest_node="child_map",
+                node_types=["test"],
+            )
+        )
         source_test_cnt = len(tests)
         if source_test_cnt < test_cnt:
             status_code = 1

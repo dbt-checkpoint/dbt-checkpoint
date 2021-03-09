@@ -9,10 +9,11 @@ from typing import Sequence
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import get_source_schemas
-from pre_commit_dbt.utils import get_tests
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import ParseDict
+from pre_commit_dbt.utils import Test
 
 
 def check_test_cnt(
@@ -25,7 +26,13 @@ def check_test_cnt(
     schemas = get_source_schemas(ymls)
 
     for schema in schemas:
-        tests = get_tests(manifest=manifest, obj=schema)
+        childs = get_parent_childs(
+            manifest=manifest,
+            obj=schema,
+            manifest_node="child_map",
+            node_types=["test"],
+        )
+        tests = [test for test in childs if isinstance(test, Test)]
         grouped = groupby(
             sorted(tests, key=lambda x: x.test_type), lambda x: x.test_type
         )

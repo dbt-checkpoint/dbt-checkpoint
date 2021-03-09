@@ -132,7 +132,7 @@ def get_model_schemas(
         schema = yaml.safe_load(yml_file.open())
         for model in schema.get("models", []):
             if isinstance(model, dict) and model.get("name"):
-                model_name = model.get("name", "")
+                model_name = model.get("name", "")  # pragma: no mutate
                 if model_name in filenames or all_schemas:
                     yield ModelSchema(
                         model_name=model_name,
@@ -161,15 +161,15 @@ def get_source_schemas(
                 )
 
 
-def obj_in_child(obj: Any, child_name: str) -> bool:
-    child_split = set(child_name.split("."))
+def obj_in_deps(obj: Any, dep_name: str) -> bool:
+    dep_split = set(dep_name.split("."))
     result = False
     if isinstance(obj, SourceSchema):
-        result = {obj.prefix, obj.source_name, obj.table_name}.issubset(child_split)
+        result = {obj.prefix, obj.source_name, obj.table_name}.issubset(dep_split)
     elif isinstance(obj, ModelSchema):
-        result = {obj.prefix, obj.model_name}.issubset(child_split)
+        result = {obj.prefix, obj.model_name}.issubset(dep_split)
     elif isinstance(obj, Model):
-        result = obj.model_id == child_name
+        result = obj.model_id == dep_name
     return result
 
 
@@ -185,13 +185,36 @@ def get_test(node_id: str, manifest: Dict[str, Any]) -> Test:
     )
 
 
-def get_tests(manifest: Dict[str, Any], obj: Any) -> Generator[Test, None, None]:
-    childs = manifest.get("child_map", {})
-    for child_name, child_items in childs.items():
-        if obj_in_child(obj, child_name):
-            for node_id in child_items:
-                if node_id.split(".")[0] == "test":
-                    yield get_test(node_id, manifest)
+def get_parent_childs(
+    manifest: Dict[str, Any], obj: Any, manifest_node: str, node_types: List[str]
+) -> Generator[Union[Test, Model, Source], None, None]:
+    deps = manifest.get(manifest_node, {})
+    for dep_name, dep_items in deps.items():
+        if obj_in_deps(obj, dep_name):
+            for node_id in dep_items:
+                node_type = node_id.split(".")[0]
+                if node_type in node_types:
+                    if node_type == "test":
+                        yield get_test(node_id, manifest)
+                    elif node_type == "model":
+                        node = manifest.get("nodes", {}).get(node_id)
+                        yield Model(
+                            model_id=node_id,
+                            model_name=node.get("name", ""),  # pragma: no mutate
+                            filename=node.get("path", ""),  # pragma: no mutate
+                            node=node,
+                        )
+                    else:  # Source
+                        node = manifest.get("sources", {}).get(node_id)
+                        yield Source(
+                            source_id=node_id,
+                            source_name=node.get(
+                                "source_name", ""
+                            ),  # pragma: no mutate
+                            table_name=node.get("name", ""),  # pragma: no mutate
+                            filename=node.get("path", ""),  # pragma: no mutate
+                            source=node,
+                        )
 
 
 def get_filenames(
