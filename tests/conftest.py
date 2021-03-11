@@ -18,7 +18,7 @@ MANIFEST = {
         "model.with_tags": {"tags": ["foo", "bar"]},
         "model.with_tags_foo": {"tags": ["foo"]},
         "model.with_tags_empty": {"tags": []},
-        "model.without_tags": {},
+        "model.without_tags": {"database": "prod", "schema": "test"},
         "model.test.catalog_cols": {
             "database": "test",
             "schema": "test",
@@ -94,7 +94,7 @@ MANIFEST = {
         "model.with_test3": {},
         "model.without_test": {},
         "model.replaced_model": {"alias": "replaced_model"},
-        "model.ref1": {"name": "ref1"},
+        "model.ref1": {"name": "ref1", "database": "core", "schema": "test"},
         "model.ref2": {"name": "ref2"},
         "model.parent_child": {"name": "parent_child"},
     },
@@ -118,8 +118,8 @@ MANIFEST = {
             "name": "src1",
         },
         "source.src.src2": {
-            "database": "prod",
-            "schema": "source1",
+            "database": "prod2",
+            "schema": "source2",
             "source_name": "src",
             "name": "src2",
         },
@@ -135,6 +135,12 @@ MANIFEST = {
             "source_name": "source1",
             "name": "src3",
         },
+        "source.parent_child.parent_child1": {
+            "database": "dev2",
+            "schema": "source1",
+            "source_name": "parent_child",
+            "name": "parent_child1",
+        },
     },
     "child_map": {
         "source.test.test1": ["test.test1", "test.test2", "model.with_schema"],
@@ -145,19 +151,25 @@ MANIFEST = {
         "model.with_test3": ["test.test1", "test.test3"],
         "model.without_test": [],
         "model.parent_child": [
+            "model.ref2",
+            "model.replaced_model",
+            "ccc.ccc.ddd",
+            "ddd.ccc.ddd",
+        ],
+        "source.parent_child.parent_child1": [
+            "model.ref2",
+            "model.replaced_model",
+            "ccc.ccc.ddd",
+            "ddd.ccc.ddd",
+        ],
+    },
+    "parent_map": {
+        "model.parent_child": [
             "source.src.src2",
             "source.src.src1",
             "model.ref1",
             "model.without_tags",
             "bbb.ccc.ddd",
-        ],
-    },
-    "parent_map": {
-        "model.parent_child": [
-            "model.ref2",
-            "model.replaced_model",
-            "ccc.ccc.ddd",
-            "ddd.ccc.ddd",
         ]
     },
 }
