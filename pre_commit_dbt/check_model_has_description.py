@@ -9,18 +9,16 @@ from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_model_schemas
+from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
     status_code = 0
-    macro_paths = [m["path"] for m in manifest.get("macros", {}).values()]
-    macro_sqls = get_filenames(macro_paths, extensions=[".sql"])
-    sqls = get_filenames(paths, [".sql"])
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    macro_filenames = set(macro_sqls.keys())
-    filenames = set(sqls.keys()).difference(macro_filenames)
+    sqls = get_model_sqls(paths, manifest)
+    filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)

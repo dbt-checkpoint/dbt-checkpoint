@@ -125,6 +125,17 @@ def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
         return []
 
 
+def get_macro_sqls(manifest: Dict[str, Any]) -> Dict[str, Path]:
+    macro_paths = [m["path"] for m in manifest.get("macros", {}).values()]
+    return get_filenames(macro_paths, extensions=[".sql"])
+
+
+def get_model_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
+    sqls = get_filenames(paths, [".sql"])
+    macro_sqls = get_macro_sqls(manifest)
+    return {k: v for k, v in sqls.items() if k not in macro_sqls}
+
+
 def get_model_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[ModelSchema, None, None]:
