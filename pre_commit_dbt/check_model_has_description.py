@@ -15,9 +15,12 @@ from pre_commit_dbt.utils import JsonOpenError
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
     status_code = 0
+    macro_paths = [m["path"] for m in manifest.get("macros", {}).values()]
+    macro_sqls = get_filenames(macro_paths, extensions=[".sql"])
     sqls = get_filenames(paths, [".sql"])
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    filenames = set(sqls.keys())
+    macro_filenames = set(macro_sqls.keys())
+    filenames = set(sqls.keys()).difference(macro_filenames)
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
