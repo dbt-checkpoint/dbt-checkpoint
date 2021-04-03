@@ -12,6 +12,7 @@ from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_model_schemas
+from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import Model
@@ -22,8 +23,8 @@ def check_column_desc(
     paths: Sequence[str], manifest: Dict[str, Any]
 ) -> Tuple[int, Dict[str, Any]]:
     status_code = 0
-    sqls = get_filenames(paths, [".sql"])
     ymls = get_filenames(paths, [".yml", ".yaml"])
+    sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
