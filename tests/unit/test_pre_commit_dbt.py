@@ -1,5 +1,8 @@
 from pre_commit_dbt import __version__
+import configparser
 
 
 def test_version():
-    assert __version__ == "0.1.0"
+    config = configparser.ConfigParser()
+    config.read('setup.cfg')
+    assert __version__ == config["metadata"]["version"]
