@@ -7,8 +7,8 @@ from typing import Sequence
 
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
-from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import JsonOpenError
@@ -20,7 +20,7 @@ def check_child_parent_cnt(
     required_cnt: Sequence[Dict[str, Any]],
 ) -> int:
     status_code = 0
-    sqls = get_filenames(paths, [".sql"])
+    sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
