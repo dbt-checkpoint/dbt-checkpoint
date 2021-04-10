@@ -136,6 +136,10 @@ MANIFEST = {
             "name": "src3",
         },
     },
+    "macros": {
+        "macro.without_description": {"description": ""},
+        "macro.with_description": {"description": "test description"},
+    },
     "child_map": {
         "source.test.test1": ["test.test1", "test.test2", "model.with_schema"],
         "source.test.test2": ["test.test1"],
