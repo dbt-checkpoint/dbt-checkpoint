@@ -5,9 +5,9 @@ from pre_commit_dbt.check_macro_has_description import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
-    (["aa/bb/with_description.sql"], True, 0),
-    (["aa/bb/with_description.sql"], False, 1),
-    (["aa/bb/without_description.sql"], True, 1),
+    (["macros/aa/with_description.sql"], True, 0),
+    (["macros/aa/with_description.sql"], False, 1),
+    (["macros/aa/without_description.sql"], True, 1),
 )
 
 

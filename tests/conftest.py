@@ -137,8 +137,14 @@ MANIFEST = {
         },
     },
     "macros": {
-        "macro.without_description": {"description": ""},
-        "macro.with_description": {"description": "test description"},
+        "macro.without_description": {
+            "description": "",
+            "path": "macros/aa/without_description.sql",
+        },
+        "macro.with_description": {
+            "description": "test description",
+            "path": "macros/aa/with_description.sql",
+        },
     },
     "child_map": {
         "source.test.test1": ["test.test1", "test.test2", "model.with_schema"],
