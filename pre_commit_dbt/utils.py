@@ -34,6 +34,14 @@ class Model:
 
 
 @dataclass
+class Macro:
+    macro_id: str
+    macro_name: str
+    filename: str
+    macro: Dict[str, Any]
+
+
+@dataclass
 class Test:
     test_id: str
     test_type: str
@@ -57,6 +65,15 @@ class ModelSchema:
     schema: Dict[str, Any]
     file: Path
     prefix: str = "model"
+
+
+@dataclass
+class MacroSchema:
+    macro_name: str
+    filename: str
+    schema: Dict[str, Any]
+    file: Path
+    prefix: str = "macro"
 
 
 @dataclass
@@ -118,6 +135,18 @@ def get_models(
             yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
 
 
+def get_macros(
+    manifest: Dict[str, Any],
+    filenames: Set[str],
+) -> Generator[Macro, None, None]:
+    macros = manifest.get("macros", {})
+    for key, macro in macros.items():
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "model":
+            yield Macro(key, macro.get("name"), filename, macro)  # pragma: no mutate
+
+
 def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
     if flags:
         return [flag.replace("+", "-") for flag in flags if flag]
@@ -125,14 +154,16 @@ def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
         return []
 
 
-def get_macro_sqls(manifest: Dict[str, Any]) -> Dict[str, Path]:
+def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Path]:
+    sqls = get_filenames(paths, [".sql"])
     macro_paths = [m["path"] for m in manifest.get("macros", {}).values()]
-    return get_filenames(macro_paths, extensions=[".sql"])
+    macro_sqls = get_filenames(macro_paths, extensions=[".sql"])
+    return {k: v for k, v in sqls.items() if k in macro_sqls}
 
 
 def get_model_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
     sqls = get_filenames(paths, [".sql"])
-    macro_sqls = get_macro_sqls(manifest)
+    macro_sqls = get_macro_sqls(paths, manifest)
     return {k: v for k, v in sqls.items() if k not in macro_sqls}
 
 
@@ -150,6 +181,23 @@ def get_model_schemas(
                         file=yml_file,
                         filename=yml_file.stem,
                         schema=model,
+                    )
+
+
+def get_macro_schemas(
+    yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
+) -> Generator[MacroSchema, None, None]:
+    for yml_file in yml_files:
+        schema = yaml.safe_load(yml_file.open())
+        for macro in schema.get("macros", []):
+            if isinstance(macro, dict) and macro.get("name"):
+                macro_name = macro.get("name", "")  # pragma: no mutate
+                if macro_name in filenames or all_schemas:
+                    yield MacroSchema(
+                        macro_name=macro_name,
+                        file=yml_file,
+                        filename=yml_file.stem,
+                        schema=macro,
                     )
 
 

@@ -151,6 +151,13 @@
     entry: check-source-tags
     language: python
     types_or: [yaml]
+-   id: check-macro-has-description
+    name: Check the macro has description
+    description: Ensures that the macro has description in properties file.
+    entry: check-macro-has-description
+    language: python
+    types_or: [yaml, sql]
+    require_serial: true # because we need to process yaml and sql
 -   id: dbt-clean
     name: dbt clean
     description: Deletes all folders specified in the clean-targets.
