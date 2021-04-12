@@ -64,6 +64,9 @@ If this is the case, `pre-commit-dbt` is here to help you!
  * [`check-source-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
  * [`check-source-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
 
+**Macro checks:**
+ * [`check-macro-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
+
 **Modifiers:**
  * [`generate-missing-sources`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
  * [`generate-model-properties-file`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-model-properties-file): Generate model properties file.
