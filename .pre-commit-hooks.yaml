@@ -4,6 +4,13 @@
     entry: check-column-desc-are-same
     language: python
     files: '.*\.(yml|yaml)$'
+-   id: check-macro-has-description
+    name: Check the macro has description
+    description: Ensures that the macro has description in properties file.
+    entry: check-macro-has-description
+    language: python
+    types_or: [yaml, sql]
+    require_serial: true # because we need to process yaml and sql
 -   id: check-model-columns-have-desc
     name: Check the model columns have description
     description: Ensures that the model has columns with descriptions in properties file.
