@@ -8,33 +8,33 @@ from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
-from pre_commit_dbt.utils import get_model_schemas
-from pre_commit_dbt.utils import get_model_sqls
-from pre_commit_dbt.utils import get_models
+from pre_commit_dbt.utils import get_macro_schemas
+from pre_commit_dbt.utils import get_macro_sqls
+from pre_commit_dbt.utils import get_macros
 from pre_commit_dbt.utils import JsonOpenError
 
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_macro_sqls(paths, manifest)
     filenames = set(sqls.keys())
 
-    # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
-    # if user added schema but did not rerun the model
-    schemas = get_model_schemas(list(ymls.values()), filenames)
+    # get manifest macros that pre-commit found as changed
+    macros = get_macros(manifest, filenames)
+    # if user added schema but did not rerun the macro
+    schemas = get_macro_schemas(list(ymls.values()), filenames)
     # convert to sets
-    in_models = {model.filename for model in models if model.node.get("description")}
+    in_macros = {macro.filename for macro in macros if macro.macro.get("description")}
     in_schemas = {
-        schema.model_name for schema in schemas if schema.schema.get("description")
+        schema.macro_name for schema in schemas if schema.schema.get("description")
     }
-    missing = filenames.difference(in_models, in_schemas)
+    missing = filenames.difference(in_macros, in_schemas)
 
-    for model in missing:
+    for macro in missing:
         status_code = 1
         print(
-            f"{sqls.get(model)}: "
+            f"{sqls.get(macro)}: "
             f"does not have defined description or properties file is missing.",
         )
     return status_code

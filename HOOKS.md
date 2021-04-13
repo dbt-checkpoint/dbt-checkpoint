@@ -33,6 +33,9 @@
  * [`check-source-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
  * [`check-source-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
 
+**Macro checks:**
+ * [`check-macro-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
+
 **Modifiers:**
  * [`generate-missing-sources`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
  * [`generate-model-properties-file`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-model-properties-file): Generate model properties file.
@@ -1040,6 +1043,49 @@ Make sure you did not typo in tags.
 - Hook takes all changed `yml`.
 - All sources from yml file are parsed.
 - If the source has different tags than specified, the hook fails.
+
+-----
+### `check-macro-has-description`
+
+Ensures that the macro has a description in the properties file (usually `macro.yml`).
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v0.1.1
+ hooks:
+ - id: check-macro-has-description
+```
+
+#### When to use it
+
+You want to make sure that all macros have a description.
+#### Requirements
+
+| Macro exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Macro exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :x: Not needed since it also validates properties files | :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The macro name is obtained from the `SQL` file name.
+- The manifest is scanned for a macro.
+- Modified `yml` files are scanned for a macro.
+- If any macro (from a manifest or `yml` files) does not have a description, the hook fails.
+- The macro description must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your model and then you delete the description from a properties file, the hook success since the description is still present in `manifest.json`.
 
 -----
 

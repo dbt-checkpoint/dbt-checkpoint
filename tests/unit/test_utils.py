@@ -5,7 +5,9 @@ import pytest
 from pre_commit_dbt.utils import CalledProcessError
 from pre_commit_dbt.utils import cmd_output
 from pre_commit_dbt.utils import get_filenames
+from pre_commit_dbt.utils import get_macro_schemas
 from pre_commit_dbt.utils import get_model_schemas
+from pre_commit_dbt.utils import MacroSchema
 from pre_commit_dbt.utils import Model
 from pre_commit_dbt.utils import ModelSchema
 from pre_commit_dbt.utils import obj_in_deps
@@ -74,3 +76,44 @@ models:
     )
     result = get_model_schemas([file], {"aa"})
     assert list(result) == []
+
+
+def test_get_macro_schemas_malformed_schema(tmpdir):
+    sub = tmpdir.mkdir("sub")
+    file = sub.join("schema.yml")
+    file.write(
+        """
+version: 2
+
+macros:
+    name: aaa
+    description: bbb
+    """
+    )
+
+    result = get_macro_schemas([Path(file)], {"aa"})
+    assert list(result) == []
+
+
+def test_get_macro_schemas_correct_schema(tmpdir):
+    sub = tmpdir.mkdir("sub")
+    file = sub.join("schema.yml")
+    file.write(
+        """
+version: 2
+
+macros:
+    - name: aaa
+      description: bbb
+    """
+    )
+    result = get_macro_schemas([Path(file)], {"aaa"})
+    assert list(result) == [
+        MacroSchema(
+            macro_name="aaa",
+            filename="schema",
+            schema={"name": "aaa", "description": "bbb"},
+            file=Path(file),
+            prefix="macro",
+        )
+    ]

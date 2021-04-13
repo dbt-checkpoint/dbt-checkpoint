@@ -167,6 +167,37 @@ TESTS = (  # type: ignore
         0,
         {},
     ),
+    (
+        """
+with assets as (
+    select * from {{ ref('stg_rse__assets') }}
+),
+
+asset_category as (
+    select * from {{ ref('data_asset_category') }}
+),
+
+final as (
+    select
+        assets.*,
+        case
+            when assets.category = 'cars' then assets.category
+            when assets.category = 'wine-spirits' then assets.category
+            when assets.ticker in (select ticker from asset_category)
+                then asset_category.asset_category
+            else 'unknown'
+        end as asset_category
+
+    from assets
+
+    left join asset_category using (ticker)
+)
+
+select * from final
+    """,
+        0,
+        {},
+    ),
 )
 
 
