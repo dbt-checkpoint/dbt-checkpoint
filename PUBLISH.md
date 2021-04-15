@@ -21,6 +21,12 @@ Run pre-commit:
 pre-commit run --all-files
 ```
 
+Try import:
+
+```
+pre-commit try-repo .
+```
+
 ## 2. Docker
 
 Bump version in Dockerfile - .github/.pre-commit-config-action.yaml
