@@ -41,7 +41,9 @@ def add_space_to_parenthesis(sql: str) -> str:
     return re.sub(REGEX_PARENTHESIS, r" \1 ", sql)
 
 
-def has_table_name(sql: str, filename: str) -> Tuple[int, Set[str]]:
+def has_table_name(
+    sql: str, filename: str, dotless: Optional[bool] = False
+) -> Tuple[int, Set[str]]:
     status_code = 0
     sql_clean = replace_comments(sql)
     sql_clean = add_space_to_parenthesis(sql_clean)
@@ -51,7 +53,11 @@ def has_table_name(sql: str, filename: str) -> Tuple[int, Set[str]]:
 
     for prev, cur, nxt in prev_cur_next_iter(sql_split):
         if prev in ["from", "join"] and cur not in IGNORE_WORDS:
-            tables.add(cur.lower().strip().replace(",", "") if cur else cur)
+            table = cur.lower().strip().replace(",", "") if cur else cur
+            if dotless and "." not in table:
+                pass
+            else:
+                tables.add(table)
         if (
             cur.lower() == "as" and nxt and nxt[0] == "(" and prev not in IGNORE_WORDS
         ):  # pragma: no mutate
@@ -67,12 +73,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_filenames_args(parser)
 
+    parser.add_argument("--ignore-dotless-table", action="store_true")
+
     args = parser.parse_args(argv)
     status_code = 0
 
     for filename in args.filenames:
         sql = Path(filename).read_text()
-        status_code_file, tables = has_table_name(sql, filename)
+        status_code_file, tables = has_table_name(
+            sql, filename, args.ignore_dotless_table
+        )
         if status_code_file:
             result = "\n- ".join(list(tables))  # pragma: no mutate
             print(

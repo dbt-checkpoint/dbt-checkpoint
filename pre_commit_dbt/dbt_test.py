@@ -17,7 +17,7 @@ def prepare_cmd(
     cmd_flags: Optional[Sequence[str]] = None,
     prefix: str = "",
     postfix: str = "",
-    models: Optional[Sequence[str]] = None
+    models: Optional[Sequence[str]] = None,
 ) -> List[str]:
     global_flags = get_flags(global_flags)
     cmd_flags = get_flags(cmd_flags)
@@ -43,7 +43,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         args.cmd_flags,
         args.model_prefix,
         args.model_postfix,
-        args.models
+        args.models,
     )
     return run_dbt_cmd(cmd)
 
