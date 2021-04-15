@@ -1340,7 +1340,8 @@ Run the` dbt compile` command. Generates executable SQL from source model, test,
 `--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
 `--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
-`--model-postfix`: Postfix dbt selector, for selecting children.
+`--model-postfix`: Postfix dbt selector, for selecting children.</br>
+`--models`: pre-commit-dbt is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
 
 #### Example
 ```
@@ -1350,6 +1351,17 @@ repos:
  hooks:
  - id: dbt-compile
    args: ["--model-prefix". "+", "--"]
+```
+
+or
+
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v0.1.1
+ hooks:
+ - id: dbt-compile
+   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1394,7 +1406,8 @@ Run `dbt run` command. Executes compiled SQL model files.
 `--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
 `--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
-`--model-postfix`: Postfix dbt selector, for selecting children.
+`--model-postfix`: Postfix dbt selector, for selecting children.</br>
+`--models`: pre-commit-dbt is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
 
 #### Example
 ```
@@ -1403,7 +1416,18 @@ repos:
  rev: v0.1.1
  hooks:
  - id: dbt-run
-   args: ["--model-prefix". "+", "--"]
+   args: ["--model-prefix", "+", "--"]
+```
+
+or
+
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v0.1.1
+ hooks:
+ - id: dbt-run
+   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1419,6 +1443,7 @@ Run `dbt test` command. Runs tests on data in deployed models.
 `--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
 `--model-postfix`: Postfix dbt selector, for selecting children.
+`--models`: pre-commit-dbt is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
 
 #### Example
 ```
@@ -1428,6 +1453,17 @@ repos:
  hooks:
  - id: dbt-test
    args: ["--model-prefix", "+", "--"]
+```
+
+or
+
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v0.1.1
+ hooks:
+ - id: dbt-test
+   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
