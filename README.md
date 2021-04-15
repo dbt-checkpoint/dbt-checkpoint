@@ -19,8 +19,6 @@
 
 List of [pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects.
 
-**BETA NOTICE: This tool is still BETA and may have some bugs, so please be forgiving!**
-
 ## Goal
 
 *Quick ensure the quality of your `dbt` projects*.
@@ -40,11 +38,13 @@ If this is the case, `pre-commit-dbt` is here to help you!
  * [`check-model-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
  * [`check-model-has-meta-keys`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
  * [`check-model-has-properties-file`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-properties-file): Check the model has properties file.
- * [`check-model-has-tests-by-group`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
  * [`check-model-has-tests-by-name`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-name): Check the model has a number of tests by test name.
  * [`check-model-has-tests-by-type`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
+ * [`check-model-has-tests-by-group`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
  * [`check-model-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
  * [`check-model-parents-and-childs`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
+ * [`check-model-parents-database`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
+ * [`check-model-parents-schema`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
  * [`check-model-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
 
 **Script checks:**
@@ -63,6 +63,7 @@ If this is the case, `pre-commit-dbt` is here to help you!
  * [`check-source-has-tests-by-type`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
  * [`check-source-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
  * [`check-source-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
+ * [`check-source-childs`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
 
 **Macro checks:**
  * [`check-macro-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
@@ -98,7 +99,7 @@ pip install pre-commit
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
-  rev: v0.1.1
+  rev: v1.0.0
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
@@ -119,76 +120,84 @@ repos:
 
 Unfortunately, you cannot natively use `pre-commit-dbt` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
 
-To do that, make a file `.github/workflows/pre-commit.yml`.
+`pre-commit-dbt` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run `dbt-compile` (or `dbt-run`) command.
+To be able to compile dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example).
+
+So you want to e.g. run chach on number of tests:
+
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-model-has-tests
+   args: ["--test-cnt", "2", "--"]
+```
+
+To be able to run this in Github actions you need to modified it to:
+
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: dbt-compile
+   args: ["--cmd-flags", "++profiles-dir", "."]
+ - id: check-model-has-tests
+   args: ["--test-cnt", "2", "--"]
+```
+
+### Create profiles.yml
+
+First step is to create [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile). E.g.
+
+```
+# example profiles.yml file
+jaffle_shop:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: alice
+      password: "{{ env_var('DB_PASSWORD') }}"
+      port: 5432
+      dbname: jaffle_shop
+      schema: dbt_alice
+      threads: 4
+```
+
+and store this file in project root `./profiles.yml`.
+
+
+### Create new workflow
+
+- inside your Github repository create folder `.github/workflows` (unless it already exists).
+- create new file e.g. `main.yml`
+- specify your workflow e.g.:
+
 
 ```
 name: pre-commit
 
 on:
- pull_request:
- push:
- branches: [main]
+  pull_request:
+  push:
+  branches: [main]
 
 jobs:
- pre-commit:
- runs-on: ubuntu-latest
- steps:
- - uses: actions/checkout@v2
- - uses: actions/setup-python@v2
- - uses: pre-commit/action@v2.0.0
+  pre-commit:
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v2
+  - uses: actions/setup-python@v2
+  - id: file_changes
+    uses: trilom/file-changes-action@v1.2.4
+    with:
+      output: ' '
+  - uses: offbi/pre-commit-dbt@v1.0.0
+    env:
+      DB_PASSWORD: ${{ secrets.SuperSecret }}
+    with:
+      args: run --files ${{ steps.file_changes.outputs.files}}
 ```
-
-To run only changed files:
-
-```
-name: pre-commit
-
-on:
- pull_request:
- push:
- branches: [main]
-
-jobs:
- pre-commit:
- runs-on: ubuntu-latest
- steps:
- - uses: actions/checkout@v2
- - uses: actions/setup-python@v2
- - id: file_changes
- uses: trilom/file-changes-action@v1.2.4
- with:
- output: ' '
- - uses: pre-commit/action@v2.0.0
- with:
- extra_args: --files ${{ steps.file_changes.outputs.files}}
-```
-
-To be able to run `modifiers` you **need to use only private repository** and change your `.github/workflows/pre-commit.yml` to:
-
-```
-name: pre-commit
-
-on:
- pull_request:
- push:
- branches: [main]
-
-jobs:
- pre-commit:
- runs-on: ubuntu-latest
- steps:
- - uses: actions/checkout@v2
- with:
- fetch-depth: 0
- - uses: actions/setup-python@v2
- - id: file_changes
- uses: trilom/file-changes-action@v1.2.4
- with:
- output: ' '
- - uses: pre-commit/action@v2.0.0
- with:
- extra_args: --files ${{ steps.file_changes.outputs.files}}
- token: ${{ secrets.GITHUB_TOKEN }}
-```
-
-For more informations about `pre-commit/action` visit [https://github.com/pre-commit/action](https://github.com/pre-commit/action).

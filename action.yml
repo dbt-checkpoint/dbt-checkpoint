@@ -1,0 +1,16 @@
+# action.yaml
+name: 'pre-commit-dbt'
+description: 'List of pre-commit hooks to ensure the quality of your dbt projects.'
+branding:
+  icon: 'anchor'
+  color: 'blue'
+inputs:
+  args:
+    description: 'pre-commit args'
+    required: false
+    default: 'run --all-files'
+runs:
+  using: 'docker'
+  image: 'docker://offbi:pre-commit-dbt:v1.0.0'
+  args:
+    - ${{ inputs.args}}

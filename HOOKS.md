@@ -14,6 +14,8 @@
  * [`check-model-has-tests-by-group`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
  * [`check-model-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
  * [`check-model-parents-and-childs`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
+ * [`check-model-parents-database`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
+ * [`check-model-parents-schema`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
  * [`check-model-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
 
 **Script checks:**
@@ -32,6 +34,7 @@
  * [`check-source-has-tests-by-type`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
  * [`check-source-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
  * [`check-source-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
+ * [`check-source-childs`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
 
 **Macro checks:**
  * [`check-macro-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
@@ -67,7 +70,7 @@ Check the models have the same descriptions for the same column names.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-column-desc-are-same
 ```
@@ -107,7 +110,7 @@ Ensures that the model has columns with descriptions in the properties file (usu
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-columns-have-desc
 ```
@@ -151,7 +154,7 @@ Ensures that all columns in the database are also specified in the properties fi
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-all-columns
 ```
@@ -194,7 +197,7 @@ Ensures that the model has a description in the properties file (usually `schema
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-description
 ```
@@ -239,7 +242,7 @@ Ensures that the model has a list of valid meta keys. (usually `schema.yml`).
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-meta-keys
    args: ['--meta-keys', 'foo', 'bar', "--"]
@@ -286,7 +289,7 @@ Ensures that the model has a properties file (schema file).
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-properties-file
 ```
@@ -329,7 +332,7 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-tests-by-name
    args: ["--tests", "unique=1", "data=1", "--"]
@@ -371,7 +374,7 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-tests-by-type
    args: ["--tests", "schema=1", "data=1", "--"]
@@ -414,7 +417,7 @@ Ensures that the model has a number of tests from a group of tests.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-tests-by-group
    args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
@@ -456,7 +459,7 @@ Ensures that the model has a number of tests.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
@@ -501,7 +504,7 @@ Ensures the model has a specific number (max/min) of parents or/and childs.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-parents-and-childs
    args: ["--min-parent-cnt", "2", "--"]
@@ -530,6 +533,92 @@ You want to find orphaned models (empty file, hard-coded reference, etc.). Or yo
 
 -----
 
+### `check-model-parents-database`
+
+Ensures the parent models or sources are from certain database.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: list of allowed databases.
+`--blacklist`: list of disabled databases.
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-model-parents-database
+   args: ["--blacklist", "SRC", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+You want to be sure that certain models are using only models from specified database(s).
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :white_check_mark: Yes| :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a parent models/sources.
+- If any marent model does not have allowed or has disabled databases, the hook fails.
+
+-----
+
+### `check-model-parents-schema`
+
+Ensures the parent models or sources are from certain schema.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: list of allowed schemas.
+`--blacklist`: list of disabled schemas.
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-model-parents-schema
+   args: ["--blacklist", "stage", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+You want to be sure that certain models are using only models from specified schema(s).
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :white_check_mark: Yes| :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a parent models/sources.
+- If any marent model does not have allowed or has disabled schemas, the hook fails.
+
+-----
+
 ### `check-model-tags`
 
 Ensures that the model has only valid tags from the provided list.
@@ -543,7 +632,7 @@ Ensures that the model has only valid tags from the provided list.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-model-tags
    args: ["--tags", "foo", "bar", "--"]
@@ -584,7 +673,7 @@ Ensures that the script contains only existing sources or macros.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-script-ref-and-source
 ```
@@ -610,7 +699,7 @@ Ensure that the script does not have a semicolon at the end of the file.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-script-semicolon
 ```
@@ -646,11 +735,15 @@ Make sure you did not provide a semicolon at the end of the file.
 
 Ensures that the script is using only source or ref macro to specify the table name.
 
+#### Arguments
+
+`--ignore-dotless-table`: consider all tables without dot in name as CTE
+
 #### Example
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-script-has-no-table-name
 ```
@@ -681,7 +774,7 @@ Ensures that the source has columns with descriptions in the properties file (us
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-columns-have-desc
 ```
@@ -719,7 +812,7 @@ Ensures that all columns in the database are also specified in the properties fi
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-all-columns
 ```
@@ -756,7 +849,7 @@ Ensures that the source table has a description in the properties file (usually 
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-table-has-description
 ```
@@ -788,7 +881,7 @@ Ensures that the source has freshness options in the properties file (usually `s
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-freshness
    args: ["--freshness", "error_after", "warn_after", "--"]
@@ -823,7 +916,7 @@ Ensures that the source has a loader option in the properties file (usually `sch
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-loader
 ```
@@ -859,7 +952,7 @@ Ensures that the source has a list of valid meta keys. (usually `schema.yml`).
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-meta-keys
    args: ['--meta-keys', 'foo', 'bar', "--"]
@@ -898,7 +991,7 @@ Ensures that the source has a number of tests of a certain name (e.g. data, uniq
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-tests-by-name
    args: ["--tests", "unique=1", "data=1", "--"]
@@ -938,7 +1031,7 @@ Ensures that the source has a number of tests of a certain type (data, schema).
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-tests-by-type
    args: ["--tests", "schema=1", "data=1", "--"]
@@ -978,7 +1071,7 @@ Ensures that the source has a number of tests.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-has-tests
    args: ["--tests", "2", "--"]
@@ -1018,7 +1111,7 @@ Ensures that the source has only valid tags from the provided list.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-source-tags
    args: ["--tags", "foo", "bar", "--"]
@@ -1045,6 +1138,49 @@ Make sure you did not typo in tags.
 - If the source has different tags than specified, the hook fails.
 
 -----
+
+### `check-source-childs`
+
+Ensures the source has a specific number (max/min) of childs.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--min-child-cnt`: Minimal number of child models.
+`--max-child-cnt`: Maximal number of child models.
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-source-childs
+   args: ["--min-parent-cnt", "2", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+You want to find orphaned sources without any dependencies. Or you want to make sure that every source is used somewhere.
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :white_check_mark: Yes| :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml`.
+- All sources from yml file are parsed.
+- The manifest is scanned for child models.
+- If any source does not have a number of required childs, the hook fails.
+
+-----
 ### `check-macro-has-description`
 
 Ensures that the macro has a description in the properties file (usually `macro.yml`).
@@ -1057,7 +1193,7 @@ Ensures that the macro has a description in the properties file (usually `macro.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: check-macro-has-description
 ```
@@ -1102,7 +1238,7 @@ If any source is missing this hook tries to create it.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: generate-missing-sources
    args: ["--schema-file", "models/schema.yml", "--"]
@@ -1157,7 +1293,7 @@ Unify column descriptions across all models.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: unify-column-description
    args: ["--ignore", "foo", "--"]
@@ -1203,7 +1339,7 @@ Replace table names with `source` or `ref` macros in the script.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: replace-script-table-names
 ```
@@ -1248,7 +1384,7 @@ Generate model properties file if does not exist.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: generate-model-properties-file
    args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
@@ -1291,7 +1427,7 @@ Remove the semicolon at the end of the script.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: remove-script-semicolon
 ```
@@ -1324,7 +1460,7 @@ Run the` dbt clean` command. Deletes all folders specified in the clean-targets.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-clean
 ```
@@ -1347,7 +1483,7 @@ Run the` dbt compile` command. Generates executable SQL from source model, test,
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-compile
    args: ["--model-prefix". "+", "--"]
@@ -1358,7 +1494,7 @@ or
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-compile
    args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
@@ -1376,7 +1512,7 @@ Run `dbt deps` command. Pulls the most recent version of the dependencies listed
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-deps
 ```
@@ -1390,7 +1526,7 @@ Run `dbt docs generate` command. The command is responsible for generating your 
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-docs-generate
 ```
@@ -1413,7 +1549,7 @@ Run `dbt run` command. Executes compiled SQL model files.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-run
    args: ["--model-prefix", "+", "--"]
@@ -1424,7 +1560,7 @@ or
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-run
    args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
@@ -1449,7 +1585,7 @@ Run `dbt test` command. Runs tests on data in deployed models.
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-test
    args: ["--model-prefix", "+", "--"]
@@ -1460,7 +1596,7 @@ or
 ```
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
- rev: v0.1.1
+ rev: v1.0.0
  hooks:
  - id: dbt-test
    args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
