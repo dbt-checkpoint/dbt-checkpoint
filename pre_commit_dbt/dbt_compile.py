@@ -43,7 +43,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         args.cmd_flags,
         args.model_prefix,
         args.model_postfix,
-        args.models,
+        args.models
     )
     return run_dbt_cmd(cmd)
 
