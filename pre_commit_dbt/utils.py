@@ -363,7 +363,13 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
         default="",
         help="Postfix dbt selector, for selecting children.",
     )
-
+    parser.add_argument(
+        "--models",
+        nargs="*",
+        help="""pre-commit-dbt is by default running changed files.
+        If you need to override that, e.g. in case of Slim CI (state:modified), 
+        you can use this option.""",
+    )
 
 class ParseDict(argparse.Action):  # pragma: no cover
     """Parse a KEY=VALUE string-list into a dictionary"""
