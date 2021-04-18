@@ -11,6 +11,13 @@
     language: python
     types_or: [yaml, sql]
     require_serial: true # because we need to process yaml and sql
+-   id: check-macro-arguments-have-desc
+    name: Check the macro arguments have description
+    description: Ensures that the macro has arguments with descriptions in properties file.
+    entry: check-macro-arguments-have-desc
+    language: python
+    types_or: [yaml, sql]
+    require_serial: true # because we need to process yaml and sql
 -   id: check-model-columns-have-desc
     name: Check the model columns have description
     description: Ensures that the model has columns with descriptions in properties file.
@@ -38,6 +45,7 @@
     language: python
     types_or: [yaml, sql]
     require_serial: true # because we need to process YAML and SQL
+-   id: check-model-has-properties-file
 -   id: check-model-has-properties-file
     name: Check the model has properties file
     description: Ensures that the model has properties file (schema file).
