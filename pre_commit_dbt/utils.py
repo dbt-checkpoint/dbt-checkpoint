@@ -46,7 +46,7 @@ class Test:
     test_id: str
     test_type: str
     test_name: str
-    test_node: Dict[str, Any]
+    node: Dict[str, Any]
 
 
 @dataclass
@@ -55,7 +55,7 @@ class Source:
     source_name: str
     table_name: str
     filename: str
-    source: Dict[str, Any]
+    node: Dict[str, Any]
 
 
 @dataclass
@@ -240,7 +240,7 @@ def get_test(node_id: str, manifest: Dict[str, Any]) -> Test:
         test_id=node_id,
         test_type=test_type,
         test_name=test_name,
-        test_node=test_node,
+        node=test_node,
     )
 
 
@@ -272,7 +272,7 @@ def get_parent_childs(
                             ),  # pragma: no mutate
                             table_name=node.get("name", ""),  # pragma: no mutate
                             filename=node.get("path", ""),  # pragma: no mutate
-                            source=node,
+                            node=node,
                         )
 
 
@@ -362,6 +362,13 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
         type=str,
         default="",
         help="Postfix dbt selector, for selecting children.",
+    )
+    parser.add_argument(
+        "--models",
+        nargs="*",
+        help="""pre-commit-dbt is by default running changed files.
+        If you need to override that, e.g. in case of Slim CI (state:modified),
+        you can use this option.""",
     )
 
 
