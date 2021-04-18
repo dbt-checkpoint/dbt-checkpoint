@@ -29,12 +29,13 @@ def test_dbt_run_error():
 
 
 @pytest.mark.parametrize(
-    "files,global_flags,cmd_flags,expected",
+    "files,global_flags,cmd_flags,models,expected",
     [
-        (["/aa/bb/cc.txt"], None, None, ["dbt", "run", "-m", "cc"]),
+        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "run", "-m", "cc"]),
         (
             ["/aa/bb/cc.txt"],
             ["++debug", "++no-write-json"],
+            None,
             None,
             ["dbt", "--debug", "--no-write-json", "run", "-m", "cc"],
         ),
@@ -42,16 +43,32 @@ def test_dbt_run_error():
             ["/aa/bb/cc.txt"],
             None,
             ["+t", "prod"],
+            None,
             ["dbt", "run", "-m", "cc", "-t", "prod"],
         ),
         (
             ["/aa/bb/cc.txt"],
             "",
             ["+t", "prod"],
+            None,
             ["dbt", "run", "-m", "cc", "-t", "prod"],
+        ),
+        (
+            ["/aa/bb/cc.txt"],
+            None,
+            None,
+            [],
+            ["dbt", "run", "-m", "cc"],
+        ),
+        (
+            ["/aa/bb/cc.txt"],
+            None,
+            None,
+            ["state:modified"],
+            ["dbt", "run", "-m", "state:modified"],
         ),
     ],
 )
-def test_dbt_run_cmd(files, global_flags, cmd_flags, expected):
-    result = prepare_cmd(files, global_flags, cmd_flags)
+def test_dbt_run_cmd(files, global_flags, cmd_flags, models, expected):
+    result = prepare_cmd(files, global_flags, cmd_flags, models=models)
     assert result == expected

@@ -6,12 +6,13 @@ from pre_commit_dbt.check_script_has_no_table_name import prev_cur_next_iter
 from pre_commit_dbt.check_script_has_no_table_name import replace_comments
 
 
-# Input, expected return value, expected output
+# Input, args, expected return value, expected output
 TESTS = (  # type: ignore
     (
         """
     SELECT * FROM AA
     """,
+        [],
         1,
         {"aa"},
     ),
@@ -20,6 +21,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN BB ON AA.A = BB.A
     """,
+        [],
         1,
         {"aa", "bb"},
     ),
@@ -31,6 +33,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN BB ON AA.A = BB.A
     """,
+        [],
         1,
         {"cc", "bb"},
     ),
@@ -42,6 +45,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN BB ON AA.A = BB.A
     """,
+        [],
         1,
         {"bb"},
     ),
@@ -56,6 +60,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN BB ON AA.A = BB.A
     """,
+        [],
         1,
         {"xx"},
     ),
@@ -70,6 +75,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN BB ON AA.A = BB.A
     """,
+        [],
         1,
         {"xx.xx.xx"},
     ),
@@ -81,6 +87,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
+        [],
         0,
         {},
     ),
@@ -93,6 +100,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
+        [],
         0,
         {},
     ),
@@ -107,6 +115,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
+        [],
         0,
         {},
     ),
@@ -120,6 +129,7 @@ TESTS = (  # type: ignore
         select * from source, lateral flatten(line_items)
     )
     """,
+        [],
         0,
         {},
     ),
@@ -136,6 +146,7 @@ TESTS = (  # type: ignore
     )
     SELECT * FROM source
     """,
+        [],
         0,
         {},
     ),
@@ -152,6 +163,7 @@ TESTS = (  # type: ignore
     )
     SELECT * FROM source
     """,
+        [],
         0,
         {},
     ),
@@ -164,6 +176,7 @@ TESTS = (  # type: ignore
     )
     SELECT * FROM source
     """,
+        [],
         0,
         {},
     ),
@@ -195,26 +208,86 @@ final as (
 
 select * from final
     """,
+        [],
         0,
         {},
+    ),
+    (
+        """
+    {% set positions = ['left', 'right', 'center'] %}
+
+with
+{% for p in positions %}
+
+    cte_{{ p }} as (
+        select '{{ p }}' as position
+    ),
+
+{% endfor %}
+
+unioned as (
+    select * from cte_left
+    union all
+    select * from cte_right
+    union all
+    select * from cte_center
+)
+
+select * from unioned
+    """,
+        ["--ignore-dotless-table"],
+        0,
+        {},
+    ),
+    (
+        """
+    {% set positions = ['left', 'right', 'center'] %}
+
+with
+{% for p in positions %}
+
+    cte_{{ p }} as (
+        select '{{ p }}' as position
+    ),
+
+{% endfor %}
+
+unioned as (
+    select * from cte_left
+    union all
+    select * from cte_right
+    union all
+    select * from cte_center
+    union all
+    select * from aa.bb
+)
+
+select * from unioned
+    """,
+        ["--ignore-dotless-table"],
+        1,
+        {"aa.bb"},
     ),
 )
 
 
-@pytest.mark.parametrize(("input_s", "expected_status_code", "output"), TESTS)
-def test_has_table_name(input_s, expected_status_code, output):
-    ret, tables = has_table_name(input_s, "text.sql")
+@pytest.mark.parametrize(("input_s", "args", "expected_status_code", "output"), TESTS)
+def test_has_table_name(input_s, args, expected_status_code, output):
+    dotless = True if "--ignore-dotless-table" in args else False
+    ret, tables = has_table_name(input_s, "text.sql", dotless)
     diff = tables.symmetric_difference(output)
     assert not diff
     assert ret == expected_status_code
 
 
-@pytest.mark.parametrize(("input_s", "expected_status_code", "output"), TESTS)
-def test_has_table_name_integration(input_s, expected_status_code, output, tmpdir):
+@pytest.mark.parametrize(("input_s", "args", "expected_status_code", "output"), TESTS)
+def test_has_table_name_integration(
+    input_s, args, expected_status_code, output, tmpdir
+):
     path = tmpdir.join("file.txt")
     path.write_text(input_s, "utf-8")
 
-    ret = main([str(path)])
+    ret = main([str(path), *args])
 
     assert ret == expected_status_code
 
