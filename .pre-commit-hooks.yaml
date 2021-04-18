@@ -46,7 +46,6 @@
     types_or: [yaml, sql]
     require_serial: true # because we need to process YAML and SQL
 -   id: check-model-has-properties-file
--   id: check-model-has-properties-file
     name: Check the model has properties file
     description: Ensures that the model has properties file (schema file).
     entry: check-model-has-properties-file
