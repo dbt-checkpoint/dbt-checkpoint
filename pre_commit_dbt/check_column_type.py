@@ -50,15 +50,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_filenames_args(parser)
     add_catalog_args(parser)
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
+    parser.add_argument(
         "--pattern",
         type=str,
+        required=True,
         help="Regex pattern to match column names.",
     )
-    group.add_argument(
+    parser.add_argument(
         "--dtype",
         type=str,
+        required=True,
         help="Expected data type for the matching columns.",
     )
 
