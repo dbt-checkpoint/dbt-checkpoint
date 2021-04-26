@@ -4,6 +4,12 @@
     entry: check-column-desc-are-same
     language: python
     files: '.*\.(yml|yaml)$'
+-   id: check-column-type
+    name: Check column type
+    description: Check that if the column is of certain data type, the name matches a regex pattern.
+    entry: check-column-type
+    language: python
+    files: '.*\.(yml|yaml)$'
 -   id: check-macro-has-description
     name: Check the macro has description
     description: Ensures that the macro has description in properties file.
