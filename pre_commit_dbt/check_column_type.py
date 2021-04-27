@@ -8,7 +8,9 @@ from typing import Sequence
 from pre_commit_dbt.utils import add_catalog_args
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import get_filenames
+from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
+from pre_commit_dbt.utils import JsonOpenError
 
 
 def check_column_type(
@@ -20,7 +22,7 @@ def check_column_type(
     models = get_models(catalog, filenames)
 
     for model in models:
-        for col in model.node.get("columns", []):
+        for col in model.node.get("columns", []).values():
             col_name = col.get("name")
             col_type = col.get("type")
 
@@ -35,12 +37,11 @@ def check_column_type(
 
             # Check all files with naming pattern are of type dtype
             elif re.match(pattern, col_name):
-                if dtype != col_type:
-                    status_code = 1
-                    print(
-                        f"{col_name}: column name matches regex pattern {pattern} "
-                        f"and is of type {col_type} instead of {dtype}."
-                    )
+                status_code = 1
+                print(
+                    f"{col_name}: column name matches regex pattern {pattern} "
+                    f"and is of type {col_type} instead of {dtype}."
+                )
 
     return status_code
 
@@ -65,11 +66,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
 
+    try:
+        catalog = get_json(args.catalog)
+    except JsonOpenError as e:
+        print(f"Unable to load catalog file ({e})")
+        return 1
+
     return check_column_type(
         paths=args.filenames,
         pattern=args.pattern,
         dtype=args.dtype,
-        catalog=args.catalog,
+        catalog=catalog,
     )
 
 
