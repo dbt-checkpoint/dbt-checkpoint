@@ -9,7 +9,7 @@
     description: Check that if the column is of certain data type, the name matches a regex pattern.
     entry: check-column-type
     language: python
-    files: '.*\.(yml|yaml)$'
+    types: [sql]
 -   id: check-macro-has-description
     name: Check the macro has description
     description: Ensures that the macro has description in properties file.
