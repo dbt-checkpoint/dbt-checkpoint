@@ -4,10 +4,10 @@
     entry: check-column-desc-are-same
     language: python
     files: '.*\.(yml|yaml)$'
--   id: check-column-type
-    name: Check column type
-    description: Check that if the column is of certain data type, the name matches a regex pattern.
-    entry: check-column-type
+-   id: check-column-name-contract
+    name: Check column name contract
+    description: Check column name abides to contract.
+    entry: check-column-name-contract
     language: python
     types: [sql]
 -   id: check-macro-has-description

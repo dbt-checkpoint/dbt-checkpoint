@@ -13,7 +13,7 @@ from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 
 
-def check_column_type(
+def check_column_name_contract(
     paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
 ) -> int:
     status_code = 0
@@ -72,7 +72,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Unable to load catalog file ({e})")
         return 1
 
-    return check_column_type(
+    return check_column_name_contract(
         paths=args.filenames,
         pattern=args.pattern,
         dtype=args.dtype,

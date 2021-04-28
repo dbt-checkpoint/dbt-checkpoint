@@ -1,6 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_column_type import main
+from pre_commit_dbt.check_column_name_contract import main
 
 
 # Input args, valid manifest, expected return value
@@ -16,7 +16,7 @@ TESTS = (
 @pytest.mark.parametrize(
     ("input_args", "pattern", "dtype", "valid_catalog", "expected_status_code"), TESTS
 )
-def test_check_column_type(
+def test_check_column_name_contract(
     input_args, pattern, dtype, valid_catalog, expected_status_code, catalog_path_str
 ):
     if valid_catalog:
