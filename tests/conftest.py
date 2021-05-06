@@ -151,6 +151,24 @@ MANIFEST = {
             "description": "test description",
             "path": "macros/aa/with_description.sql",
         },
+        "macro.with_argument_description": {
+            "path": "macros/aa/with_argument_description.sql",
+            "arguments": {
+                "test1": {"name": "test1", "description": "test"},
+                "test2": {"name": "test2", "description": "test"},
+            },
+        },
+        "macro.with_some_argument_description": {
+            "path": "macros/aa/with_some_argument_description.sql",
+            "arguments": {
+                "test1": {"name": "test1", "description": "test"},
+                "test2": {"name": "test2"},
+            },
+        },
+        "macro.without_arguments_description": {
+            "path": "macros/aa/without_arguments_description.sql",
+            "arguments": {"test1": {"name": "test1"}, "test2": {"name": "test2"}},
+        },
     },
     "child_map": {
         "source.test.test1": ["test.test1", "test.test2", "model.with_schema"],

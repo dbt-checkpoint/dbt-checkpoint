@@ -38,6 +38,7 @@
 
 **Macro checks:**
  * [`check-macro-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
+ * [`check-macro-arguments-have-desc`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
 
 **Modifiers:**
  * [`generate-missing-sources`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
@@ -1221,7 +1222,50 @@ You want to make sure that all macros have a description.
 
 #### Known limitations
 
-If you `run` your model and then you delete the description from a properties file, the hook success since the description is still present in `manifest.json`.
+If you `run` and then you delete the description from a properties file, the hook success since the description is still present in `manifest.json`.
+
+-----
+### `check-macro-arguments-have-desc`
+
+Ensures that the macro has arguments with descriptions in the properties file (usually `schema.yml`).
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v0.1.1
+ hooks:
+ - id: check-macro-arguments-have-desc
+```
+
+#### When to use it
+
+You want to make sure that all specified arguments in the properties files (usually `schema.yml`) have some description. **This hook does not validate if all macro arguments are also present in a properties file.**
+#### Requirements
+
+| Macro exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Macro exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :x: Not needed since it also validates properties files | :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The macro name is obtained from the `SQL` file name.
+- The manifest is scanned for a macro.
+- Modified `yml` files are scanned for a macro.
+- If any argument in the found macro does not contain a description, the hook fails.
+- The description must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` and then you delete argument description from a properties file, the hook success since the description is still present in `manifest.json`.
 
 -----
 
