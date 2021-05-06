@@ -223,6 +223,34 @@ CATALOG = {
             },
         },
         "model.test.only_model_cols": {"metadata": {}, "columns": {}},
+        "model.test.with_boolean_column_with_prefix": {
+            "metadata": {},
+            "columns": {
+                "is_boolean": {"type": "boolean", "name": "is_boolean"},
+                "COL2": {"type": "TEXT", "name": "COL2"},
+            },
+        },
+        "model.test.with_boolean_column_without_prefix": {
+            "metadata": {},
+            "columns": {
+                "COL1": {"type": "boolean", "name": "COL1"},
+                "COL2": {"type": "TEXT", "name": "COL2"},
+            },
+        },
+        "model.test.without_boolean_column_with_prefix": {
+            "metadata": {},
+            "columns": {
+                "is_not_boolean": {"type": "TEXT", "name": "is_not_boolean"},
+                "COL2": {"type": "TEXT", "name": "COL2"},
+            },
+        },
+        "model.test.without_boolean_column_without_prefix": {
+            "metadata": {},
+            "columns": {
+                "COL1": {"type": "TEXT", "name": "COL1"},
+                "COL2": {"type": "TEXT", "name": "COL2"},
+            },
+        },
     },
     "sources": {
         "source.test.ff.with_catalog_columns": {},

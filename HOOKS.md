@@ -4,6 +4,7 @@
 
 **Model checks:**
  * [`check-column-desc-are-same`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
+ * [`check-column-name-contract`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
  * [`check-model-columns-have-desc`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
  * [`check-model-has-all-columns`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
  * [`check-model-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
@@ -97,6 +98,48 @@ E.g. in two of your models, you have `customer_id` with the description `This is
 - Modified `yml` files are scanned for a model.
 - If any column in the found model has different descriptions than others, the hook fails.
 - The description must be in either the yml file **or** the manifest.
+
+-----
+### `check-column-name-contract`
+
+Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists on a regex pattern and a data type.
+
+#### Arguments
+
+`--pattern`: Regex pattern to match column names.
+`--dtype`: Data type.
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-column-name-contract
+   args: [--patter, "(is|has|do)_.*", --dtype, boolean]
+```
+
+#### When to use it
+
+You want to make sure your columns follow a contract, e.g. all your boolean columns start with the prefixes `is_`, `has_` or `do_`.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :x: Not needed | :white_check_mark: Yes |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The catalog is scanned for a model.
+- If any column in the found model matches the regex pattern and it's data type does not match the contract's data type, the hook fails.
+- If any column in the found model matches the contract's data type and does not match the regex pattern, the hook fails.
+
 
 -----
 ### `check-model-columns-have-desc`
