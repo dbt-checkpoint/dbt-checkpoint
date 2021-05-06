@@ -14,7 +14,7 @@ from pre_commit_dbt.utils import JsonOpenError
 
 
 def check_model_name_contract(
-    paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
+    paths: Sequence[str], pattern: str, catalog: Dict[str, Any]
 ) -> int:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
@@ -22,26 +22,10 @@ def check_model_name_contract(
     models = get_models(catalog, filenames)
 
     for model in models:
-        for col in model.node.get("columns", []).values():
-            col_name = col.get("name")
-            col_type = col.get("type")
-
-            # Check all files of type dtype follow naming pattern
-            if dtype == col_type:
-                if re.match(pattern, col_name) is None:
-                    status_code = 1
-                    print(
-                        f"{col_name}: column is of type {dtype} and "
-                        f"does not match regex pattern {pattern}."
-                    )
-
-            # Check all files with naming pattern are of type dtype
-            elif re.match(pattern, col_name):
-                status_code = 1
-                print(
-                    f"{col_name}: column name matches regex pattern {pattern} "
-                    f"and is of type {col_type} instead of {dtype}."
-                )
+        model_name = model.filename
+        if re.match(pattern, model_name) is None:
+            status_code = 1
+            print(f"{model_name}: model does not match regex pattern {pattern}.")
 
     return status_code
 
@@ -55,13 +39,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--pattern",
         type=str,
         required=True,
-        help="Regex pattern to match column names.",
-    )
-    parser.add_argument(
-        "--dtype",
-        type=str,
-        required=True,
-        help="Expected data type for the matching columns.",
+        help="Regex pattern to match model names.",
     )
 
     args = parser.parse_args(argv)
@@ -75,7 +53,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     return check_model_name_contract(
         paths=args.filenames,
         pattern=args.pattern,
-        dtype=args.dtype,
         catalog=catalog,
     )
 
