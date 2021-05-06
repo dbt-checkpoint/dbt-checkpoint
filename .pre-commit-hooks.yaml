@@ -81,6 +81,12 @@
     entry: check-model-has-tests
     language: python
     types: [sql]
+-   id: check-model-name-contract
+    name: Check model name contract
+    description: Check model name abides to contract.
+    entry: check-model-name-contract
+    language: python
+    types: [sql]
 -   id: check-model-parents-and-childs
     name: Check the model has a parents/childs
     description: Ensures the model has a specific number (max/min) of parents or/and childs.
