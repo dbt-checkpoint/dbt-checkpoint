@@ -2,9 +2,11 @@
 
 :bulb: Click on hook name to view the details.
 
+[`check-column-name-contract`]: https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-column-name-contract
+
 **Model checks:**
  * [`check-column-desc-are-same`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
- * [`check-column-name-contract`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
+ * [`check-column-name-contract`](): Check column name abides to contract.
  * [`check-model-columns-have-desc`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
  * [`check-model-has-all-columns`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
  * [`check-model-has-description`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
@@ -14,6 +16,7 @@
  * [`check-model-has-tests-by-type`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
  * [`check-model-has-tests-by-group`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
  * [`check-model-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
+ * [`check-model-name-contract`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
  * [`check-model-parents-and-childs`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
  * [`check-model-parents-database`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
  * [`check-model-parents-schema`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
@@ -532,6 +535,49 @@ You want to make sure that every model was tested.
 
 -----
 
+### `check-model-name-contract`
+
+Check that model name abides to a contract (similar to [`check-column-name-contract`]()). A contract consists of a regex pattern.
+
+#### Arguments
+
+`--pattern`: Regex pattern to match model names.
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-model-name-contract
+   args: [--pattern, "(base_|stg_).*"]
+   files: models/staging/
+ - id: check-model-name-contract
+   args: [--pattern, "(dim_|fct_).*"]
+   files: models/marts/
+```
+
+#### When to use it
+
+You want to make sure your model names follow a naming convention (e.g., staging models start with a `stg_` prefix).
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :x: Not needed | :white_check_mark: Yes |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The catalog is scanned for a model.
+- If any model does not match the regex pattern, the hook fails.
+
+-----
 ### `check-model-parents-and-childs`
 
 Ensures the model has a specific number (max/min) of parents or/and childs.
