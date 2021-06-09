@@ -22,10 +22,3 @@
 * [Changelog](development/changelog.md)
 * [Contribution guide](development/contribution-guide.md)
 
-## Resources
-
----
-
-* [dbt](https://docs.getdbt.com)
-* [pre-commit](http://pre-commit.com)
-
