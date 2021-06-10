@@ -2,10 +2,11 @@
 
 Unfortunately, you cannot natively use `pre-commit-dbt` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
 
-`pre-commit-dbt` for the most of the hooks needs `manifest.json` \(see requirements section in hook documentation\), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run `dbt-compile` \(or `dbt-run`\) command. To be able to compile dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** \(see example\).
+`pre-commit-dbt` for most of the hooks needs `manifest.json` \(see requirements section in hook documentation\), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that, you need to run `dbt-compile` \(or `dbt-run`\) command. To be able to compile `dbt`, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** \(see example\).
 
-So you want to e.g. run chach on number of tests:
+So you want to e.g. run a check on a number of tests:
 
+{% code title=".pre-commit-config.yaml" %}
 ```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
@@ -14,9 +15,11 @@ repos:
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
 ```
+{% endcode %}
 
-To be able to run this in Github actions you need to modified it to:
+To be able to run this in Github actions you need to modify it to:
 
+{% code title=".pre-commit-config.yaml" %}
 ```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
@@ -27,13 +30,12 @@ repos:
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
 ```
+{% endcode %}
 
 #### Create profiles.yml
 
-First step is to create [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile). E.g.
-
+{% code title="profiles.yml" %}
 ```yaml
-# example profiles.yml file
 jaffle_shop:
   target: dev
   outputs:
@@ -47,16 +49,18 @@ jaffle_shop:
       schema: dbt_alice
       threads: 4
 ```
+{% endcode %}
 
-and store this file in project root `./profiles.yml`.
+Store this file in project root `./profiles.yml`.
 
 #### Create new workflow
 
-* inside your Github repository create folder `.github/workflows` \(unless it already exists\).
+* inside your Github repository create a folder `.github/workflows` \(unless it already exists\).
 * create new file e.g. `main.yml`
 * specify your workflow e.g.:
 
-```text
+{% code title="main.yml" %}
+```yaml
 name: pre-commit
 
 on:
@@ -80,4 +84,5 @@ jobs:
     with:
       args: run --files ${{ steps.file_changes.outputs.files}}
 ```
+{% endcode %}
 

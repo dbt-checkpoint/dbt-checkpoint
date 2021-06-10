@@ -9,16 +9,18 @@ description: >-
 
 ### Install
 
-For detailed installation and usage, instructions see [pre-commit.com](https://pre-commit.com/) site.
+In your command line run:
 
 ```bash
 pip install pre-commit
 ```
 
+For detailed installation and usage, instructions see [pre-commit.com](https://pre-commit.com/) site.
+
 ### Setup
 
-1. Create a file named `.pre-commit-config.yaml` in your `dbt` root folder.
-2. Add hooks you want to run before every commit. E.g.:
+* Create a file named `.pre-commit-config.yaml` in your `dbt` root folder.
+* Add hooks you want to run before every commit. E.g.:
 
 {% code title=".pre-commit-config.yaml" %}
 ```yaml
@@ -41,5 +43,5 @@ repos:
 ```
 {% endcode %}
 
-1. Optionally, run `pre-commit install` to set up the git hook scripts. With this, `pre-commit` will run automatically on `git commit`! You can also manually run `pre-commit run` after you `stage` all files you want to run. Or `pre-commit run --all-files` to run the hooks against all of the files \(not only `staged`\).
+* Optionally, run `pre-commit install` to set up the git hook scripts. With this, `pre-commit` will run automatically on `git commit`! You can also manually run `pre-commit run` after you `stage` all files you want to run. Or `pre-commit run --all-files` to run the hooks against all of the files \(not only `staged`\).
 
