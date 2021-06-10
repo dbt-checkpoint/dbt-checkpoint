@@ -10,13 +10,15 @@ description: Check the models have the same descriptions for the same column nam
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
  hooks:
  - id: check-column-desc-are-same
 ```
+{% endcode %}
 
 **When to use it**
 

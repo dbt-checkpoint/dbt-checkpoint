@@ -1,6 +1,8 @@
-# check-model-has-tests
+---
+description: Ensures that the model has a number of tests.
+---
 
-Ensures that the model has a number of tests.
+# check-model-has-tests
 
 **Arguments**
 
@@ -9,7 +11,8 @@ Ensures that the model has a number of tests.
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -17,9 +20,10 @@ repos:
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
 ```
+{% endcode %}
 
 {% hint style="danger" %}
-Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able
+ Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
 {% endhint %}
 
 **When to use it**

@@ -1,6 +1,8 @@
-# check-model-has-meta-keys
+---
+description: Ensures that the model has a list of valid meta keys.
+---
 
-Ensures that the model has a list of valid meta keys. \(usually `schema.yml`\).
+# check-model-has-meta-keys
 
 **Arguments**
 
@@ -9,7 +11,8 @@ Ensures that the model has a list of valid meta keys. \(usually `schema.yml`\).
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -17,6 +20,7 @@ repos:
  - id: check-model-has-meta-keys
    args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
+{% endcode %}
 
 {% hint style="danger" %}
 Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.

@@ -1,6 +1,8 @@
-# check-model-has-properties-file
+---
+description: Ensures that the model has a properties file (schema file).
+---
 
-Ensures that the model has a properties file \(schema file\).
+# check-model-has-properties-file
 
 **Arguments**
 
@@ -9,13 +11,15 @@ Ensures that the model has a properties file \(schema file\).
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
  hooks:
  - id: check-model-has-properties-file
 ```
+{% endcode %}
 
 **When to use it**
 

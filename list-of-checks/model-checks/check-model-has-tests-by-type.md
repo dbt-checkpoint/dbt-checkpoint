@@ -1,6 +1,8 @@
-# check-model-has-tests-by-type
+---
+description: 'Ensures that the model has a number of tests of a certain type (data, schema).'
+---
 
-Ensures that the model has a number of tests of a certain type \(data, schema\).
+# check-model-has-tests-by-type
 
 **Arguments**
 
@@ -9,7 +11,8 @@ Ensures that the model has a number of tests of a certain type \(data, schema\).
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -17,6 +20,7 @@ repos:
  - id: check-model-has-tests-by-type
    args: ["--tests", "schema=1", "data=1", "--"]
 ```
+{% endcode %}
 
 {% hint style="danger" %}
 Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.

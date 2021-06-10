@@ -1,6 +1,10 @@
-# check-model-has-all-columns
+---
+description: >-
+  Ensures that all columns in the database are also specified in the properties
+  file (usually schema.yml).
+---
 
-Ensures that all columns in the database are also specified in the properties file. \(usually `schema.yml`\).
+# check-model-has-all-columns
 
 **Arguments**
 
@@ -9,13 +13,15 @@ Ensures that all columns in the database are also specified in the properties fi
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
  hooks:
  - id: check-model-has-all-columns
 ```
+{% endcode %}
 
 **When to use it**
 

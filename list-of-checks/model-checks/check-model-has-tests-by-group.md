@@ -1,6 +1,8 @@
-# check-model-has-tests-by-group
+---
+description: Ensures that the model has a number of tests from a group of tests.
+---
 
-Ensures that the model has a number of tests from a group of tests.
+# check-model-has-tests-by-group
 
 **Arguments**
 
@@ -9,7 +11,8 @@ Ensures that the model has a number of tests from a group of tests.
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -17,9 +20,10 @@ repos:
  - id: check-model-has-tests-by-group
    args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"] 
 ```
+{% endcode %}
 
 {% hint style="danger" %}
-Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able
+ Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
 {% endhint %}
 
 **When to use it**

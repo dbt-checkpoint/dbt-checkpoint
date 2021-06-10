@@ -1,6 +1,10 @@
-# check-model-has-tests-by-name
+---
+description: >-
+  Ensures that the model has a number of tests of a certain name (e.g. data,
+  unique).
+---
 
-Ensures that the model has a number of tests of a certain name \(e.g. data, unique\).
+# check-model-has-tests-by-name
 
 **Arguments**
 
@@ -9,7 +13,8 @@ Ensures that the model has a number of tests of a certain name \(e.g. data, uniq
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -17,6 +22,7 @@ repos:
  - id: check-model-has-tests-by-name
    args: ["--tests", "unique=1", "data=1", "--"]
 ```
+{% endcode %}
 
 {% hint style="danger" %}
  Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.

@@ -12,11 +12,11 @@
 ## List of Checks
 
 * [Model checks](list-of-checks/model-checks/README.md)
-  * [check-model-parents-and-childs](list-of-checks/model-checks/check-model-parents-and-childs.md)
   * [check-model-has-tests](list-of-checks/model-checks/check-model-has-tests.md)
   * [check-model-has-tests-by-group](list-of-checks/model-checks/check-model-has-tests-by-group.md)
   * [check-model-has-tests-by-type](list-of-checks/model-checks/check-model-has-tests-by-type.md)
   * [check-model-has-tests-by-name](list-of-checks/model-checks/check-model-has-tests-by-name.md)
+  * [check-model-parents-and-childs](list-of-checks/model-checks/check-model-parents-and-childs.md)
   * [check-model-has-properties-file](list-of-checks/model-checks/check-model-has-properties-file.md)
   * [check-model-has-meta-keys](list-of-checks/model-checks/check-model-has-meta-keys.md)
   * [check-model-has-description](list-of-checks/model-checks/check-model-has-description.md)

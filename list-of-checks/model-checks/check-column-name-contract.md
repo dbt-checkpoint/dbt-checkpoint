@@ -12,7 +12,8 @@ description: >-
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -20,6 +21,7 @@ repos:
  - id: check-column-name-contract
    args: [--patter, "(is|has|do)_.*", --dtype, boolean]
 ```
+{% endcode %}
 
 **When to use it**
 

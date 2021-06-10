@@ -1,6 +1,10 @@
-# check-model-has-description
+---
+description: >-
+  Ensures that the model has a description in the properties file (usually
+  schema.yml).
+---
 
-Ensures that the model has a description in the properties file \(usually `schema.yml`\).
+# check-model-has-description
 
 **Arguments**
 
@@ -8,13 +12,15 @@ Ensures that the model has a description in the properties file \(usually `schem
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
  hooks:
  - id: check-model-has-description
 ```
+{% endcode %}
 
 **When to use it**
 

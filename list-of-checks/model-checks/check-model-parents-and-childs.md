@@ -1,8 +1,8 @@
+---
+description: Ensures the model has a specific number (max/min) of parents or/and childs.
+---
+
 # check-model-parents-and-childs
-
-
-
-Ensures the model has a specific number \(max/min\) of parents or/and childs.
 
 **Arguments**
 
@@ -11,7 +11,8 @@ Ensures the model has a specific number \(max/min\) of parents or/and childs.
 
 **Example**
 
-```text
+{% code title=".pre-commit-config.yaml" %}
+```yaml
 repos:
 - repo: https://github.com/offbi/pre-commit-dbt
  rev: v1.0.0
@@ -19,9 +20,10 @@ repos:
  - id: check-model-parents-and-childs
    args: ["--min-parent-cnt", "2", "--"]
 ```
+{% endcode %}
 
 {% hint style="danger" %}
-Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able
+ Do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
 {% endhint %}
 
 **When to use it**
