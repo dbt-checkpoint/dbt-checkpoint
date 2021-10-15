@@ -116,7 +116,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-column-name-contract
-   args: [--patter, "(is|has|do)_.*", --dtype, boolean]
+   args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
 ```
 
 #### When to use it
@@ -1200,7 +1200,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-source-childs
-   args: ["--min-parent-cnt", "2", "--"]
+   args: ["--min-child-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
