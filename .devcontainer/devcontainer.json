@@ -1,0 +1,20 @@
+
+{
+  "name": "Python 3",
+  "image": "python:3.8.12-slim",
+
+  // Set *default* container specific settings.json values on container create.
+  "settings": { 
+    "python.pythonPath": "/usr/local/bin/python",
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "python.languageServer": "Pylance"
+  },
+
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance"
+  ],
+
+  "postCreateCommand": "pip install -r requirements-dev.txt && pip install -e ."
+}
