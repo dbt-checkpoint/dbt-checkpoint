@@ -10,7 +10,7 @@ from typing import Tuple
 from pre_commit_dbt.utils import add_filenames_args
 
 REGEX_COMMENTS = (
-    r"((\/\*|\{#)([^*]|[\r\n]|([\*#]+([^*\/#]|[\r\n])))*(\*+\/|#\})|[ \t]*--.*)"
+    r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 )
 REGEX_SPLIT = r"[\s]+"
 IGNORE_WORDS = ["", "(", "{{"]  # pragma: no mutate
