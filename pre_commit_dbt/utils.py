@@ -89,11 +89,12 @@ class SourceSchema:
 def cmd_output(
     *cmd: str,
     expected_code: Optional[int] = 0,
+    prj_root: Optional[str] = None,
     **kwargs: Any,
 ) -> str:
     kwargs.setdefault("stdout", subprocess.PIPE)
     kwargs.setdefault("stderr", subprocess.PIPE)
-    proc = subprocess.Popen(cmd, **kwargs)
+    proc = subprocess.Popen(cmd, **kwargs, cwd=prj_root)
     stdout, stderr = proc.communicate()
     stdout = stdout.decode()
     if expected_code is not None and proc.returncode != expected_code:
@@ -291,11 +292,11 @@ def get_filenames(
     return result
 
 
-def run_dbt_cmd(cmd: Sequence[Any]) -> int:
+def run_dbt_cmd(cmd: Sequence[Any], prj_root: Optional[str] = None) -> int:
     status_code = 0
     print(f"Executing cmd: `{' '.join(cmd)}`")
     try:
-        output = cmd_output(*list(filter(None, cmd)), expected_code=0)
+        output = cmd_output(*list(filter(None, cmd)), expected_code=0, prj_root=prj_root)
         print(output)
     except CalledProcessError as e:
         print(e.args[3])  # pragma: no mutate
@@ -369,6 +370,14 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
         help="""pre-commit-dbt is by default running changed files.
         If you need to override that, e.g. in case of Slim CI (state:modified),
         you can use this option.""",
+    )
+
+def add_dbt_cmd_prj_root(parser: argparse.ArgumentParser) -> NoReturn:
+    parser.add_argument(
+        "--prj-root",
+        type=str,
+        default=None,
+        help="Optional relative path to dbt project root directory.",
     )
 
 

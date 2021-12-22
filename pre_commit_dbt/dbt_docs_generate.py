@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Sequence
 
 from pre_commit_dbt.utils import add_dbt_cmd_args
+from pre_commit_dbt.utils import add_dbt_cmd_prj_root
 from pre_commit_dbt.utils import get_flags
 from pre_commit_dbt.utils import run_dbt_cmd
 
@@ -21,11 +22,12 @@ def docs_generate_cmd(
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_dbt_cmd_args(parser)
+    add_dbt_cmd_prj_root(parser)
 
     args = parser.parse_args(argv)
 
     cmd = docs_generate_cmd(args.global_flags, args.cmd_flags)
-    return run_dbt_cmd(cmd)
+    return run_dbt_cmd(cmd, prj_root=args.prj_root)
 
 
 if __name__ == "__main__":
