@@ -24,7 +24,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
 
-    cmd = docs_generate_cmd(args.global_flags, args.cmd_flags)
+    cmd = prepare_cmd(args.global_flags, args.cmd_flags)
     return run_dbt_cmd(cmd)
 
 
