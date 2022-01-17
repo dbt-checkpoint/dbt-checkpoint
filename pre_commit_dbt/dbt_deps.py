@@ -7,6 +7,7 @@ from pre_commit_dbt.utils import add_dbt_cmd_args
 from pre_commit_dbt.utils import get_flags
 from pre_commit_dbt.utils import run_dbt_cmd
 
+
 def prepare_cmd(
     global_flags: Optional[Sequence[str]] = None,
     cmd_flags: Optional[Sequence[str]] = None,
