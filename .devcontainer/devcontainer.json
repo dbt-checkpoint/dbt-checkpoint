@@ -1,7 +1,9 @@
 
 {
   "name": "Python 3",
-  "image": "python:3.8.12-slim",
+	"build": {
+		"dockerfile": "Dockerfile",
+	},
 
   // Set *default* container specific settings.json values on container create.
   "settings": { 
