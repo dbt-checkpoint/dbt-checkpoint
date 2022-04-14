@@ -127,7 +127,7 @@
     description: Ensures the source has a specific number (max/min) of childs.
     entry: check-source-childs
     language: python
-    types: [sql]  
+    types: [sql]
 -   id: check-source-columns-have-desc
     name: Check for source column descriptions
     description: Ensures that the source has columns with descriptions in the properties file.
