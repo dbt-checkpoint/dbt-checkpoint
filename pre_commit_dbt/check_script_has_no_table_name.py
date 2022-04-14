@@ -40,6 +40,9 @@ def replace_comments(sql: str) -> str:
 def add_space_to_parenthesis(sql: str) -> str:
     return re.sub(REGEX_PARENTHESIS, r" \1 ", sql)
 
+def add_space_to_source_ref(sql: str) -> str:
+    sql = sql.replace("}}", " }}")
+    return sql.replace("{{", "{{ ")
 
 def has_table_name(
     sql: str, filename: str, dotless: Optional[bool] = False
@@ -47,6 +50,7 @@ def has_table_name(
     status_code = 0
     sql_clean = replace_comments(sql)
     sql_clean = add_space_to_parenthesis(sql_clean)
+    sql_clean = add_space_to_source_ref(sql_clean)
     sql_split = re.split(REGEX_SPLIT, sql_clean)
     tables = set()
     cte = set()
