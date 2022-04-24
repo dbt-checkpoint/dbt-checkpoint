@@ -126,9 +126,14 @@ def get_json(json_filename: str) -> Dict[str, Any]:
 def get_models(
     manifest: Dict[str, Any],
     filenames: Set[str],
+    include_ephemeral: bool = False,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():
+        # Ephemeral models break many tests and should be wholly excluded, someone can make an
+        # argument for their inclusion on a case by case basis in which case we would pass `include_ephemeral`
+        if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
+            continue
         split_key = key.split(".")
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "model":
