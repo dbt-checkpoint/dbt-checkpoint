@@ -5,6 +5,9 @@ from pre_commit_dbt.check_model_has_meta_keys import main
 # Input args, valid manifest, expected return value
 TESTS = (
     (["aa/bb/with_meta.sql", "--meta-keys", "foo", "bar"], True, 0),
+    (["aa/bb/with_meta.sql", "--meta-keys", "foo", "--allow-extra-keys"], True, 0),
+    (["aa/bb/with_meta.sql", "--meta-keys", "xyz", "--allow-extra-keys"], True, 1),
+    (["aa/bb/with_meta.sql", "--meta-keys", "foo"], True, 1),
     (["aa/bb/with_meta.sql", "--meta-keys", "foo", "bar"], False, 1),
     (["aa/bb/without_meta.sql", "--meta-keys", "foo", "bar"], True, 1),
 )

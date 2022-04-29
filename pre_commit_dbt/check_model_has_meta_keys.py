@@ -1,6 +1,7 @@
 import argparse
 from typing import Any
 from typing import Dict
+from typing import Iterable
 from typing import Optional
 from typing import Sequence
 
@@ -14,8 +15,23 @@ from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 
 
+def validate_keys(
+    actual: Iterable[str], expected: Iterable[str], allow_extra_keys: bool
+) -> bool:
+    actual = set(actual)
+    expected = set(expected)
+
+    if allow_extra_keys:
+        return expected.issubset(actual)
+    else:
+        return expected == actual
+
+
 def has_meta_key(
-    paths: Sequence[str], manifest: Dict[str, Any], meta_keys: Sequence[str]
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    meta_keys: Sequence[str],
+    allow_extra_keys: bool,
 ) -> int:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
@@ -29,12 +45,14 @@ def has_meta_key(
     in_models = {
         model.filename
         for model in models
-        if set(model.node.get("meta", {}).keys()) == set(meta_keys)
+        if validate_keys(model.node.get("meta", {}).keys(), meta_keys, allow_extra_keys)
     }
     in_schemas = {
         schema.model_name
         for schema in schemas
-        if set(schema.schema.get("meta", {}).keys()) == set(meta_keys)
+        if validate_keys(
+            schema.schema.get("meta", {}).keys(), meta_keys, allow_extra_keys
+        )
     }
     missing = filenames.difference(in_models, in_schemas)
 
@@ -60,6 +78,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="List of required key in meta part of model.",
     )
 
+    parser.add_argument(
+        "--allow-extra-keys",
+        action="store_true",
+        required=False,
+        help="Whether extra keys are allowed.",
+    )
+
     args = parser.parse_args(argv)
 
     try:
@@ -69,7 +94,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     return has_meta_key(
-        paths=args.filenames, manifest=manifest, meta_keys=args.meta_keys
+        paths=args.filenames,
+        manifest=manifest,
+        meta_keys=args.meta_keys,
+        allow_extra_keys=args.allow_extra_keys,
     )
 
 
