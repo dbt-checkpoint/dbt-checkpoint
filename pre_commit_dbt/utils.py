@@ -140,6 +140,21 @@ def get_models(
             yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
 
 
+def get_ephemeral(
+    manifest: Dict[str, Any],
+) -> Generator[Model, None, None]:
+    output = []
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():
+        if not node.get("config", {}).get("materialized") == "ephemeral":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if split_key[0] == "model":
+            output.append(filename)
+    return filename
+
+
 def get_macros(
     manifest: Dict[str, Any],
     filenames: Set[str],
