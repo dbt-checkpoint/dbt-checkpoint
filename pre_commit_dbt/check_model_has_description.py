@@ -22,7 +22,6 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
-    ephemeral = get_ephemeral(manifest)
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     # convert to sets
@@ -33,8 +32,6 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
     missing = filenames.difference(in_models, in_schemas)
 
     for model in missing:
-        if model in ephemeral:
-            continue
         status_code = 1
         print(
             f"{sqls.get(model)}: "

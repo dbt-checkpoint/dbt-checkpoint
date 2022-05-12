@@ -142,7 +142,7 @@ def get_models(
 
 def get_ephemeral(
     manifest: Dict[str, Any],
-) -> Generator[Model, None, None]:
+) -> List[str]:
     output = []
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():
@@ -152,7 +152,7 @@ def get_ephemeral(
         filename = split_key[-1]
         if split_key[0] == "model":
             output.append(filename)
-    return filename
+    return output
 
 
 def get_macros(
@@ -182,9 +182,10 @@ def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, 
 
 
 def get_model_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
+    ephemeral = get_ephemeral(manifest)
     sqls = get_filenames(paths, [".sql"])
     macro_sqls = get_macro_sqls(paths, manifest)
-    return {k: v for k, v in sqls.items() if k not in macro_sqls}
+    return {k: v for k, v in sqls.items() if k not in macro_sqls and k not in ephemeral}
 
 
 def get_model_schemas(
