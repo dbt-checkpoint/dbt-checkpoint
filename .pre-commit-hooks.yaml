@@ -87,6 +87,11 @@
     entry: check-model-name-contract
     language: python
     types: [sql]
+-   id: check-model-parents-database
+    name: Check parent models or sources are from certain database
+    entry: check-model-parents-database
+    language: python
+    types_or: [yaml]
 -   id: check-model-parents-schema
     name: Check parent models or sources are from certain schema
     entry: check-model-parents-schema
