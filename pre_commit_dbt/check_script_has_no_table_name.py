@@ -56,8 +56,9 @@ def has_table_name(
             table = cur.lower().strip().replace(",", "") if cur else cur
             if dotless and "." not in table:
                 pass
-            if require2dots and table.count(".")<2:
-                pass
+            elif require2dots:
+                if table.count(".") ==2:
+                    tables.add(table)
             else:
                 tables.add(table)
         if (
