@@ -274,7 +274,8 @@ select * from unioned
 @pytest.mark.parametrize(("input_s", "args", "expected_status_code", "output"), TESTS)
 def test_has_table_name(input_s, args, expected_status_code, output):
     dotless = True if "--ignore-dotless-table" in args else False
-    ret, tables = has_table_name(input_s, "text.sql", dotless)
+    require2dots = True if "--require-two-dots-table" in args else False
+    ret, tables = has_table_name(input_s, "text.sql", dotless, require2dots)
     diff = tables.symmetric_difference(output)
     assert not diff
     assert ret == expected_status_code
