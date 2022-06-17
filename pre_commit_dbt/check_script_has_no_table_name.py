@@ -54,11 +54,10 @@ def has_table_name(
     for prev, cur, nxt in prev_cur_next_iter(sql_split):
         if prev in ["from", "join"] and cur not in IGNORE_WORDS:
             table = cur.lower().strip().replace(",", "") if cur else cur
-            if dotless and "." not in table:
+            if (dotless and "." not in table) or (require2dots and table.count(".") == 1):
                 pass
-            elif require2dots:
-                if table.count(".") ==2:
-                    tables.add(table)
+            elif require2dots and table.count(".") ==2:
+                tables.add(table)
             else:
                 tables.add(table)
         if (
