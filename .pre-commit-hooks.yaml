@@ -260,3 +260,9 @@
     entry: remove-script-semicolon
     language: python
     types: [sql]
+-   id: check-exposure-has-owner
+    name: Check exposure has  owner
+    description: Checks that the exposure has an owner
+    entry: check-exposure-has-owner
+    language: python
+    types: [yaml]
