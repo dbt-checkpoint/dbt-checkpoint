@@ -304,7 +304,6 @@ def get_filenames(
     for path in paths:
         file = Path(path)
         filename = file.stem
-        print(extensions)
         if extensions and file.suffix not in extensions:
             pass
         else:
