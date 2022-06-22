@@ -85,6 +85,15 @@ class SourceSchema:
     table_schema: Dict[str, Any]
     prefix: str = "source"
 
+@dataclass
+class ExposureSchema:
+    exposure_name: str
+    exposure_type: str
+    owner: Dict[str, Any]
+    models: List[str]
+    filename: str
+    prefix: str = "exposure"
+
 
 def cmd_output(
     *cmd: str,
@@ -218,7 +227,21 @@ def get_source_schemas(
                     source_schema=source,
                     table_schema=table,
                 )
-
+def get_exposures(yml_files: Sequence[Path]) -> Generator[ExposureSchema, None, None]:
+    for yml_file in yml_files:
+        schema = yaml.safe_load(yml_file.open())
+        for exposure in schema.get("exposures", []):
+            exposure_name = exposure.get("name")
+            exposure_type = exposure.get("type")
+            exposure_owner = exposure.get("owner")
+            exposure_models = exposure.get("depends_on")
+            yield ExposureSchema(
+                    exposure_name=exposure_name,
+                    filename=yml_file.stem,
+                    exposure_type=exposure_type,
+                    owner=exposure_owner,
+                    models=exposure_models,
+                )
 
 def obj_in_deps(obj: Any, dep_name: str) -> bool:
     dep_split = set(dep_name.split("."))
@@ -284,6 +307,7 @@ def get_filenames(
     for path in paths:
         file = Path(path)
         filename = file.stem
+        print(extensions)
         if extensions and file.suffix not in extensions:
             pass
         else:
