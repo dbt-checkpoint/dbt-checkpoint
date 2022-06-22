@@ -8,23 +8,15 @@ import logging
 
 def has_models(paths: Sequence[str]):
     status_code = 0
-    print(paths)
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    print(ymls)
     exposures = get_exposures(list(ymls.values()))
-    missing_model=[]
-    for exposure in exposures:
-        print(exposure)
-        if exposure.models is None:
-            missing_model.append(exposure.exposure_name)
-    print(f"missing_model: {missing_model}")
+    missing_model = { exposure.exposure_name for exposure in exposures if exposure.models is None}
     for exposure in missing_model:
         status_code = 1
         print(
             f"{exposure}: "
             f"does not have any model",
         )
-    print(f"status_code: {status_code}")
     return status_code
 
 
