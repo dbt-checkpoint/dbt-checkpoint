@@ -433,7 +433,7 @@ def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None
     for key, node in nodes.items():
         if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
             continue    
-        if node_path_in_paths(node["path"]):
+        if node_path_in_paths(node["path"], paths):
             double_slash_index = node["patch_path"].find("//")
             root_folder = node["root_path"].split('/')[-1]
             clean_patch_path = node["patch_path"][double_slash_index+2:]
