@@ -25,9 +25,9 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
-
-    print(models)
-
+    for model in models:
+        print(model)
+        
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     # convert to sets
