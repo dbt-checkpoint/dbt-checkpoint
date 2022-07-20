@@ -422,6 +422,8 @@ def find_file_with_suffix(filename, suffix, root_path):
         return Path(file)
 
 def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None):
+    for path in paths:
+        print(path)
     print(paths)
     print(manifest)
     # For each path
