@@ -1,4 +1,5 @@
 import argparse
+import glob
 import json
 import subprocess
 from dataclasses import dataclass
@@ -415,3 +416,21 @@ class ParseDict(argparse.Action):  # pragma: no cover
                 result[key] = value
 
         setattr(namespace, self.dest, result)
+
+def find_file_with_suffix(filename, suffix, root_path):
+    for file in glob.glob(f"{str(root_path)}/**/{filename + '.' + suffix}"):
+        return Path(file)
+
+def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None):
+    print(paths)
+    print(manifest)
+    # For each path
+    for path in paths:
+        file = Path(path)
+        filename = file.stem
+        # If SQL find it's property YML
+            # If exists append
+        # If YML find it's SQL
+            # If exists append
+    
+    return paths
