@@ -425,7 +425,7 @@ def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None
     for path in paths:
         print(path)
     print(paths)
-    print(manifest)
+    #print(manifest)
     # For each path
     for path in paths:
         file = Path(path)
