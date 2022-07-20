@@ -440,4 +440,5 @@ def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None
 
             paths.append(f"{root_folder}/{clean_patch_path}")
 
+    print(paths)
     return paths
