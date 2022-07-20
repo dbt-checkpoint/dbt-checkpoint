@@ -14,7 +14,6 @@ from typing import Sequence
 from typing import Set
 from typing import Text
 from typing import Union
-from traitlets import Bool
 
 import yaml
 
@@ -428,7 +427,7 @@ def node_path_in_paths(node_path, paths):
             return True
     return False
 
-def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None, include_ephemeral: Bool = False):    
+def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None, include_ephemeral: bool = False):    
     nodes = manifest.get("nodes", {})
 
     for key, node in nodes.items():
