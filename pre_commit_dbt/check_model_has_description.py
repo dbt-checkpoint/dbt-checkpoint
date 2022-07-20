@@ -15,7 +15,9 @@ from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import get_missing_file_paths
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
-    paths= get_missing_file_paths(paths, manifest)
+    print(paths)
+    print(manifest)
+    #paths= get_missing_file_paths(paths, manifest)
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest)
