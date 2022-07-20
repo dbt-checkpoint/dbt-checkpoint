@@ -14,6 +14,7 @@ from typing import Sequence
 from typing import Set
 from typing import Text
 from typing import Union
+from traitlets import Bool
 
 import yaml
 
@@ -421,18 +422,23 @@ def find_file_with_suffix(filename, suffix, root_path):
     for file in glob.glob(f"{str(root_path)}/**/{filename + '.' + suffix}"):
         return Path(file)
 
-def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None):
+def node_path_in_paths(node_path, paths):
     for path in paths:
-        print(path)
-    print(paths)
-    #print(manifest)
-    # For each path
-    for path in paths:
-        file = Path(path)
-        filename = file.stem
-        # If SQL find it's property YML
-            # If exists append
-        # If YML find it's SQL
-            # If exists append
-    
+        if node_path in path:
+            return True
+    return False
+
+def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None, include_ephemeral: Bool = False):    
+    nodes = manifest.get("nodes", {})
+
+    for key, node in nodes.items():
+        if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
+            continue    
+        if node_path_in_paths(node["path"]):
+            double_slash_index = node["patch_path"].find("//")
+            root_folder = node["root_path"].split('/')[-1]
+            clean_patch_path = node["patch_path"][double_slash_index+2:]
+
+            paths.append(f"{root_folder}/{clean_patch_path}")
+
     return paths
