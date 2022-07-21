@@ -427,18 +427,22 @@ def node_path_in_paths(node_path, paths):
             return True
     return False
 
-def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None, include_ephemeral: bool = False):    
+def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None, include_ephemeral: bool = False):
     nodes = manifest.get("nodes", {})
 
     for key, node in nodes.items():
         if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
-            continue    
+            continue
+
+        # YML path discovery based on .SQL paths
         if node_path_in_paths(node["path"], paths):
             double_slash_index = node["patch_path"].find("//")
             root_folder = node["root_path"].split('/')[-1]
             clean_patch_path = node["patch_path"][double_slash_index+2:]
 
             paths.append(f"{root_folder}/{clean_patch_path}")
+
+        
 
     print(paths)
     return paths
