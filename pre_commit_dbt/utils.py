@@ -133,7 +133,10 @@ def get_models(
     for key, node in nodes.items():
         # Ephemeral models break many tests and should be wholly excluded, someone can make an
         # argument for their inclusion on a case by case basis in which case we would pass `include_ephemeral`
-        if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
             continue
         split_key = key.split(".")
         filename = split_key[-1]
@@ -417,32 +420,83 @@ class ParseDict(argparse.Action):  # pragma: no cover
 
         setattr(namespace, self.dest, result)
 
+
 def find_file_with_suffix(filename, suffix, root_path):
     for file in glob.glob(f"{str(root_path)}/**/{filename + '.' + suffix}"):
         return Path(file)
 
-def node_path_in_paths(node_path, paths):
-    for path in paths:
-        if node_path in path:
-            return True
-    return False
 
-def get_missing_file_paths(paths: Sequence[str], manifest: Dict[str, Any] = None, include_ephemeral: bool = False):
+def clean_yml_path(yml_path):
+    double_slash_index = yml_path.find("//")
+    return yml_path[double_slash_index + 2 :]
+
+
+def get_related_sqls(
+    yml_path,
+    paths: Sequence[str],
+    manifest: Dict[str, Any] = None,
+    include_ephemeral: bool = False,
+):
+    yml_split_path = yml_path.split("/")
+    root_path = yml_split_path.pop(0)
+    dbt_patch_path = "/".join(yml_split_path)
+
     nodes = manifest.get("nodes", {})
 
     for key, node in nodes.items():
-        if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
             continue
 
-        # YML path discovery based on .SQL paths
-        if node_path_in_paths(node["path"], paths):
-            double_slash_index = node["patch_path"].find("//")
-            root_folder = node["root_path"].split('/')[-1]
-            clean_patch_path = node["patch_path"][double_slash_index+2:]
+        if node["patch_path"] and dbt_patch_path in node["patch_path"]:
+            if ".sql" in node["original_file_path"]:
+                target_sql_name = f"{root_path}/{node['original_file_path']}"
+                if target_sql_name not in paths:
+                    paths.append(target_sql_name)
 
-            paths.append(f"{root_folder}/{clean_patch_path}")
+    return paths
 
-        
 
-    print(paths)
+def get_related_yml(
+    sql_path,
+    paths: Sequence[str],
+    manifest: Dict[str, Any] = None,
+    include_ephemeral: bool = False,
+):
+
+    nodes = manifest.get("nodes", {})
+
+    for key, node in nodes.items():
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
+            continue
+
+        if node["path"] and node["path"] in sql_path:
+            root_folder = node["root_path"].split("/")[-1]
+            clean_patch_path = clean_yml_path(node["patch_path"])
+            target_yml_path = f"{root_folder}/{clean_patch_path}"
+            if target_yml_path not in paths:
+                paths.append(target_yml_path)
+
+    return paths
+
+
+def get_missing_file_paths(
+    paths: Sequence[str],
+    manifest: Dict[str, Any] = None,
+    include_ephemeral: bool = False,
+):
+    for path in paths:
+        suffix = Path(path).suffix.lower()
+        if suffix == ".sql":
+            paths = get_related_yml(path, paths, manifest, include_ephemeral)
+        elif suffix == ".yml":
+            paths = get_related_sqls(path, paths, manifest, include_ephemeral)
+        else:
+            continue
+
     return paths
