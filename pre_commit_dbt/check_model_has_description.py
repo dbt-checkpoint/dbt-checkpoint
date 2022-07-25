@@ -14,6 +14,7 @@ from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import get_missing_file_paths
 
+
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
     print(paths)
     paths = get_missing_file_paths(paths, manifest)
