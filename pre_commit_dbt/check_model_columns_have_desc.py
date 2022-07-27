@@ -17,11 +17,14 @@ from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import Model
 from pre_commit_dbt.utils import ModelSchema
+from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def check_column_desc(
     paths: Sequence[str], manifest: Dict[str, Any]
 ) -> Tuple[int, Dict[str, Any]]:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest)

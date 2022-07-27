@@ -10,11 +10,14 @@ from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
+from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def validate_tags(
     paths: Sequence[str], manifest: Dict[str, Any], tags: Sequence[str]
 ) -> int:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())

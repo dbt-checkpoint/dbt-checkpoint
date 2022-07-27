@@ -16,9 +16,7 @@ from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
-    print(paths)
     paths = get_missing_file_paths(paths, manifest)
-    print(paths)
 
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])

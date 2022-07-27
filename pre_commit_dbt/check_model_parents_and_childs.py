@@ -12,6 +12,7 @@ from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import JsonOpenError
+from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def check_child_parent_cnt(
@@ -19,6 +20,8 @@ def check_child_parent_cnt(
     manifest: Dict[str, Any],
     required_cnt: Sequence[Dict[str, Any]],
 ) -> int:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
