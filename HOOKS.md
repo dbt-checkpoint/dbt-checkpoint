@@ -37,6 +37,7 @@
  * [`check-source-has-tests-by-name`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests-by-name): Check the source has a number of tests by test name.
  * [`check-source-has-tests-by-type`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
  * [`check-source-has-tests`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
+ * [`check-source-has-tests-by-group`](https://github.com/cityblock/pre-commit-dbt/blob/main/HOOKS.md#check-source-has-tests-by-group): Check the source has a number of tests from a group of tests.
  * [`check-source-tags`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
  * [`check-source-childs`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
 
@@ -1186,6 +1187,47 @@ You want to make sure that every source was tested.
 - Hook takes all changed `yml`.
 - All sources from yml file are parsed.
 - If the source does not have the required test count, the hook fails.
+
+-----
+
+### `check-source-has-tests-by-group`
+
+Ensures that the source has a number of tests from a group of tests.
+
+#### Arguments
+
+`--tests`: list of test names.
+`--test_cnt`: number of tests required across test group.
+
+#### Example
+```
+repos:
+- repo: https://github.com/cityblock/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-source-has-tests-by-group
+   args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+You want to make sure that every source has one (or more) of a group of eligible tests (e.g. a set of unique tests).
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :white_check_mark: Yes| :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The source name is obtained from the `SQL` file name.
+- If any source does not have the number of required tests, the hook fails.
 
 -----
 
