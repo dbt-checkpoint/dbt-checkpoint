@@ -434,14 +434,14 @@ def clean_yml_path(yml_path):
 def get_related_sqls(
     yml_path,
     paths: Sequence[str],
-    manifest: Dict[str, Any] = None,
+    nodes: Dict[str, Any],
     include_ephemeral: bool = False,
 ):
-    yml_split_path = yml_path.split("/")
-    root_path = yml_split_path.pop(0)
-    dbt_patch_path = "/".join(yml_split_path)
+    yml_path = Path(yml_path)
+    yml_path_parts = yml_path.parts
 
-    nodes = manifest.get("nodes", {})
+    root_path = yml_path_parts[0]
+    dbt_patch_path = "/".join(yml_path_parts)
 
     for key, node in nodes.items():
         if (
@@ -462,12 +462,9 @@ def get_related_sqls(
 def get_related_yml(
     sql_path,
     paths: Sequence[str],
-    manifest: Dict[str, Any] = None,
+    nodes: Dict[str, Any],
     include_ephemeral: bool = False,
 ):
-
-    nodes = manifest.get("nodes", {})
-
     for key, node in nodes.items():
         if (
             not include_ephemeral
@@ -476,8 +473,13 @@ def get_related_yml(
             continue
 
         if node["path"] and node["path"] in sql_path:
-            root_folder = node["root_path"].split("/")[-1]
-            clean_patch_path = clean_yml_path(node["patch_path"])
+            root_folder = Path(node["root_path"]).name
+
+            # Original patch_path has 'project\\path\to\yml.yml'
+            patch_path = Path(node["patch_path"])
+            # Remove the project_name from patch_path
+            clean_patch_path = patch_path.relative_to(*patch_path.parts[:2])
+
             target_yml_path = f"{root_folder}/{clean_patch_path}"
             if target_yml_path not in paths:
                 paths.append(target_yml_path)
@@ -490,13 +492,36 @@ def get_missing_file_paths(
     manifest: Dict[str, Any] = None,
     include_ephemeral: bool = False,
 ):
-    for path in paths:
-        suffix = Path(path).suffix.lower()
-        if suffix == ".sql":
-            paths = get_related_yml(path, paths, manifest, include_ephemeral)
-        elif suffix == ".yml":
-            paths = get_related_sqls(path, paths, manifest, include_ephemeral)
-        else:
-            continue
+    nodes = manifest.get("nodes", {})
+
+    if nodes:
+        for path in paths:
+            suffix = Path(path).suffix.lower()
+            if suffix == ".sql":
+                paths = get_related_yml(path, paths, nodes, include_ephemeral)
+            elif suffix == ".yml" or suffix == ".yaml":
+                paths = get_related_sqls(path, paths, nodes, include_ephemeral)
+            else:
+                continue
+
+    return paths
+
+
+def get_missing_file_paths(
+    paths: Sequence[str],
+    manifest: Dict[str, Any] = None,
+    include_ephemeral: bool = False,
+):
+    nodes = manifest.get("nodes", {})
+
+    if nodes:
+        for path in paths:
+            suffix = Path(path).suffix.lower()
+            if suffix == ".sql":
+                paths = get_related_yml(path, paths, nodes, include_ephemeral)
+            elif suffix == ".yml" or suffix == ".yaml":
+                paths = get_related_sqls(path, paths, nodes, include_ephemeral)
+            else:
+                continue
 
     return paths
