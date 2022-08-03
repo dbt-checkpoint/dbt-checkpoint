@@ -1,4 +1,5 @@
 import argparse
+import glob
 import json
 import subprocess
 from dataclasses import dataclass
@@ -132,7 +133,10 @@ def get_models(
     for key, node in nodes.items():
         # Ephemeral models break many tests and should be wholly excluded, someone can make an
         # argument for their inclusion on a case by case basis in which case we would pass `include_ephemeral`
-        if not include_ephemeral and node.get("config", {}).get("materialized") == "ephemeral":
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
             continue
         split_key = key.split(".")
         filename = split_key[-1]
@@ -415,3 +419,75 @@ class ParseDict(argparse.Action):  # pragma: no cover
                 result[key] = value
 
         setattr(namespace, self.dest, result)
+
+
+def add_related_sqls(
+    yml_path,
+    nodes: Dict[str, Any],
+    paths_with_missing: List[str],
+    include_ephemeral: bool = False,
+):
+    yml_path_class = Path(yml_path)
+    yml_path_parts = yml_path_class.parts
+
+    root_path = yml_path_parts[0]
+    dbt_patch_path = "/".join(yml_path_parts)
+
+    for key, node in nodes.items():
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
+            continue
+        if "patch_path" in node and dbt_patch_path in node["patch_path"]:
+            if ".sql" in node["original_file_path"]:
+                target_sql_name = f"{root_path}/{node['original_file_path']}"
+                if target_sql_name not in paths_with_missing:
+                    paths_with_missing.append(target_sql_name)
+
+
+def add_related_ymls(
+    sql_path,
+    nodes: Dict[str, Any],
+    paths_with_missing: List[str],
+    include_ephemeral: bool = False,
+):
+    for key, node in nodes.items():
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
+            continue
+
+        if "path" in node and node["path"] in sql_path:
+            root_folder = Path(node["root_path"]).name
+
+            # Original patch_path has 'project\\path\to\yml.yml'
+            patch_path = Path(node["patch_path"])
+            # Remove the project_name from patch_path
+            clean_patch_path = patch_path.relative_to(*patch_path.parts[:2])
+
+            target_yml_path = f"{root_folder}/{clean_patch_path}"
+            if target_yml_path not in paths_with_missing:
+                paths_with_missing.append(target_yml_path)
+
+
+def get_missing_file_paths(
+    paths: Sequence[str],
+    manifest: Dict[str, Any] = None,
+    include_ephemeral: bool = False,
+):
+    nodes = manifest.get("nodes", {})
+    paths_with_missing = list(paths)
+
+    if nodes:
+        for path in paths:
+            suffix = Path(path).suffix.lower()
+            if suffix == ".sql":
+                add_related_ymls(path, nodes, paths_with_missing, include_ephemeral)
+            elif suffix == ".yml" or suffix == ".yaml":
+                add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
+            else:
+                continue
+
+    return paths_with_missing

@@ -11,11 +11,14 @@ from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
+from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def check_column_name_contract(
     paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
 ) -> int:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())

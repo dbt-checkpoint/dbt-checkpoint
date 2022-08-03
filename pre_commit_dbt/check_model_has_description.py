@@ -12,9 +12,12 @@ from pre_commit_dbt.utils import get_model_schemas
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
+from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest)
@@ -22,6 +25,7 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
+
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     # convert to sets
