@@ -463,7 +463,7 @@ def add_related_ymls(
         ):
             continue
 
-        if ("path" in node) and (node["path"]) and (node["path"] in sql_path):
+        if ("path" in node) and (node["path"]) and (node.get("path") in sql_path):
             root_folder = Path(node["root_path"]).name
 
             # Original patch_path has 'project\\path\to\yml.yml'
@@ -481,13 +481,11 @@ def get_missing_file_paths(
     manifest: Dict[str, Any] = None,
     include_ephemeral: bool = False,
 ):
-    print(paths)
     nodes = manifest.get("nodes", {})
     paths_with_missing = list(paths)
 
     if nodes:
         for path in paths:
-            print(path)
             suffix = Path(path).suffix.lower()
             if suffix == ".sql":
                 add_related_ymls(path, nodes, paths_with_missing, include_ephemeral)
