@@ -444,7 +444,7 @@ def add_related_sqls(
             and (node["patch_path"])
             and (dbt_patch_path in node["patch_path"])
         ):
-            if ".sql" in node["original_file_path"]:
+            if ".sql" in node["original_file_path"].lower():
                 target_sql_name = f"{root_path}/{node['original_file_path']}"
                 if target_sql_name not in paths_with_missing:
                     paths_with_missing.append(target_sql_name)
