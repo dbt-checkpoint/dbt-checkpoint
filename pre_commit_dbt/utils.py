@@ -439,7 +439,11 @@ def add_related_sqls(
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
-        if (node) and ("patch_path" in node) and (dbt_patch_path in node["patch_path"]):
+        if (
+            ("patch_path" in node)
+            and (node["patch_path"])
+            and (dbt_patch_path in node["patch_path"])
+        ):
             if ".sql" in node["original_file_path"]:
                 target_sql_name = f"{root_path}/{node['original_file_path']}"
                 if target_sql_name not in paths_with_missing:
@@ -459,7 +463,7 @@ def add_related_ymls(
         ):
             continue
 
-        if (node) and ("path" in node) and (node["path"] in sql_path):
+        if ("path" in node) and (node["path"]) and (node["path"] in sql_path):
             root_folder = Path(node["root_path"]).name
 
             # Original patch_path has 'project\\path\to\yml.yml'
