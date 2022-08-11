@@ -481,6 +481,7 @@ def get_missing_file_paths(
     manifest: Dict[str, Any] = None,
     include_ephemeral: bool = False,
 ):
+    print(f"Original paths: {','.join(*paths)}")
     nodes = manifest.get("nodes", {})
     paths_with_missing = list(paths)
 
@@ -493,5 +494,5 @@ def get_missing_file_paths(
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
-
+    print(f"Paths including missing: {','.join(*paths_with_missing)}")
     return paths_with_missing
