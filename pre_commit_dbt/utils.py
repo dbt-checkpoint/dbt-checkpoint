@@ -464,16 +464,18 @@ def add_related_ymls(
             continue
 
         if ("path" in node) and (node["path"]) and (node.get("path") in sql_path):
-            root_folder = Path(node["root_path"]).name
+            patch_path = node.get("patch_path", None)
+            if patch_path:
+                root_folder = Path(node["root_path"]).name
 
-            # Original patch_path has 'project\\path\to\yml.yml'
-            patch_path = Path(node["patch_path"])
-            # Remove the project_name from patch_path
-            clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
+                # Original patch_path has 'project\\path\to\yml.yml'
+                patch_path = Path(patch_path)
+                # Remove the project_name from patch_path
+                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
 
-            target_yml_path = f"{root_folder}/{clean_patch_path}"
-            if target_yml_path not in paths_with_missing:
-                paths_with_missing.append(target_yml_path)
+                target_yml_path = f"{root_folder}/{clean_patch_path}"
+                if target_yml_path not in paths_with_missing:
+                    paths_with_missing.append(target_yml_path)
 
 
 def get_missing_file_paths(
