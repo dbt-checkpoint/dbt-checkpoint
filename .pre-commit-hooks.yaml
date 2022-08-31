@@ -1,262 +1,266 @@
--   id: check-column-desc-are-same
-    name: Check column descriptions are same
-    description: Check the models have same descriptions for same column names.
-    entry: check-column-desc-are-same
-    language: python
-    files: '.*\.(yml|yaml)$'
--   id: check-column-name-contract
-    name: Check column name contract
-    description: Check column name abides to contract.
-    entry: check-column-name-contract
-    language: python
-    types: [sql]
--   id: check-macro-has-description
-    name: Check the macro has description
-    description: Ensures that the macro has description in properties file.
-    entry: check-macro-has-description
-    language: python
-    types_or: [yaml, sql]
-    require_serial: true # because we need to process yaml and sql
--   id: check-macro-arguments-have-desc
-    name: Check the macro arguments have description
-    description: Ensures that the macro has arguments with descriptions in properties file.
-    entry: check-macro-arguments-have-desc
-    language: python
-    types_or: [yaml, sql]
-    require_serial: true # because we need to process yaml and sql
--   id: check-model-columns-have-desc
-    name: Check the model columns have description
-    description: Ensures that the model has columns with descriptions in properties file.
-    entry: check-model-columns-have-desc
-    language: python
-    types_or: [yaml, sql]
-    require_serial: true # because we need to process yaml and sql
--   id: check-model-has-all-columns
-    name: Check the model has all columns in properties file
-    description: Ensures that all columns in database are specified in properties file.
-    entry: check-model-has-all-columns
-    language: python
-    types: [sql]
--   id: check-model-has-description
-    name: Check the model has description
-    description: Ensures that the model has description in properties file.
-    entry: check-model-has-description
-    language: python
-    types_or: [yaml, sql]
-    require_serial: true # because we need to process yaml and sql
--   id: check-model-has-meta-keys
-    name: Check the model has keys in the meta part
-    description: Ensures that the model has a list of valid meta keys.
-    entry: check-model-has-meta-keys
-    language: python
-    types_or: [yaml, sql]
-    require_serial: true # because we need to process YAML and SQL
--   id: check-model-has-properties-file
-    name: Check the model has properties file
-    description: Ensures that the model has properties file (schema file).
-    entry: check-model-has-properties-file
-    language: python
-    types: [sql]
--   id: check-model-has-tests-by-group
-    name: Check the model has a number of tests from a group of tests.
-    description: Ensures that the model has a number of tests from a group of tests.
-    entry: check-model-has-tests-by-group
-    language: python
-    types: [sql]
--   id: check-model-has-tests-by-name
-    name: Check the model tests by a test name
-    description: Ensures that the model has a number of tests of a certain name (e.g. data, unique).
-    entry: check-model-has-tests-by-name
-    language: python
-    types: [sql]
--   id: check-model-has-tests-by-type
-    name: Check the model tests by a test type
-    description: Ensures that the model has a number of tests of a certain type (data, schema).
-    entry: check-model-has-tests-by-type
-    language: python
-    types: [sql]
--   id: check-model-has-tests
-    name: Check the model has a tests
-    description: Ensures that the model has a number of tests.
-    entry: check-model-has-tests
-    language: python
-    types: [sql]
--   id: check-model-name-contract
-    name: Check model name contract
-    description: Check model name abides to contract.
-    entry: check-model-name-contract
-    language: python
-    types: [sql]
--   id: check-model-parents-schema
-    name: Check parent models or sources are from certain schema
-    entry: check-model-parents-schema
-    language: python
-    types_or: [yaml]
--   id: check-model-parents-and-childs
-    name: Check the model has a parents/childs
-    description: Ensures the model has a specific number (max/min) of parents or/and childs.
-    entry: check-model-parents-and-childs
-    language: python
-    types: [sql]
--   id: check-model-tags
-    name: Check the model has valid tags
-    description: Ensures that the model has only valid tags from the provided list.
-    entry: check-model-tags
-    language: python
-    types: [sql]
--   id: check-script-has-no-table-name
-    name: Check the script has not table name
-    description: Ensures that the script is using only source or ref macro to specify the table name.
-    entry: check-script-has-no-table-name
-    language: python
-    types: [sql]
--   id: check-script-ref-and-source
-    name: Check the script has existing refs and sources
-    description: Ensures that the script contains only existing sources or macros.
-    entry: check-script-ref-and-source
-    language: python
-    types: [sql]
--   id: check-script-semicolon
-    name: Check the script does not contain a semicolon
-    description: Ensure that the script does not have a semicolon at the end of the file.
-    entry: check-script-semicolon
-    language: python
-    types: [sql]
--   id: check-source-childs
-    name: Check the source has a specific number (max/min) of childs.
-    description: Ensures the source has a specific number (max/min) of childs.
-    entry: check-source-childs
-    language: python
-    types: [sql]  
--   id: check-source-columns-have-desc
-    name: Check for source column descriptions
-    description: Ensures that the source has columns with descriptions in the properties file.
-    entry: check-source-columns-have-desc
-    language: python
-    types_or: [yaml]
--   id: check-source-has-all-columns
-    name: Check the source has all columns in the properties file
-    description: Ensures that all columns in the database are specified in the properties file.
-    entry: check-source-has-all-columns
-    language: python
-    types_or: [yaml]
--   id: check-source-table-has-description
-    name: Check the source table has description
-    description: Ensures that the source table has description in properties file.
-    entry: check-source-table-has-description
-    language: python
-    types_or: [yaml]
--   id: check-source-has-freshness
-    name: Check the source has the freshness
-    description: Ensures that the source has freshness options.
-    entry: check-source-has-freshness
-    language: python
-    types_or: [yaml]
--   id: check-source-has-loader
-    name: Check the source has loader option
-    description: Ensures that the source has loader option.
-    entry: check-source-has-loader
-    language: python
-    types_or: [yaml]
--   id: check-source-has-meta-keys
-    name: Check the source has keys in the meta part
-    description: Ensures that the source has a list of valid meta keys.
-    entry: check-source-has-meta-keys
-    language: python
-    types_or: [yaml]
--   id: check-source-has-tests-by-name
-    name: Check the source tests by test name
-    description: Ensures that the source has a number of tests of a certain name (e.g. data, unique).
-    entry: check-source-has-tests-by-name
-    language: python
-    types_or: [yaml]
--   id: check-source-has-tests-by-type
-    name: Check the source tests by test type
-    description: Ensures that the source has a number of tests of a certain type (data, schema).
-    entry: check-source-has-tests-by-type
-    language: python
-    types_or: [yaml]
--   id: check-source-has-tests
-    name: Check the source has tests
-    description: Ensures that the source has a number of tests.
-    entry: check-source-has-tests
-    language: python
-    types_or: [yaml]
--   id: check-source-tags
-    name: Check the source has valid tags
-    description: Ensures that the source has only valid tags from the provided list.
-    entry: check-source-tags
-    language: python
-    types_or: [yaml]
--   id: dbt-clean
-    name: dbt clean
-    description: Deletes all folders specified in the clean-targets.
-    entry: dbt-clean
-    language: python
-    pass_filenames: false
--   id: dbt-compile
-    name: dbt compile
-    description: Generates executable SQL from source model, test, and analysis files.
-    entry: dbt-compile
-    language: python
-    types: [sql]
-    require_serial: true
--   id: dbt-deps
-    name: dbt deps
-    description: Pulls the most recent version of the dependencies listed in your packages.yml.
-    entry: dbt-deps
-    language: python
-    pass_filenames: false
--   id: dbt-docs-generate
-    name: dbt docs generate
-    description: The command is responsible for generating your project's documentation website.
-    entry: dbt-docs-generate
-    language: python
-    pass_filenames: false
--   id: dbt-run
-    name: dbt run
-    description: Executes compiled sql model files.
-    entry: dbt-run
-    language: python
-    require_serial: true
-    types: [sql]
--   id: dbt-test
-    name: dbt test
-    description: Runs tests on data in deployed models.
-    entry: dbt-test
-    language: python
-    require_serial: true
-    types: [sql]
--   id: generate-missing-sources
-    name: Generate missing sources
-    description: If any source is missing this hook tries to create it.
-    entry: generate-missing-sources
-    language: python
-    types: [sql]
--   id: generate-model-properties-file
-    name: Generate model properties file
-    description: Generate model properties file if does not exists.
-    entry: generate-model-properties-file
-    language: python
-    types: [sql]
-    args: ["--properties-file", "/Users/tomsejr/Documents/03-Workspace/Private/jaffle_shop/{database}/{schema}/{name}.yml"]
-    require_serial: true
--   id: unify-column-description
-    name: Unify column description
-    description: Unify column descriptions across all models
-    entry: unify-column-description
-    language: python
-    files: '.*\.(yml|yaml)$'
-    require_serial: true
--   id: replace-script-table-names
-    name: Replace script table names
-    description: Replace table names with source or ref macros in the script.
-    entry: replace-script-table-names
-    language: python
-    types: [sql]
--   id: remove-script-semicolon
-    name: Remove script semicolon
-    description: Remove semicolon at the end of the script.
-    entry: remove-script-semicolon
-    language: python
-    types: [sql]
+- id: check-column-desc-are-same
+  name: Check column descriptions are same
+  description: Check the models have same descriptions for same column names.
+  entry: check-column-desc-are-same
+  language: python
+  files: '.*\.(yml|yaml)$'
+- id: check-column-name-contract
+  name: Check column name contract
+  description: Check column name abides to contract.
+  entry: check-column-name-contract
+  language: python
+  types: [sql, yaml]
+- id: check-macro-has-description
+  name: Check the macro has description
+  description: Ensures that the macro has description in properties file.
+  entry: check-macro-has-description
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process yaml and sql
+- id: check-macro-arguments-have-desc
+  name: Check the macro arguments have description
+  description: Ensures that the macro has arguments with descriptions in properties file.
+  entry: check-macro-arguments-have-desc
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process yaml and sql
+- id: check-model-columns-have-desc
+  name: Check the model columns have description
+  description: Ensures that the model has columns with descriptions in properties file.
+  entry: check-model-columns-have-desc
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process yaml and sql
+- id: check-model-has-all-columns
+  name: Check the model has all columns in properties file
+  description: Ensures that all columns in database are specified in properties file.
+  entry: check-model-has-all-columns
+  language: python
+  types: [sql, yaml]
+- id: check-model-has-description
+  name: Check the model has description
+  description: Ensures that the model has description in properties file.
+  entry: check-model-has-description
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process yaml and sql
+- id: check-model-has-meta-keys
+  name: Check the model has keys in the meta part
+  description: Ensures that the model has a list of valid meta keys.
+  entry: check-model-has-meta-keys
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process YAML and SQL
+- id: check-model-has-properties-file
+  name: Check the model has properties file
+  description: Ensures that the model has properties file (schema file).
+  entry: check-model-has-properties-file
+  language: python
+  types: [sql, yaml]
+- id: check-model-has-tests-by-group
+  name: Check the model has a number of tests from a group of tests.
+  description: Ensures that the model has a number of tests from a group of tests.
+  entry: check-model-has-tests-by-group
+  language: python
+  types: [sql, yaml]
+- id: check-model-has-tests-by-name
+  name: Check the model tests by a test name
+  description: Ensures that the model has a number of tests of a certain name (e.g. data, unique).
+  entry: check-model-has-tests-by-name
+  language: python
+  types: [sql, yaml]
+- id: check-model-has-tests-by-type
+  name: Check the model tests by a test type
+  description: Ensures that the model has a number of tests of a certain type (data, schema).
+  entry: check-model-has-tests-by-type
+  language: python
+  types: [sql, yaml]
+- id: check-model-has-tests
+  name: Check the model has a tests
+  description: Ensures that the model has a number of tests.
+  entry: check-model-has-tests
+  language: python
+  types: [sql, yaml]
+- id: check-model-name-contract
+  name: Check model name contract
+  description: Check model name abides to contract.
+  entry: check-model-name-contract
+  language: python
+  types: [sql]
+- id: check-model-parents-schema
+  name: Check parent models or sources are from certain schema
+  entry: check-model-parents-schema
+  language: python
+  types_or: [yaml, sql]
+- id: check-model-parents-and-childs
+  name: Check the model has a parents/childs
+  description: Ensures the model has a specific number (max/min) of parents or/and childs.
+  entry: check-model-parents-and-childs
+  language: python
+  types: [sql, yaml]
+- id: check-model-tags
+  name: Check the model has valid tags
+  description: Ensures that the model has only valid tags from the provided list.
+  entry: check-model-tags
+  language: python
+  types: [sql, yaml]
+- id: check-script-has-no-table-name
+  name: Check the script has not table name
+  description: Ensures that the script is using only source or ref macro to specify the table name.
+  entry: check-script-has-no-table-name
+  language: python
+  types: [sql]
+- id: check-script-ref-and-source
+  name: Check the script has existing refs and sources
+  description: Ensures that the script contains only existing sources or macros.
+  entry: check-script-ref-and-source
+  language: python
+  types: [sql]
+- id: check-script-semicolon
+  name: Check the script does not contain a semicolon
+  description: Ensure that the script does not have a semicolon at the end of the file.
+  entry: check-script-semicolon
+  language: python
+  types: [sql]
+- id: check-source-childs
+  name: Check the source has a specific number (max/min) of childs.
+  description: Ensures the source has a specific number (max/min) of childs.
+  entry: check-source-childs
+  language: python
+  types: [sql]
+- id: check-source-columns-have-desc
+  name: Check for source column descriptions
+  description: Ensures that the source has columns with descriptions in the properties file.
+  entry: check-source-columns-have-desc
+  language: python
+  types_or: [yaml]
+- id: check-source-has-all-columns
+  name: Check the source has all columns in the properties file
+  description: Ensures that all columns in the database are specified in the properties file.
+  entry: check-source-has-all-columns
+  language: python
+  types_or: [yaml]
+- id: check-source-table-has-description
+  name: Check the source table has description
+  description: Ensures that the source table has description in properties file.
+  entry: check-source-table-has-description
+  language: python
+  types_or: [yaml]
+- id: check-source-has-freshness
+  name: Check the source has the freshness
+  description: Ensures that the source has freshness options.
+  entry: check-source-has-freshness
+  language: python
+  types_or: [yaml]
+- id: check-source-has-loader
+  name: Check the source has loader option
+  description: Ensures that the source has loader option.
+  entry: check-source-has-loader
+  language: python
+  types_or: [yaml]
+- id: check-source-has-meta-keys
+  name: Check the source has keys in the meta part
+  description: Ensures that the source has a list of valid meta keys.
+  entry: check-source-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-source-has-tests-by-name
+  name: Check the source tests by test name
+  description: Ensures that the source has a number of tests of a certain name (e.g. data, unique).
+  entry: check-source-has-tests-by-name
+  language: python
+  types_or: [yaml]
+- id: check-source-has-tests-by-type
+  name: Check the source tests by test type
+  description: Ensures that the source has a number of tests of a certain type (data, schema).
+  entry: check-source-has-tests-by-type
+  language: python
+  types_or: [yaml]
+- id: check-source-has-tests
+  name: Check the source has tests
+  description: Ensures that the source has a number of tests.
+  entry: check-source-has-tests
+  language: python
+  types_or: [yaml]
+- id: check-source-tags
+  name: Check the source has valid tags
+  description: Ensures that the source has only valid tags from the provided list.
+  entry: check-source-tags
+  language: python
+  types_or: [yaml]
+- id: dbt-clean
+  name: dbt clean
+  description: Deletes all folders specified in the clean-targets.
+  entry: dbt-clean
+  language: python
+  pass_filenames: false
+- id: dbt-compile
+  name: dbt compile
+  description: Generates executable SQL from source model, test, and analysis files.
+  entry: dbt-compile
+  language: python
+  types: [sql]
+  require_serial: true
+- id: dbt-deps
+  name: dbt deps
+  description: Pulls the most recent version of the dependencies listed in your packages.yml.
+  entry: dbt-deps
+  language: python
+  pass_filenames: false
+- id: dbt-docs-generate
+  name: dbt docs generate
+  description: The command is responsible for generating your project's documentation website.
+  entry: dbt-docs-generate
+  language: python
+  pass_filenames: false
+- id: dbt-run
+  name: dbt run
+  description: Executes compiled sql model files.
+  entry: dbt-run
+  language: python
+  require_serial: true
+  types: [sql]
+- id: dbt-test
+  name: dbt test
+  description: Runs tests on data in deployed models.
+  entry: dbt-test
+  language: python
+  require_serial: true
+  types: [sql]
+- id: generate-missing-sources
+  name: Generate missing sources
+  description: If any source is missing this hook tries to create it.
+  entry: generate-missing-sources
+  language: python
+  types: [sql]
+- id: generate-model-properties-file
+  name: Generate model properties file
+  description: Generate model properties file if does not exists.
+  entry: generate-model-properties-file
+  language: python
+  types: [sql]
+  args:
+    [
+      "--properties-file",
+      "/Users/tomsejr/Documents/03-Workspace/Private/jaffle_shop/{database}/{schema}/{name}.yml",
+    ]
+  require_serial: true
+- id: unify-column-description
+  name: Unify column description
+  description: Unify column descriptions across all models
+  entry: unify-column-description
+  language: python
+  files: '.*\.(yml|yaml)$'
+  require_serial: true
+- id: replace-script-table-names
+  name: Replace script table names
+  description: Replace table names with source or ref macros in the script.
+  entry: replace-script-table-names
+  language: python
+  types: [sql]
+- id: remove-script-semicolon
+  name: Remove script semicolon
+  description: Remove semicolon at the end of the script.
+  entry: remove-script-semicolon
+  language: python
+  types: [sql]
