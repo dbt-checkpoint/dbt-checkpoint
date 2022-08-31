@@ -428,9 +428,9 @@ def add_related_sqls(
     include_ephemeral: bool = False,
 ):
     yml_path_class = Path(yml_path)
-    yml_path_parts = yml_path_class.parts
+    yml_path_parts = list(yml_path_class.parts)
 
-    root_path = yml_path_parts[0]
+    root_path = yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
     for key, node in nodes.items():
@@ -439,11 +439,7 @@ def add_related_sqls(
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
-        if (
-            ("patch_path" in node)
-            and (node["patch_path"])
-            and (dbt_patch_path in node["patch_path"])
-        ):
+        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
             if ".sql" in node["original_file_path"].lower():
                 target_sql_name = f"{root_path}/{node['original_file_path']}"
                 if target_sql_name not in paths_with_missing:
@@ -463,7 +459,7 @@ def add_related_ymls(
         ):
             continue
 
-        if ("path" in node) and (node["path"]) and (node.get("path") in sql_path):
+        if node.get("path") and (node.get("path") in sql_path):
             patch_path = node.get("patch_path", None)
             if patch_path:
                 root_folder = Path(node["root_path"]).name
