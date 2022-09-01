@@ -6,6 +6,8 @@ from typing import Sequence
 from typing import Set
 from typing import Tuple
 
+from rich.console import Console
+
 from pre_commit_dbt.utils import add_catalog_args
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
@@ -15,6 +17,7 @@ from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import get_missing_file_paths
 
+console = Console()
 
 def compare_columns(
     catalog_columns: Dict[str, Any], model_columns: Dict[str, Any]
@@ -52,30 +55,18 @@ def check_model_columns(
                 schema_path = "any .yml file"
             if model_only:
                 status_code = 1
-                print_cols = ["- name: %s" % (col) for col in model_only if col]
-                print(
-                    "{file}: columns in {schema_path} but not in db (catalog.json):\n"
-                    "{columns}".format(
-                        file=sqls.get(model.filename),
-                        columns="\n".join(print_cols),  # pragma: no mutate
-                        schema_path=schema_path,
-                    )
-                )
+                print_cols = ["- name: [yellow]%s[/yellow]" % (col) for col in model_only if col]
+                console.print(f"[red]{sqls.get(model.filename)}[/red]: columns in [yellow]{schema_path}[/yellow] but not in Database:")
+                console.print(f"{'\n'.join(print_cols)}")
             if catalog_only:
                 status_code = 1
-                print_cols = ["- name: %s" % (col) for col in catalog_only if col]
-                print(
-                    "{file}: columns in db (catalog.json) but not in {schema_path}:\n"
-                    "{columns}".format(
-                        file=sqls.get(model.filename),
-                        columns="\n".join(print_cols),  # pragma: no mutate
-                        schema_path=schema_path,
-                    )
-                )
+                print_cols = ["- name: [yellow]%s[/yellow]" % (col) for col in catalog_only if col]
+                console.print(f"[red]{sqls.get(model.filename)}[/red]: columns in Database but not in [yellow]{schema_path}[/yellow]:")
+                console.print(f"{'\n'.join(print_cols)}")
         else:
             status_code = 1
-            print(
-                f"Unable to find model `{model.model_id}` in catalog file. "
+            console.print(
+                f"Unable to find model [red]`{model.model_id}`[/red] in catalog file. "
                 f"Make sure you run `dbt docs generate` before executing this hook."
             )
     return status_code
