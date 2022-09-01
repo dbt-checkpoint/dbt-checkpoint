@@ -19,6 +19,7 @@ from pre_commit_dbt.utils import get_missing_file_paths
 
 console = Console()
 
+
 def compare_columns(
     catalog_columns: Dict[str, Any], model_columns: Dict[str, Any]
 ) -> Tuple[Set[str], Set[str]]:
@@ -55,14 +56,26 @@ def check_model_columns(
                 schema_path = "any .yml file"
             if model_only:
                 status_code = 1
-                print_cols = ["- name: [yellow]%s[/yellow]" % (col) for col in model_only if col]
-                console.print(f"[red]{sqls.get(model.filename)}[/red]: columns in [yellow]{schema_path}[/yellow] but not in Database:")
-                console.print(f"{'\n'.join(print_cols)}")
+                print_cols = ["- name: %s" % (col) for col in model_only if col]
+                console.print(
+                    "[red]{file}[/red]: columns in [yellow]{schema_path}[/yellow] but not in Database:\n"
+                    "[yellow]{columns}[/yellow]".format(
+                        file=sqls.get(model.filename),
+                        columns="\n".join(print_cols),  # pragma: no mutate
+                        schema_path=schema_path,
+                    )
+                )
             if catalog_only:
                 status_code = 1
-                print_cols = ["- name: [yellow]%s[/yellow]" % (col) for col in catalog_only if col]
-                console.print(f"[red]{sqls.get(model.filename)}[/red]: columns in Database but not in [yellow]{schema_path}[/yellow]:")
-                console.print(f"{'\n'.join(print_cols)}")
+                print_cols = ["- name: %s" % (col) for col in catalog_only if col]
+                print(
+                    "[red]{file}[/red]: columns in Database but not in [yellow]{schema_path}[/yellow]:\n"
+                    "[yellow]{columns}[/yellow]".format(
+                        file=sqls.get(model.filename),
+                        columns="\n".join(print_cols),  # pragma: no mutate
+                        schema_path=schema_path,
+                    )
+                )
         else:
             status_code = 1
             console.print(
