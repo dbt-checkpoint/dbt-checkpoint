@@ -49,7 +49,7 @@ def check_model_columns(
             )
             schema_path = model.node.get("patch_path", "schema")  # pragma: no mutate
             if not schema_path:
-                schema_path = "any YML file"
+                schema_path = "any .yml file"
             if model_only:
                 status_code = 1
                 print_cols = ["- name: %s" % (col) for col in model_only if col]
