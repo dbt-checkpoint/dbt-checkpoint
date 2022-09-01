@@ -12,6 +12,9 @@ from pre_commit_dbt.utils import get_macro_schemas
 from pre_commit_dbt.utils import get_macro_sqls
 from pre_commit_dbt.utils import get_macros
 from pre_commit_dbt.utils import JsonOpenError
+from rich.console import Console
+
+console = Console()
 
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
@@ -33,8 +36,8 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
 
     for macro in missing:
         status_code = 1
-        print(
-            f"{sqls.get(macro)}: "
+        console.print(
+            f"[red]{sqls.get(macro)}[/red]: "
             f"does not have defined description or properties file is missing.",
         )
     return status_code

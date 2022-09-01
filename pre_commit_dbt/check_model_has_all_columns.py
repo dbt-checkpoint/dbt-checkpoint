@@ -56,10 +56,12 @@ def check_model_columns(
                 schema_path = "any .yml file"
             if model_only:
                 status_code = 1
-                print_cols = ["- name: %s" % (col) for col in model_only if col]
+                print_cols = [
+                    "- name: [yellow]%s[/yellow]" % (col) for col in model_only if col
+                ]
                 console.print(
-                    "[red]{file}[/red]: columns in [yellow]{schema_path}[/yellow] but not in Database:\n"
-                    "[yellow]{columns}[/yellow]".format(
+                    "Columns in [yellow]{schema_path}[/yellow], but not in Database ([red]{file}[/red]):\n"
+                    "{columns}".format(
                         file=sqls.get(model.filename),
                         columns="\n".join(print_cols),  # pragma: no mutate
                         schema_path=schema_path,
@@ -67,10 +69,12 @@ def check_model_columns(
                 )
             if catalog_only:
                 status_code = 1
-                print_cols = ["- name: %s" % (col) for col in catalog_only if col]
+                print_cols = [
+                    "- name: [red]%s[/red]" % (col) for col in catalog_only if col
+                ]
                 print(
-                    "[red]{file}[/red]: columns in Database but not in [yellow]{schema_path}[/yellow]:\n"
-                    "[yellow]{columns}[/yellow]".format(
+                    "Columns in Database ([red]{file}[/red]), but not in [yellow]{schema_path}[/yellow]:\n"
+                    "{columns}".format(
                         file=sqls.get(model.filename),
                         columns="\n".join(print_cols),  # pragma: no mutate
                         schema_path=schema_path,

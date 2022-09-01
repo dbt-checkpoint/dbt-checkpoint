@@ -5,6 +5,9 @@ from typing import Sequence
 
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import get_source_schemas
+from rich.console import Console
+
+console = Console()
 
 
 def has_description(paths: Sequence[str]) -> int:
@@ -17,8 +20,8 @@ def has_description(paths: Sequence[str]) -> int:
     for schema in schemas:
         if not schema.table_schema.get("description"):
             status_code = 1
-            print(
-                f"{schema.source_name}.{schema.table_name}: "
+            console.print(
+                f"[red]{schema.source_name}.{schema.table_name}[/red]: "
                 f"does not have defined description.",
             )
     return status_code

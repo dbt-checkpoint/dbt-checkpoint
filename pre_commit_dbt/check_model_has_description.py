@@ -13,6 +13,9 @@ from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import get_missing_file_paths
+from rich.console import Console
+
+console = Console()
 
 
 def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
@@ -37,8 +40,8 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> int:
 
     for model in missing:
         status_code = 1
-        print(
-            f"{sqls.get(model)}: "
+        console.print(
+            f"[red]{sqls.get(model)}[/red]: "
             f"does not have defined description or properties file is missing.",
         )
     return status_code

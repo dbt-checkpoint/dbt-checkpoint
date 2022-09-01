@@ -6,6 +6,9 @@ from typing import Set
 
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import get_source_schemas
+from rich.console import Console
+
+console = Console()
 
 
 def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> int:
@@ -27,18 +30,18 @@ def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> int:
         loaded = table.get("loaded_at_field") or source.get("loaded_at_field")
         if not loaded:
             status_code = 1
-            print(
-                f"{schema.source_name}.{schema.table_name}: "
+            console.print(
+                f"[red]{schema.source_name}.{schema.table_name}[/red]: "
                 f"is missing `loaded_at_field` which is required for freshness."
             )
         if not (freshness == required_freshness):
             status_code = 1
             missing_params = required_freshness.difference(freshness)
             result = "\n- ".join(list(missing_params))  # pragma: no mutate
-            print(
-                f"{schema.source_name}.{schema.table_name}: "
+            console.print(
+                f"[red]{schema.source_name}.{schema.table_name}[/red]: "
                 f"miss some required freshness parameters:"
-                f"\n- {result} "
+                f"\n- [yellow]{result}[/yellow] "
             )
     return status_code
 

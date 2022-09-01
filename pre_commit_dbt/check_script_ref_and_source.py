@@ -13,6 +13,9 @@ from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import JsonOpenError
+from rich.console import Console
+
+console = Console()
 
 
 def check_refs_sources(
@@ -58,11 +61,11 @@ def check_refs_sources(
         status_code = 1
         source_name = src.get("source_name")  # pragma: no mutate
         table_name = src.get("table_name")  # pragma: no mutate
-        print(f"Missing source `{source_name}.{table_name}`")
+        console.print(f"Missing source [red]`{source_name}.{table_name}`[/red]")
 
     for missing_ref in models:
         status_code = 1
-        print(f"Missing model (ref) {missing_ref}")
+        console.print(f"Missing model (ref) [red]{missing_ref}[/red]")
 
     return status_code, models, sources
 
