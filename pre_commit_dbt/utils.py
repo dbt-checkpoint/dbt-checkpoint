@@ -494,3 +494,11 @@ def get_missing_file_paths(
                 continue
     print(f"Paths including missing: {','.join(paths_with_missing)}")
     return paths_with_missing
+
+
+def color_string_red(string: str):
+    return "\033[91m" + string + "\033[0m"
+
+
+def color_string_yellow(string: str):
+    return "\033[93m" + string + "\033[0m"
