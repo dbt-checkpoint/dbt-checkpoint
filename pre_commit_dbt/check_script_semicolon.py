@@ -5,9 +5,7 @@ from typing import Optional
 from typing import Sequence
 
 from pre_commit_dbt.utils import add_filenames_args
-from rich.console import Console
-
-console = Console()
+from pre_commit_dbt.utils import color_string_red
 
 
 def check_semicolon(file_obj: IO[bytes], replace: bool = False) -> int:
@@ -50,8 +48,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         with open(filename, "rb+") as file_obj:
             status_code_file = check_semicolon(file_obj)
             if status_code_file:
-                console.print(
-                    f"[red]{filename}[/red]: contains a semicolon at the end. "
+                print(
+                    f"{color_string_red(filename)}: contains a semicolon at the end. "
                     f"dbt does not support that."
                 )
                 status_code = status_code_file

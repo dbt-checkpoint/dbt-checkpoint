@@ -13,9 +13,8 @@ from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_model_schemas
 from pre_commit_dbt.utils import ModelSchema
-from rich.console import Console
-
-console = Console()
+from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import color_string_yellow
 
 
 @dataclass
@@ -61,11 +60,9 @@ def check_column_desc(paths: Sequence[str], ignore: Optional[Sequence[str]]) -> 
         group_cnt = Counter([group.description for group in groups])
         if len(group_cnt.keys()) > 1:
             status_code = 1
-            console.print(f"[red]{name}[/red]: has different descriptions:")
+            print(f"{color_string_red(name)}: has different descriptions:")
             for desc, cnt in group_cnt.items():
-                console.print(
-                    "  - [yellow](%s)[/yellow]: [yellow]%s[/yellow]" % (cnt, desc)
-                )
+                print(f"  - {color_string_yellow(cnt)}: {color_string_yellow(desc)}")
     return status_code
 
 

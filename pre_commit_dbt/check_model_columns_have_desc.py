@@ -18,9 +18,8 @@ from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import Model
 from pre_commit_dbt.utils import ModelSchema
 from pre_commit_dbt.utils import get_missing_file_paths
-from rich.console import Console
-
-console = Console()
+from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import color_string_yellow
 
 
 def check_column_desc(
@@ -71,9 +70,9 @@ def check_column_desc(
         if columns:
             status_code = 1
             result = "\n- ".join(list(columns))  # pragma: no mutate
-            console.print(
-                f"[red]{sqls.get(model)}[/red]: "
-                f"following columns are missing description:\n- [yellow]{result}[/yellow]",
+            print(
+                f"{color_string_red(sqls.get(model))}: "
+                f"following columns are missing description:\n- {color_string_yellow(result)}",
             )
     return status_code, missing
 

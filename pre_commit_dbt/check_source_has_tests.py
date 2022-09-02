@@ -11,9 +11,8 @@ from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import get_source_schemas
 from pre_commit_dbt.utils import JsonOpenError
-from rich.console import Console
-
-console = Console()
+from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import color_string_yellow
 
 
 def check_test_cnt(
@@ -37,9 +36,9 @@ def check_test_cnt(
         source_test_cnt = len(tests)
         if source_test_cnt < test_cnt:
             status_code = 1
-            console.print(
-                f"[red]{schema.source_name}.{schema.table_name}[/red]: "
-                f"has only [yellow]{source_test_cnt}[/yellow] tests, but [red]{test_cnt}[/red] are required.",
+            print(
+                f"{color_string_red(f'{schema.source_name}.{schema.table_name}')}: "
+                f"has only {color_string_yellow(source_test_cnt)} tests, but {color_string_red(test_cnt)} are required.",
             )
     return status_code
 

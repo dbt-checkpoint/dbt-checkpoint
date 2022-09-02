@@ -11,10 +11,8 @@ from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import get_missing_file_paths
-from rich.console import Console
-
-console = Console()
+from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import color_string_yellow
 
 
 def check_column_name_contract(
@@ -34,17 +32,17 @@ def check_column_name_contract(
             if dtype == col_type:
                 if re.match(pattern, col_name) is None:
                     status_code = 1
-                    console.print(
-                        f"[red]{col_name}[/red]: column is of type [yellow]{dtype}[/yellow] and "
-                        f"does not match regex pattern [yellow]{pattern}[/yellow]."
+                    print(
+                        f"{color_string_red(col_name)}: column is of type {color_string_yellow(dtype)} and "
+                        f"does not match regex pattern {color_string_yellow(pattern)}."
                     )
 
             # Check all files with naming pattern are of type dtype
             elif re.match(pattern, col_name):
                 status_code = 1
-                console.print(
-                    f"[red]{col_name}[/red]: column name matches regex pattern [yellow]{pattern}[/yellow] "
-                    f"and is of type [yellow]{col_type}[/yellow] instead of [yellow]{dtype}[/yellow]."
+                print(
+                    f"{color_string_red(col_name)}: column name matches regex pattern {color_string_yellow(pattern)} "
+                    f"and is of type {color_string_yellow(col_type)} instead of {color_string_yellow(dtype)}."
                 )
 
     return status_code
