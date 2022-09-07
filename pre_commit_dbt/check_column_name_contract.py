@@ -11,14 +11,13 @@ from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import get_missing_file_paths
+from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import color_string_yellow
 
 
 def check_column_name_contract(
     paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
@@ -34,16 +33,16 @@ def check_column_name_contract(
                 if re.match(pattern, col_name) is None:
                     status_code = 1
                     print(
-                        f"{col_name}: column is of type {dtype} and "
-                        f"does not match regex pattern {pattern}."
+                        f"{color_string_red(col_name)}: column is of type {color_string_yellow(dtype)} and "
+                        f"does not match regex pattern {color_string_yellow(pattern)}."
                     )
 
             # Check all files with naming pattern are of type dtype
             elif re.match(pattern, col_name):
                 status_code = 1
                 print(
-                    f"{col_name}: column name matches regex pattern {pattern} "
-                    f"and is of type {col_type} instead of {dtype}."
+                    f"{color_string_red(col_name)}: column name matches regex pattern {color_string_yellow(pattern)} "
+                    f"and is of type {color_string_yellow(col_type)} instead of {color_string_yellow(dtype)}."
                 )
 
     return status_code

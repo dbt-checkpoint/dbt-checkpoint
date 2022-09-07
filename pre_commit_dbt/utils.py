@@ -428,9 +428,9 @@ def add_related_sqls(
     include_ephemeral: bool = False,
 ):
     yml_path_class = Path(yml_path)
-    yml_path_parts = yml_path_class.parts
+    yml_path_parts = list(yml_path_class.parts)
 
-    root_path = yml_path_parts[0]
+    root_path = yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
     for key, node in nodes.items():
@@ -439,8 +439,8 @@ def add_related_sqls(
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
-        if "patch_path" in node and dbt_patch_path in node["patch_path"]:
-            if ".sql" in node["original_file_path"]:
+        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+            if ".sql" in node["original_file_path"].lower():
                 target_sql_name = f"{root_path}/{node['original_file_path']}"
                 if target_sql_name not in paths_with_missing:
                     paths_with_missing.append(target_sql_name)
@@ -459,17 +459,19 @@ def add_related_ymls(
         ):
             continue
 
-        if "path" in node and node["path"] in sql_path:
-            root_folder = Path(node["root_path"]).name
+        if node.get("path") and (node.get("path") in sql_path):
+            patch_path = node.get("patch_path", None)
+            if patch_path:
+                root_folder = Path(node["root_path"]).name
 
-            # Original patch_path has 'project\\path\to\yml.yml'
-            patch_path = Path(node["patch_path"])
-            # Remove the project_name from patch_path
-            clean_patch_path = patch_path.relative_to(*patch_path.parts[:2])
+                # Original patch_path has 'project\\path\to\yml.yml'
+                patch_path = Path(patch_path)
+                # Remove the project_name from patch_path
+                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
 
-            target_yml_path = f"{root_folder}/{clean_patch_path}"
-            if target_yml_path not in paths_with_missing:
-                paths_with_missing.append(target_yml_path)
+                target_yml_path = f"{root_folder}/{clean_patch_path}"
+                if target_yml_path not in paths_with_missing:
+                    paths_with_missing.append(target_yml_path)
 
 
 def get_missing_file_paths(
@@ -489,5 +491,12 @@ def get_missing_file_paths(
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
-
     return paths_with_missing
+
+
+def color_string_red(string: str):
+    return "\033[91m" + str(string) + "\033[0m"
+
+
+def color_string_yellow(string: str):
+    return "\033[93m" + str(string) + "\033[0m"
