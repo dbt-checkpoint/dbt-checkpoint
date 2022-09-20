@@ -196,17 +196,18 @@ def get_model_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[ModelSchema, None, None]:
     for yml_file in yml_files:
-        schema = yaml.safe_load(yml_file.open())
-        for model in schema.get("models", []):
-            if isinstance(model, dict) and model.get("name"):
-                model_name = model.get("name", "")  # pragma: no mutate
-                if model_name in filenames or all_schemas:
-                    yield ModelSchema(
-                        model_name=model_name,
-                        file=yml_file,
-                        filename=yml_file.stem,
-                        schema=model,
-                    )
+        with open(yml_file, "r") as file:
+            schema = yaml.safe_load(file)
+            for model in schema.get("models", []):
+                if isinstance(model, dict) and model.get("name"):
+                    model_name = model.get("name", "")  # pragma: no mutate
+                    if model_name in filenames or all_schemas:
+                        yield ModelSchema(
+                            model_name=model_name,
+                            file=yml_file,
+                            filename=yml_file.stem,
+                            schema=model,
+                        )
 
 
 def get_macro_schemas(
