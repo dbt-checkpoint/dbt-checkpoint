@@ -427,7 +427,7 @@ def add_related_sqls(
     nodes: Dict[str, Any],
     paths_with_missing: List[str],
     include_ephemeral: bool = False,
-):
+) -> None:
     yml_path_class = Path(yml_path)
     yml_path_parts = list(yml_path_class.parts)
 
@@ -452,7 +452,7 @@ def add_related_ymls(
     nodes: Dict[str, Any],
     paths_with_missing: List[str],
     include_ephemeral: bool = False,
-):
+) -> None:
     for key, node in nodes.items():
         if (
             not include_ephemeral
@@ -495,9 +495,9 @@ def get_missing_file_paths(
     return paths_with_missing
 
 
-def color_string_red(string: str):
+def red(string: str):
     return "\033[91m" + str(string) + "\033[0m"
 
 
-def color_string_yellow(string: str):
+def yellow(string: str):
     return "\033[93m" + str(string) + "\033[0m"

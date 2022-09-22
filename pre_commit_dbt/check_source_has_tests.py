@@ -11,8 +11,8 @@ from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import get_source_schemas
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import color_string_red
-from pre_commit_dbt.utils import color_string_yellow
+from pre_commit_dbt.utils import red
+from pre_commit_dbt.utils import yellow
 
 
 def check_test_cnt(
@@ -37,8 +37,8 @@ def check_test_cnt(
         if source_test_cnt < test_cnt:
             status_code = 1
             print(
-                f"{color_string_red(f'{schema.source_name}.{schema.table_name}')}: "
-                f"has only {color_string_yellow(source_test_cnt)} tests, but {color_string_red(test_cnt)} are required.",
+                f"{red(f'{schema.source_name}.{schema.table_name}')}: "
+                f"has only {yellow(source_test_cnt)} tests, but {red(test_cnt)} are required.",
             )
     return status_code
 

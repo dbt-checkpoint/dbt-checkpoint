@@ -1,4 +1,5 @@
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pytest
 
@@ -7,18 +8,30 @@ from pre_commit_dbt.check_model_has_description import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
-    (["aa/bb/with_description.sql"], {
-        "models": [{
-            "name": "with_description",
-            "description": "test description"
-        }]}, True, 0),
-    (["aa/bb/with_description.sql"], {"models": [{
-            "name": "with_description",
-            "description": "test description"
-        }]}, False, 1),
-    (["aa/bb/without_description.sql"], {"models": [{
-            "name": "without_description",
-        }]}, True, 1),
+    (
+        ["aa/bb/with_description.sql"],
+        {"models": [{"name": "with_description", "description": "test description"}]},
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/with_description.sql"],
+        {"models": [{"name": "with_description", "description": "test description"}]},
+        False,
+        1,
+    ),
+    (
+        ["aa/bb/without_description.sql"],
+        {
+            "models": [
+                {
+                    "name": "without_description",
+                }
+            ]
+        },
+        True,
+        1,
+    ),
 )
 
 
@@ -30,6 +43,7 @@ TESTS = (
 #         mock_popen.return_value.returncode = 0
 #         result = main(("test",))
 #         assert result == 0
+
 
 @pytest.mark.parametrize(
     ("input_args", "schema", "valid_manifest", "expected_status_code"), TESTS

@@ -8,12 +8,12 @@ from typing import Sequence
 from typing import Set
 from typing import Tuple
 
-from pre_commit_dbt.utils import add_filenames_args, color_string_red
+from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import red
 
 
 def check_refs_sources(
@@ -59,11 +59,11 @@ def check_refs_sources(
         status_code = 1
         source_name = src.get("source_name")  # pragma: no mutate
         table_name = src.get("table_name")  # pragma: no mutate
-        print(f"Missing source `{color_string_red(f'{source_name}.{table_name}')}`")
+        print(f"Missing source `{red(f'{source_name}.{table_name}')}`")
 
     for missing_ref in models:
         status_code = 1
-        print(f"Missing model (ref) {color_string_red(missing_ref)}")
+        print(f"Missing model (ref) {red(missing_ref)}")
 
     return status_code, models, sources
 

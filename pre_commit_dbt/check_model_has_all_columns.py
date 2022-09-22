@@ -10,12 +10,12 @@ from pre_commit_dbt.utils import add_catalog_args
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_missing_file_paths
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import get_missing_file_paths
-from pre_commit_dbt.utils import color_string_red
-from pre_commit_dbt.utils import color_string_yellow
+from pre_commit_dbt.utils import red
+from pre_commit_dbt.utils import yellow
 
 
 def compare_columns(
@@ -54,34 +54,30 @@ def check_model_columns(
                 schema_path = "any .yml file"
             if model_only:
                 status_code = 1
-                print_cols = [
-                    "- name: %s" % color_string_yellow(col) for col in model_only if col
-                ]
+                print_cols = ["- name: %s" % yellow(col) for col in model_only if col]
                 print(
                     "Columns in {schema_path}, but not in Database ({file}):\n"
                     "{columns}".format(
-                        file=color_string_red(sqls.get(model.filename)),
+                        file=red(sqls.get(model.filename)),
                         columns="\n".join(print_cols),  # pragma: no mutate
-                        schema_path=color_string_yellow(schema_path),
+                        schema_path=yellow(schema_path),
                     )
                 )
             if catalog_only:
                 status_code = 1
-                print_cols = [
-                    "- name: %s" % color_string_red(col) for col in catalog_only if col
-                ]
+                print_cols = ["- name: %s" % red(col) for col in catalog_only if col]
                 print(
                     "Columns in Database ({file}), but not in {schema_path}:\n"
                     "{columns}".format(
-                        file=color_string_red(sqls.get(model.filename)),
+                        file=red(sqls.get(model.filename)),
                         columns="\n".join(print_cols),  # pragma: no mutate
-                        schema_path=color_string_yellow(schema_path),
+                        schema_path=yellow(schema_path),
                     )
                 )
         else:
             status_code = 1
             print(
-                f"Unable to find model `{color_string_red(model.model_id)}` in catalog file. "
+                f"Unable to find model `{red(model.model_id)}` in catalog file. "
                 f"Make sure you run `dbt docs generate` before executing this hook."
             )
     return status_code

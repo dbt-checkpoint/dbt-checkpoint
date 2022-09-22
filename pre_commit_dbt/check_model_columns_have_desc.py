@@ -11,15 +11,15 @@ from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_missing_file_paths
 from pre_commit_dbt.utils import get_model_schemas
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import Model
 from pre_commit_dbt.utils import ModelSchema
-from pre_commit_dbt.utils import get_missing_file_paths
-from pre_commit_dbt.utils import color_string_red
-from pre_commit_dbt.utils import color_string_yellow
+from pre_commit_dbt.utils import red
+from pre_commit_dbt.utils import yellow
 
 
 def check_column_desc(
@@ -53,7 +53,7 @@ def check_column_desc(
             missing_cols = {
                 key
                 for key, value in item.node.get("columns", {}).items()
-                if not value.get("description")
+                if (isinstance(value, dict) and not value.get("description"))
             }
         else:
             continue  # pragma: no cover, no mutate
@@ -71,8 +71,8 @@ def check_column_desc(
             status_code = 1
             result = "\n- ".join(list(columns))  # pragma: no mutate
             print(
-                f"{color_string_red(sqls.get(model))}: "
-                f"following columns are missing description:\n- {color_string_yellow(result)}",
+                f"{red(sqls.get(model))}: "
+                f"following columns are missing description:\n- {yellow(result)}",
             )
     return status_code, missing
 

@@ -6,10 +6,10 @@ from typing import Optional
 from typing import Sequence
 from typing import Set
 from typing import Tuple
-from pre_commit_dbt.utils import color_string_red
-from pre_commit_dbt.utils import color_string_yellow
 
 from pre_commit_dbt.utils import add_filenames_args
+from pre_commit_dbt.utils import red
+from pre_commit_dbt.utils import yellow
 
 REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 REGEX_SPLIT = r"[\s]+"
@@ -91,8 +91,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if status_code_file:
             result = "\n- ".join(list(tables))  # pragma: no mutate
             print(
-                f"{color_string_red(filename)}: "
-                f"does not use source() or ref() macros for tables:\n- {color_string_yellow(result)}",
+                f"{red(filename)}: "
+                f"does not use source() or ref() macros for tables:\n- {yellow(result)}",
             )
             status_code = status_code_file
 

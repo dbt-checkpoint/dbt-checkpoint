@@ -8,11 +8,11 @@ from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_missing_file_paths
 from pre_commit_dbt.utils import get_model_schemas
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
-from pre_commit_dbt.utils import get_missing_file_paths
 
 
 def has_meta_key(

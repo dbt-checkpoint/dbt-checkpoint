@@ -1,3 +1,6 @@
+from unittest.mock import mock_open
+from unittest.mock import patch
+
 import pytest
 
 from pre_commit_dbt.generate_model_properties_file import main
@@ -5,21 +8,53 @@ from pre_commit_dbt.generate_model_properties_file import main
 TESTS = (
     (
         ["aa/bb/catalog_cols.sql"],
+        {"name": "catalog_cols", "columns": [{"name": "col1"}, {"name": "col2"}]},
         True,
         True,
         1,
         "- name: catalog_cols\n  columns:\n  - name: col1\n  - name: col2\n",
     ),
-    (["aa/bb/catalog_cols.sql"], False, True, 1, None),
-    (["aa/bb/catalog_cols.sql"], True, False, 1, None),
-    (["aa/bb/without_catalog.sql"], True, True, 1, "- name: without_catalog\n"),
-    (["aa/bb/with_schema.sql"], True, True, 0, None),
+    (
+        ["aa/bb/catalog_cols.sql"],
+        {"name": "catalog_cols", "columns": [{"name": "col1"}, {"name": "col2"}]},
+        False,
+        True,
+        1,
+        None,
+    ),
+    (
+        ["aa/bb/catalog_cols.sql"],
+        {"name": "catalog_cols", "columns": [{"name": "col1"}, {"name": "col2"}]},
+        True,
+        False,
+        1,
+        None,
+    ),
+    (
+        ["aa/bb/without_catalog.sql"],
+        {
+            "name": "without_catalog",
+        },
+        True,
+        True,
+        1,
+        "- name: without_catalog\n",
+    ),
+    (
+        ["aa/bb/with_schema.sql"],
+        {"name": "with_schema", "columns": [{"name": "col1"}, {"name": "col2"}]},
+        True,
+        True,
+        0,
+        None,
+    ),
 )
 
 
 @pytest.mark.parametrize(
     (
         "input_args",
+        "model_prop",
         "valid_manifest",
         "valid_catalog",
         "expected_status_code",
@@ -29,6 +64,7 @@ TESTS = (
 )
 def test_generate_model_properties_file(
     input_args,
+    model_prop,
     valid_manifest,
     valid_catalog,
     expected_status_code,
@@ -43,7 +79,16 @@ def test_generate_model_properties_file(
         input_args.extend(["--manifest", manifest_path_str])
     if valid_catalog:
         input_args.extend(["--catalog", catalog_path_str])
-    status_code = main(input_args)
+
+    if expected_status_code == 1:
+        with patch(
+            "pre_commit_dbt.generate_model_properties_file.get_model_properties"
+        ) as mock_get_model_properties:
+            mock_get_model_properties.return_value = model_prop
+            status_code = main(input_args)
+    else:
+        status_code = main(input_args)
+
     assert status_code == expected_status_code
     if expected:
         prefix = "version: 2\nmodels:\n"
@@ -66,6 +111,7 @@ models:
 @pytest.mark.parametrize(
     (
         "input_args",
+        "model_prop",
         "valid_manifest",
         "valid_catalog",
         "expected_status_code",
@@ -76,6 +122,7 @@ models:
 def test_generate_model_properties_file_existing_schema(
     schema,
     input_args,
+    model_prop,
     valid_manifest,
     valid_catalog,
     expected_status_code,
@@ -91,7 +138,14 @@ def test_generate_model_properties_file_existing_schema(
         input_args.extend(["--manifest", manifest_path_str])
     if valid_catalog:
         input_args.extend(["--catalog", catalog_path_str])
-    status_code = main(input_args)
+    if expected_status_code == 1:
+        with patch(
+            "pre_commit_dbt.generate_model_properties_file.get_model_properties"
+        ) as mock_get_model_properties:
+            mock_get_model_properties.return_value = model_prop
+            status_code = main(input_args)
+    else:
+        status_code = main(input_args)
     assert status_code == expected_status_code
     if expected:
         schema = "version: 2\nmodels:\n" if schema == """version: 2""" else schema

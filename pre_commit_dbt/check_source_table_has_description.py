@@ -5,7 +5,7 @@ from typing import Sequence
 
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import get_source_schemas
-from pre_commit_dbt.utils import color_string_red
+from pre_commit_dbt.utils import red
 
 
 def has_description(paths: Sequence[str]) -> int:
@@ -19,7 +19,7 @@ def has_description(paths: Sequence[str]) -> int:
         if not schema.table_schema.get("description"):
             status_code = 1
             print(
-                f"{color_string_red(f'{schema.source_name}.{schema.table_name}')}: "
+                f"{red(f'{schema.source_name}.{schema.table_name}')}: "
                 f"does not have defined description.",
             )
     return status_code
