@@ -92,7 +92,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             result = "\n- ".join(list(tables))  # pragma: no mutate
             print(
                 f"{red(filename)}: "
-                f"does not use source() or ref() macros for tables:\n- {yellow(result)}",
+                f"does not use source() or ref() macros for tables:\n",
+                f"- {yellow(result)}",
             )
             status_code = status_code_file
 

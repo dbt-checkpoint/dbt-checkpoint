@@ -41,7 +41,7 @@ def check_column_name_contract(
             elif re.match(pattern, col_name):
                 status_code = 1
                 print(
-                    f"{red(col_name)}: column name matches regex pattern {yellow(pattern)} "
+                    f"{red(col_name)}: name matches regex pattern {yellow(pattern)} "
                     f"and is of type {yellow(col_type)} instead of {yellow(dtype)}."
                 )
 

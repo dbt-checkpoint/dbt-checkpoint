@@ -38,7 +38,7 @@ def check_test_cnt(
             status_code = 1
             print(
                 f"{red(f'{schema.source_name}.{schema.table_name}')}: "
-                f"has only {yellow(source_test_cnt)} tests, but {red(test_cnt)} are required.",
+                f"has {yellow(source_test_cnt)} tests, {red(test_cnt)} are required.",
             )
     return status_code
 

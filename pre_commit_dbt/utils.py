@@ -1,5 +1,4 @@
 import argparse
-import glob
 import json
 import subprocess
 from dataclasses import dataclass
@@ -130,9 +129,10 @@ def get_models(
     include_ephemeral: bool = False,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():
-        # Ephemeral models break many tests and should be wholly excluded, someone can make an
-        # argument for their inclusion on a case by case basis in which case we would pass `include_ephemeral`
+    for key, node in nodes.items():  # pragma: no cover
+        # Ephemeral models break many tests and should be wholly excluded,
+        # someone can make an argument for their inclusion on a case by case basis
+        # in which case we would pass `include_ephemeral`
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -149,7 +149,7 @@ def get_ephemeral(
 ) -> List[str]:
     output = []
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():
+    for key, node in nodes.items():  # pragma: no cover
         if not node.get("config", {}).get("materialized") == "ephemeral":
             continue
         split_key = key.split(".")
@@ -423,18 +423,18 @@ class ParseDict(argparse.Action):  # pragma: no cover
 
 
 def add_related_sqls(
-    yml_path,
-    nodes: Dict[str, Any],
+    yml_path: str,
+    nodes: Dict[Any, Any],
     paths_with_missing: List[str],
     include_ephemeral: bool = False,
-) -> None:
+) -> NoReturn:
     yml_path_class = Path(yml_path)
     yml_path_parts = list(yml_path_class.parts)
 
     root_path = yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
-    for key, node in nodes.items():
+    for key, node in nodes.items():  # pragma: no cover
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -448,12 +448,12 @@ def add_related_sqls(
 
 
 def add_related_ymls(
-    sql_path,
-    nodes: Dict[str, Any],
+    sql_path: str,
+    nodes: Dict[Any, Any],
     paths_with_missing: List[str],
     include_ephemeral: bool = False,
-) -> None:
-    for key, node in nodes.items():
+) -> NoReturn:
+    for key, node in nodes.items():  # pragma: no cover
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -477,13 +477,13 @@ def add_related_ymls(
 
 def get_missing_file_paths(
     paths: Sequence[str],
-    manifest: Dict[str, Any] = None,
+    manifest: Dict[Any, Any] = {},
     include_ephemeral: bool = False,
-):
+) -> List[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = list(paths)
 
-    if nodes:
+    if nodes:  # pragma: no cover
         for path in paths:
             suffix = Path(path).suffix.lower()
             if suffix == ".sql":
@@ -495,9 +495,9 @@ def get_missing_file_paths(
     return paths_with_missing
 
 
-def red(string: str):
+def red(string: Optional[Any]) -> str:
     return "\033[91m" + str(string) + "\033[0m"
 
 
-def yellow(string: str):
+def yellow(string: Optional[Any]) -> str:
     return "\033[93m" + str(string) + "\033[0m"
