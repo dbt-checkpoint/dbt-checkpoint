@@ -9,14 +9,18 @@ from typing import Tuple
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_missing_file_paths
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import JsonOpenError
+from pre_commit_dbt.utils import red
 
 
 def has_properties_file(
     paths: Sequence[str], manifest: Dict[str, Any]
 ) -> Tuple[int, Set[str]]:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
@@ -30,7 +34,7 @@ def has_properties_file(
     for model in missing:
         status_code = 1
         print(
-            f"{sqls.get(model)}: "
+            f"{red(sqls.get(model))}: "
             f"does not have model properties defined in any .yml file.",
         )
     return status_code, missing

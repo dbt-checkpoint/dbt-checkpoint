@@ -8,10 +8,10 @@ from typing import Set
 from typing import Tuple
 
 from pre_commit_dbt.utils import add_filenames_args
+from pre_commit_dbt.utils import red
+from pre_commit_dbt.utils import yellow
 
-REGEX_COMMENTS = (
-    r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
-)
+REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 REGEX_SPLIT = r"[\s]+"
 IGNORE_WORDS = ["", "(", "{{"]  # pragma: no mutate
 REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
@@ -41,12 +41,17 @@ def add_space_to_parenthesis(sql: str) -> str:
     return re.sub(REGEX_PARENTHESIS, r" \1 ", sql)
 
 
+def add_space_to_source_ref(sql: str) -> str:
+    return sql.replace("{{", "{{ ").replace("}}", " }}")
+
+
 def has_table_name(
     sql: str, filename: str, dotless: Optional[bool] = False
 ) -> Tuple[int, Set[str]]:
     status_code = 0
     sql_clean = replace_comments(sql)
     sql_clean = add_space_to_parenthesis(sql_clean)
+    sql_clean = add_space_to_source_ref(sql_clean)
     sql_split = re.split(REGEX_SPLIT, sql_clean)
     tables = set()
     cte = set()
@@ -86,8 +91,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if status_code_file:
             result = "\n- ".join(list(tables))  # pragma: no mutate
             print(
-                f"{filename}: "
-                f"does not use source() or ref() macros for tables:\n- {result}",
+                f"{red(filename)}: "
+                f"does not use source() or ref() macros for tables:\n",
+                f"- {yellow(result)}",
             )
             status_code = status_code_file
 

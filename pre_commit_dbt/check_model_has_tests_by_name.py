@@ -8,6 +8,7 @@ from typing import Sequence
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_missing_file_paths
 from pre_commit_dbt.utils import get_model_sqls
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import get_parent_childs
@@ -19,6 +20,8 @@ from pre_commit_dbt.utils import Test
 def check_test_cnt(
     paths: Sequence[str], manifest: Dict[str, Any], required_tests: Dict[str, int]
 ) -> int:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
