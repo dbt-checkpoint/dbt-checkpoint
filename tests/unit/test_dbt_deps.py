@@ -11,7 +11,7 @@ def test_dbt_deps():
             b"stderr",
         )
         mock_popen.return_value.returncode = 0
-        result = main()
+        result = main(argv=[])
         assert result == 0
 
 
@@ -22,7 +22,7 @@ def test_dbt_deps_error():
             b"stderr",
         )
         mock_popen.return_value.returncode = 1
-        result = main()
+        result = main(argv=[])
         assert result == 1
 
 

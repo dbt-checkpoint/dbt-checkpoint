@@ -17,6 +17,8 @@ from pre_commit_dbt.utils import get_macros
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import Macro
 from pre_commit_dbt.utils import MacroSchema
+from pre_commit_dbt.utils import red
+from pre_commit_dbt.utils import yellow
 
 
 def check_argument_desc(
@@ -66,8 +68,8 @@ def check_argument_desc(
             status_code = 1
             result = "\n- ".join(list(arguments))  # pragma: no mutate
             print(
-                f"{sqls.get(macro)}: "
-                f"following arguments are missing description:\n- {result}",
+                f"{red(sqls.get(macro))}: "
+                f"following arguments are missing description:\n- {yellow(result)}",
             )
     return status_code, missing
 
