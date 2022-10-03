@@ -183,7 +183,8 @@ TESTS = (  # type: ignore
     (
         """
 with assets as (
-    select * from {{ ref('stg_rse__assets') }}
+    -- Test for no space in jinja expression
+    select * from {{ref('stg_rse__assets')}}
 ),
 
 asset_category as (

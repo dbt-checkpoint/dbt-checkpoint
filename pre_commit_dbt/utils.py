@@ -126,13 +126,37 @@ def get_json(json_filename: str) -> Dict[str, Any]:
 def get_models(
     manifest: Dict[str, Any],
     filenames: Set[str],
+    include_ephemeral: bool = False,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():
+    for key, node in nodes.items():  # pragma: no cover
+        # Ephemeral models break many tests and should be wholly excluded,
+        # someone can make an argument for their inclusion on a case by case basis
+        # in which case we would pass `include_ephemeral`
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
+            continue
         split_key = key.split(".")
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "model":
             yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
+
+
+def get_ephemeral(
+    manifest: Dict[str, Any],
+) -> List[str]:
+    output = []
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():  # pragma: no cover
+        if not node.get("config", {}).get("materialized") == "ephemeral":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if split_key[0] == "model":
+            output.append(filename)
+    return output
 
 
 def get_macros(
@@ -162,26 +186,28 @@ def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, 
 
 
 def get_model_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
+    ephemeral = get_ephemeral(manifest)
     sqls = get_filenames(paths, [".sql"])
     macro_sqls = get_macro_sqls(paths, manifest)
-    return {k: v for k, v in sqls.items() if k not in macro_sqls}
+    return {k: v for k, v in sqls.items() if k not in macro_sqls and k not in ephemeral}
 
 
 def get_model_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[ModelSchema, None, None]:
     for yml_file in yml_files:
-        schema = yaml.safe_load(yml_file.open())
-        for model in schema.get("models", []):
-            if isinstance(model, dict) and model.get("name"):
-                model_name = model.get("name", "")  # pragma: no mutate
-                if model_name in filenames or all_schemas:
-                    yield ModelSchema(
-                        model_name=model_name,
-                        file=yml_file,
-                        filename=yml_file.stem,
-                        schema=model,
-                    )
+        with open(yml_file, "r") as file:
+            schema = yaml.safe_load(file)
+            for model in schema.get("models", []):
+                if isinstance(model, dict) and model.get("name"):
+                    model_name = model.get("name", "")  # pragma: no mutate
+                    if model_name in filenames or all_schemas:
+                        yield ModelSchema(
+                            model_name=model_name,
+                            file=yml_file,
+                            filename=yml_file.stem,
+                            schema=model,
+                        )
 
 
 def get_macro_schemas(
@@ -394,3 +420,84 @@ class ParseDict(argparse.Action):  # pragma: no cover
                 result[key] = value
 
         setattr(namespace, self.dest, result)
+
+
+def add_related_sqls(
+    yml_path: str,
+    nodes: Dict[Any, Any],
+    paths_with_missing: List[str],
+    include_ephemeral: bool = False,
+) -> NoReturn:
+    yml_path_class = Path(yml_path)
+    yml_path_parts = list(yml_path_class.parts)
+
+    root_path = yml_path_parts.pop(0)
+    dbt_patch_path = "/".join(yml_path_parts)
+
+    for key, node in nodes.items():  # pragma: no cover
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
+            continue
+        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+            if ".sql" in node["original_file_path"].lower():
+                target_sql_name = f"{root_path}/{node['original_file_path']}"
+                if target_sql_name not in paths_with_missing:
+                    paths_with_missing.append(target_sql_name)
+
+
+def add_related_ymls(
+    sql_path: str,
+    nodes: Dict[Any, Any],
+    paths_with_missing: List[str],
+    include_ephemeral: bool = False,
+) -> NoReturn:
+    for key, node in nodes.items():  # pragma: no cover
+        if (
+            not include_ephemeral
+            and node.get("config", {}).get("materialized") == "ephemeral"
+        ):
+            continue
+
+        if node.get("path") and (node.get("path") in sql_path):
+            patch_path = node.get("patch_path", None)
+            if patch_path:
+                root_folder = Path(node["root_path"]).name
+
+                # Original patch_path has 'project\\path\to\yml.yml'
+                patch_path = Path(patch_path)
+                # Remove the project_name from patch_path
+                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
+
+                target_yml_path = f"{root_folder}/{clean_patch_path}"
+                if target_yml_path not in paths_with_missing:
+                    paths_with_missing.append(target_yml_path)
+
+
+def get_missing_file_paths(
+    paths: Sequence[str],
+    manifest: Dict[Any, Any] = {},
+    include_ephemeral: bool = False,
+) -> List[str]:
+    nodes = manifest.get("nodes", {})
+    paths_with_missing = list(paths)
+
+    if nodes:  # pragma: no cover
+        for path in paths:
+            suffix = Path(path).suffix.lower()
+            if suffix == ".sql":
+                add_related_ymls(path, nodes, paths_with_missing, include_ephemeral)
+            elif suffix == ".yml" or suffix == ".yaml":
+                add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
+            else:
+                continue
+    return paths_with_missing
+
+
+def red(string: Optional[Any]) -> str:
+    return "\033[91m" + str(string) + "\033[0m"
+
+
+def yellow(string: Optional[Any]) -> str:
+    return "\033[93m" + str(string) + "\033[0m"

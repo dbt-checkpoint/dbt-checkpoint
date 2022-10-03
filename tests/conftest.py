@@ -6,19 +6,81 @@ from pre_commit_dbt.utils import cmd_output
 
 MANIFEST = {
     "nodes": {
-        "model.with_schema": {"patch_path": "/path/exists"},
-        "model.without_schema": {"patch_path": ""},
-        "model.with_description": {"description": "test description"},
-        "model.without_description": {"description": ""},
-        "model.with_columns": {"columns": {"test": {"name": "test"}}},
-        "model.without_columns": {},
-        "model.with_meta": {"meta": {"foo": "test", "bar": "test"}},
-        "model.with_meta_foo": {"meta": {"foo": "test"}},
-        "model.without_meta": {},
-        "model.with_tags": {"tags": ["foo", "bar"]},
-        "model.with_tags_foo": {"tags": ["foo"]},
-        "model.with_tags_empty": {"tags": []},
-        "model.without_tags": {"database": "prod", "schema": "test"},
+        "model.with_schema": {
+            "patch_path": "project://bb/with_schema.yml",
+            "path": "aa/bb/with_schema.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_schema": {
+            "patch_path": "",
+            "path": "aa/bb/without_schema.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_description": {
+            "description": "test description",
+            "patch_path": "project://bb/with_description.yml",
+            "path": "aa/bb/with_description.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_description": {
+            "description": "",
+            "patch_path": "project://bb/without_description.yml",
+            "path": "aa/bb/without_description.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_columns": {
+            "columns": {"test": {"name": "test"}},
+            "patch_path": "project://bb/with_columns.yml",
+            "path": "aa/bb/with_columns.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_columns": {
+            "patch_path": "project://bb/without_columns.yml",
+            "path": "aa/bb/without_columns.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_meta": {
+            "meta": {"foo": "test", "bar": "test"},
+            "patch_path": "project://bb/with_meta.yml",
+            "path": "aa/bb/with_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_meta_foo": {
+            "meta": {"foo": "test"},
+            "patch_path": "project://bb/with_meta_foo.yml",
+            "path": "aa/bb/with_meta_foo.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_meta": {
+            "patch_path": "project://bb/without_meta.yml",
+            "path": "aa/bb/without_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_tags": {
+            "tags": ["foo", "bar"],
+            "patch_path": "project://bb/with_tags.yml",
+            "path": "aa/bb/with_tags.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_tags_foo": {
+            "tags": ["foo"],
+            "patch_path": "project://bb/with_tags_foo.yml",
+            "path": "aa/bb/with_tags_foo.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_tags_empty": {
+            "tags": [],
+            "patch_path": "project://bb/with_tags_empty.yml",
+            "path": "aa/bb/with_tags_empty.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_tags": {
+            "database": "prod",
+            "schema": "test",
+            "patch_path": "project://bb/without_tags.yml",
+            "path": "aa/bb/without_tags.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.test.catalog_cols": {
             "database": "test",
             "schema": "test",
@@ -28,12 +90,18 @@ MANIFEST = {
                 "col1": {"name": "col1", "description": "test"},
                 "col2": {"name": "col2", "description": "test"},
             },
+            "patch_path": "project://bb/catalog_cols.yml",
+            "path": "aa/bb/catalog_cols.sql",
+            "root_path": "/path/to/aa",
         },
         "model.test.partial_catalog_cols": {
             "name": "partial_catalog_cols",
             "columns": {
                 "col1": {"name": "col1", "description": "test"},
             },
+            "patch_path": "project://bb/partial_catalog_cols.yml",
+            "path": "aa/bb/partial_catalog_cols.sql",
+            "root_path": "/path/to/aa",
         },
         "model.test.only_model_cols": {
             "name": "only_model_cols",
@@ -41,6 +109,9 @@ MANIFEST = {
                 "col1": {"name": "col1", "description": "test"},
                 "col2": {"name": "col2", "description": "test"},
             },
+            "patch_path": "project://bb/only_model_cols.yml",
+            "path": "aa/bb/only_model_cols.sql",
+            "root_path": "/path/to/aa",
         },
         "model.test.without_catalog": {
             "name": "without_catalog",
@@ -51,52 +122,120 @@ MANIFEST = {
                 "col1": {"name": "col1", "description": "test"},
                 "col2": {"name": "col2", "description": "test"},
             },
+            "patch_path": "project://bb/without_catalog.yml",
+            "path": "aa/bb/without_catalog.sql",
+            "root_path": "/path/to/aa",
         },
-        "model.test.only_catalog_cols": {"name": "only_catalog_cols", "columns": {}},
+        "model.test.only_catalog_cols": {
+            "name": "only_catalog_cols",
+            "columns": {},
+            "patch_path": "project://bb/only_catalog_cols.yml",
+            "path": "aa/bb/only_catalog_cols.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.with_column_description": {
             "columns": {
                 "test1": {"name": "test1", "description": "test"},
                 "test2": {"name": "test2", "description": "test"},
-            }
+            },
+            "patch_path": "project://bb/with_column_description.yml",
+            "path": "aa/bb/with_column_description.sql",
+            "root_path": "/path/to/aa",
         },
         "model.with_some_column_description": {
             "columns": {
                 "test1": {"name": "test1", "description": "test"},
                 "test2": {"name": "test2"},
-            }
+            },
+            "patch_path": "project://bb/with_some_column_description.yml",
+            "path": "aa/bb/with_some_column_description.sql",
+            "root_path": "/path/to/aa",
         },
         "model.without_columns_description": {
-            "columns": {"test1": {"name": "test1"}, "test2": {"name": "test2"}}
+            "columns": {
+                "test1": {"name": "test1"},
+                "test2": {"name": "test2"},
+                "patch_path": "project://bb/without_columns_description.yml",
+                "path": "aa/bb/without_columns_description.sql",
+                "root_path": "/path/to/aa",
+            }
         },
         "model.same_col_desc_1": {
             "columns": {
                 "test1": {"name": "test1", "description": "test"},
                 "test2": {"name": "test2", "description": "test"},
-            }
+            },
+            "patch_path": "project://bb/same_col_desc_1.yml",
+            "path": "aa/bb/same_col_desc_1.sql",
+            "root_path": "/path/to/aa",
         },
         "model.same_col_desc_2": {
             "columns": {
                 "test1": {"name": "test1", "description": "test"},
                 "test2": {"name": "test2"},
-            }
+            },
+            "patch_path": "project://bb/same_col_desc_2.yml",
+            "path": "aa/bb/same_col_desc_2.sql",
+            "root_path": "/path/to/aa",
         },
         "model.same_col_desc_3": {
             "columns": {
                 "test1": {"name": "test1", "description": "test1"},
                 "test2": {"name": "test2", "description": "test2"},
-            }
+            },
+            "patch_path": "project://bb/same_col_desc_3.yml",
+            "path": "aa/bb/same_col_desc_3.sql",
+            "root_path": "/path/to/aa",
         },
         "test.test1": {"tags": ["schema"], "test_metadata": {"name": "unique"}},
         "test.test2": {"tags": ["data"]},
         "test.test3": {"tags": ["schema"], "test_metadata": {"name": "unique_where"}},
-        "model.with_test1": {},
-        "model.with_test2": {},
-        "model.with_test3": {},
-        "model.without_test": {},
-        "model.replaced_model": {"alias": "replaced_model"},
-        "model.ref1": {"name": "ref1", "database": "core", "schema": "test"},
-        "model.ref2": {"name": "ref2"},
-        "model.parent_child": {"name": "parent_child"},
+        "model.with_test1": {
+            "patch_path": "project://bb/with_test1.yml",
+            "path": "aa/bb/with_test1.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_test2": {
+            "patch_path": "project://bb/with_test2.yml",
+            "path": "aa/bb/with_test2.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_test3": {
+            "patch_path": "project://bb/with_test3.yml",
+            "path": "aa/bb/with_test3.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_test": {
+            "patch_path": "project://bb/without_test.yml",
+            "path": "aa/bb/without_test.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.replaced_model": {
+            "alias": "replaced_model",
+            "patch_path": "project://bb/replaced_model.yml",
+            "path": "aa/bb/replaced_model.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.ref1": {
+            "name": "ref1",
+            "database": "core",
+            "schema": "test",
+            "patch_path": "project://bb/ref1.yml",
+            "path": "aa/bb/ref1.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.ref2": {
+            "name": "ref2",
+            "patch_path": "project://bb/ref2.yml",
+            "path": "aa/bb/ref2.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.parent_child": {
+            "name": "parent_child",
+            "patch_path": "project://bb/parent_child.yml",
+            "path": "aa/bb/parent_child.sql",
+            "root_path": "/path/to/aa",
+        },
     },
     "sources": {
         "source.source1.table1": {
