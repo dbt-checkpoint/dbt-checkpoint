@@ -35,16 +35,6 @@ TESTS = (
 )
 
 
-# with patch("pre_commit_dbt.utils.subprocess.Popen") as mock_popen:
-#         mock_popen.return_value.communicate.return_value = (
-#             b"stdout",
-#             b"stderr",
-#         )
-#         mock_popen.return_value.returncode = 0
-#         result = main(("test",))
-#         assert result == 0
-
-
 @pytest.mark.parametrize(
     ("input_args", "schema", "valid_manifest", "expected_status_code"), TESTS
 )
