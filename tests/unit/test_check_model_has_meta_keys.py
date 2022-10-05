@@ -1,8 +1,6 @@
-from unittest.mock import mock_open
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
 
 import pytest
-
 from pre_commit_dbt.check_model_has_meta_keys import main
 
 # Input args, valid manifest, expected return value
@@ -40,12 +38,22 @@ TESTS = (
         True,
         1,
     ),
+    (
+        ["aa/bb/with_meta.sql", "--meta-keys", "foo", "--allow-extra-keys"],
+        {"models": [{"name": "with_meta", "meta": {"foo": "bar", "baz": "test"}}]},
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/with_meta.sql", "--meta-keys", "baz"],
+        {"models": [{"name": "with_meta", "meta": {"foo": "bar", "baz": "test"}}]},
+        True,
+        1,
+    ),
 )
 
 
-@pytest.mark.parametrize(
-    ("input_args", "schema", "valid_manifest", "expected_status_code"), TESTS
-)
+@pytest.mark.parametrize(("input_args", "schema", "valid_manifest", "expected_status_code"), TESTS)
 def test_check_model_meta_keys(
     input_args, schema, valid_manifest, expected_status_code, manifest_path_str
 ):
