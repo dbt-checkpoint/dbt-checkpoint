@@ -179,7 +179,6 @@ and store this file in project root `./profiles.yml`.
 - create new file e.g. `main.yml`
 - specify your workflow e.g.:
 
-
 ```
 name: pre-commit
 

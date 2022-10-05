@@ -8,6 +8,7 @@ from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import get_missing_file_paths
 from pre_commit_dbt.utils import get_models
 from pre_commit_dbt.utils import get_parent_childs
 from pre_commit_dbt.utils import JsonOpenError
@@ -19,6 +20,8 @@ def check_parents_schema(
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
 ) -> int:
+    paths = get_missing_file_paths(paths, manifest)
+
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())

@@ -1,3 +1,6 @@
+from unittest.mock import mock_open
+from unittest.mock import patch
+
 import pytest
 
 from pre_commit_dbt.check_model_columns_have_desc import check_column_desc
@@ -6,22 +9,89 @@ from pre_commit_dbt.check_model_columns_have_desc import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
-    (["aa/bb/with_column_description.sql"], True, 0),
-    (["aa/bb/with_column_description.sql"], False, 1),
-    (["aa/bb/without_columns_description.sql"], True, 1),
-    (["aa/bb/with_some_column_description.sql"], True, 1),
+    (
+        ["aa/bb/with_column_description.sql"],
+        {
+            "models": [
+                {
+                    "name": "with_description",
+                    "description": "test description",
+                    "columns": [
+                        {"name": "column_1", "description": "description_1"},
+                        {"name": "column_2", "description": "description_2"},
+                    ],
+                }
+            ]
+        },
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/with_column_description.sql"],
+        {
+            "models": [
+                {
+                    "name": "with_description",
+                    "description": "test description",
+                    "columns": [
+                        {"name": "column_1", "description": "description_1"},
+                        {"name": "column_2", "description": "description_2"},
+                    ],
+                }
+            ]
+        },
+        False,
+        1,
+    ),
+    (
+        ["aa/bb/without_columns_description.sql"],
+        {
+            "models": [
+                {
+                    "name": "with_description",
+                    "description": "test description",
+                    "columns": [
+                        {"name": "column_1"},
+                        {"name": "column_2"},
+                    ],
+                }
+            ]
+        },
+        True,
+        1,
+    ),
+    (
+        ["aa/bb/with_some_column_description.sql"],
+        {
+            "models": [
+                {
+                    "name": "with_description",
+                    "description": "test description",
+                    "columns": [
+                        {"name": "column_1", "description": "description_1"},
+                        {"name": "column_2"},
+                    ],
+                }
+            ]
+        },
+        True,
+        1,
+    ),
 )
 
 
 @pytest.mark.parametrize(
-    ("input_args", "valid_manifest", "expected_status_code"), TESTS
+    ("input_args", "schema", "valid_manifest", "expected_status_code"), TESTS
 )
 def test_check_model_columns_have_desc(
-    input_args, valid_manifest, expected_status_code, manifest_path_str
+    input_args, schema, valid_manifest, expected_status_code, manifest_path_str
 ):
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])
-    status_code = main(input_args)
+    with patch("builtins.open", mock_open(read_data="data")):
+        with patch("pre_commit_dbt.utils.yaml.safe_load") as mock_safe_load:
+            mock_safe_load.return_value = schema
+            status_code = main(input_args)
     assert status_code == expected_status_code
 
 

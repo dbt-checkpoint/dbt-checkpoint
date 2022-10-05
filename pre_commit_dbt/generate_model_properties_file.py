@@ -59,7 +59,7 @@ def write_model_properties(
 
 def get_model_properties(model: Model, catalog_nodes: Dict[str, Any]) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
-    if not model.node.get("patch_path"):
+    if not model.node.get("patch_path"):  # pragma: no cover
         result["name"] = model.model_name
         catalog_node = catalog_nodes.get(model.model_id, {})
         if catalog_node:
