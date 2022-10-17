@@ -1622,7 +1622,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: dbt-compile
-   args: ["--model-prefix". "+", "--"]
+   args: ["--model-prefix", "+", "--"]
 ```
 
 or
