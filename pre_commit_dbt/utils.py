@@ -3,16 +3,18 @@ import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import NoReturn
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Text
-from typing import Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    List,
+    NoReturn,
+    Optional,
+    Sequence,
+    Set,
+    Text,
+    Union,
+)
 
 import yaml
 
@@ -496,8 +498,8 @@ def get_missing_file_paths(
 
 
 def red(string: Optional[Any]) -> str:
-    return "\033[91m" + str(string) + "\033[0m"
+    return "\\e[0;91m" + str(string) + "\\e[0m"
 
 
 def yellow(string: Optional[Any]) -> str:
-    return "\033[93m" + str(string) + "\033[0m"
+    return "\\e[0;93m" + str(string) + "\\e[0m"
