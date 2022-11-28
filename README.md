@@ -101,8 +101,8 @@ pip install pre-commit
 2. Add [list of hooks](#list-of-pre-commit-dbt-hooks) you want to run befor every commit. E.g.:
 ```
 repos:
-- repo: https://github.com/offbi/pre-commit-dbt
-  rev: v1.0.0
+- repo: https://github.com/datacoves/pre-commit-dbt
+  rev: v2.0.0
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
