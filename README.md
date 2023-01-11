@@ -1,6 +1,6 @@
 ## IMPORTANT NOTE
 
-This repository was moved from https://github.com/dbt-checkpoint/dbt-checkpoint, originally created by [Radek Tomšej](https://github.com/tomsej).
+This repository was moved from [offbi/pre-commit-dbt](https://github.com/offbi/pre-commit-dbt) on Jan 11th, originally created by [Radek Tomšej](https://github.com/tomsej).
 This new version is maintained by [Datacoves](https://datacoves.com) and [Montreal Analytics](https://www.montrealanalytics.com/).
 Please update any reference to the old repo.
 
