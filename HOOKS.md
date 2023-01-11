@@ -280,10 +280,13 @@ If you `run` your model and then you delete the description from a properties fi
 
 Ensures that the model has a list of valid meta keys. (usually `schema.yml`).
 
+By default, it does not allow the model to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the model.
+`--meta-keys`: list of the required keys in the meta part of the model.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 ```
@@ -1619,7 +1622,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: dbt-compile
-   args: ["--model-prefix". "+", "--"]
+   args: ["--model-prefix", "+", "--"]
 ```
 
 or

@@ -1,9 +1,8 @@
-from unittest.mock import mock_open
-from unittest.mock import patch
-
 import pytest
+from unittest.mock import patch, mock_open
 
 from pre_commit_dbt.check_model_has_meta_keys import main
+
 
 # Input args, valid manifest, expected return value
 TESTS = (

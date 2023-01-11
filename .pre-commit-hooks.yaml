@@ -92,6 +92,11 @@
   entry: check-model-parents-schema
   language: python
   types_or: [yaml, sql]
+- id: check-model-parents-database
+  name: Check parent models or sources are from certain database
+  entry: check-model-parents-database
+  language: python
+  types_or: [sql, yaml]
 - id: check-model-parents-and-childs
   name: Check the model has a parents/childs
   description: Ensures the model has a specific number (max/min) of parents or/and childs.

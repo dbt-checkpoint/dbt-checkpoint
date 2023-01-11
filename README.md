@@ -1,3 +1,13 @@
+## IMPORTANT NOTE - DEPRECATION WARNING
+
+This repository is deprecated and no longer maintaned. We invite you to start using the forked version maintained by [Datacoves](https://datacoves.com) on [datacoves/pre-commit-dbt](https://github.com/datacoves/pre-commit-dbt).
+
+### Acknowledgements
+
+Thank you to [Radek Tomšej](https://github.com/tomsej) for initial development and maintenance of this great package, and for sharing your work with the community!
+
+---
+
 <p align="center">
  <img src=".github/pre-commit-dbt.png" alt="dbt-pre-commit" width=600/>
  <h1 align="center">pre-commit-dbt</h1>
