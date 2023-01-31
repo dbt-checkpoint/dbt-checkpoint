@@ -186,7 +186,7 @@
   description: Ensures that the source has a number of tests of a certain group (unique, unique-combination-of-columns).
   entry: check-source-has-tests-by-group
   language: python
-  types_or: [yaml]
+  types_or: [sql, yaml]
 - id: check-source-has-tests
   name: Check the source has tests
   description: Ensures that the source has a number of tests.
