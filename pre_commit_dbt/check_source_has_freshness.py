@@ -21,6 +21,10 @@ def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> int:
         source = schema.source_schema
         table = schema.table_schema
         merged = {**source.get("freshness", {}), **table.get("freshness", {})}
+        # if filter is present, remove it because it's not a dictionary like
+        # warn_after or error_after
+        if "filter" in merged.keys():
+            merged.pop("filter")
         freshness = {
             key
             for key, value in merged.items()
