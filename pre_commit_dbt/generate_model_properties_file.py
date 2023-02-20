@@ -1,4 +1,6 @@
 import argparse
+import os
+import time
 from pathlib import Path
 from typing import Any
 from typing import Dict
@@ -6,11 +8,12 @@ from typing import NoReturn
 from typing import Optional
 from typing import Sequence
 
-import yaml
+from yaml import dump
+from yaml import safe_load
 
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_catalog_args
-from pre_commit_dbt.utils import add_filenames_args
-from pre_commit_dbt.utils import add_manifest_args
+from pre_commit_dbt.utils import add_default_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
@@ -19,7 +22,7 @@ from pre_commit_dbt.utils import Model
 
 
 def append_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoReturn:
-    file = yaml.safe_load(path.open())
+    file = safe_load(path.open())
     if file.get("models"):
         model = file.get("models")
     else:
@@ -28,7 +31,7 @@ def append_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoRet
     model.append(model_schema)
     model_name = model_schema.get("name")  # pragma: no mutate
     with open(path, "w") as f:
-        yaml.dump(file, f, default_flow_style=False, sort_keys=False)
+        dump(file, f, default_flow_style=False, sort_keys=False)
         print(
             f"{path}: the schema of the `{model_name}` model was appended to the file."
         )
@@ -39,7 +42,7 @@ def write_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoRetu
     file = {"version": 2, "models": [model_schema]}
     model_name = model_schema.get("name")  # pragma: no mutate
     with open(path, "w") as f:
-        yaml.dump(file, f, default_flow_style=False, sort_keys=False)
+        dump(file, f, default_flow_style=False, sort_keys=False)
         print(
             f"{path}: the schema of the `{model_name}` model was written to the file."
         )
@@ -82,7 +85,7 @@ def generate_properties_file(
     manifest: Dict[str, Any],
     catalog: Dict[str, Any],
     properties_file: str,
-) -> int:
+) -> Dict[str, Any]:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
@@ -103,13 +106,12 @@ def generate_properties_file(
         if model_prop:
             status_code = 1
             write_model_properties(properties_file, model_prop, path_template)
-    return status_code
+    return {"status_code": status_code}
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Optional[Sequence[str]] = None) -> Dict:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
-    add_manifest_args(parser)
+    add_default_args(parser)
     add_catalog_args(parser)
 
     parser.add_argument(
@@ -145,13 +147,30 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Unable to load catalog file ({e})")
         return 1
 
-    status_code = generate_properties_file(
+    start_time = time.time()
+    hook_properties = generate_properties_file(
         paths=args.filenames,
         manifest=manifest,
         catalog=catalog,
         properties_file=args.properties_file,
     )
-    return status_code
+    end_time = time.time()
+    script_args = vars(args)
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": "Generate model properties file.",
+            "status": hook_properties.get("status_code"),
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
+
+    return hook_properties.get("status_code")
 
 
 if __name__ == "__main__":

@@ -4,23 +4,33 @@ from pre_commit_dbt.check_model_tags import main
 
 
 TESTS = (
-    (["aa/bb/with_tags.sql", "--tags", "foo", "bar"], True, 0),
-    (["aa/bb/with_tags_foo.sql", "--tags", "foo", "bar"], True, 0),
-    (["aa/bb/with_tags_foo.sql", "--tags", "bar"], True, 1),
-    (["aa/bb/with_tags_empty.sql", "--tags", "bar"], True, 0),
-    (["aa/bb/without_tags.sql", "--tags", "foo", "bar"], True, 0),
-    (["aa/bb/without_tags.sql", "--tags", "foo", "bar"], False, 1),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar"], True, True, 0),
+    (["aa/bb/with_tags_foo.sql", "--is_test", "--tags", "foo", "bar"], True, True, 0),
+    (["aa/bb/with_tags_foo.sql", "--is_test", "--tags", "bar"], True, True, 1),
+    (["aa/bb/with_tags_empty.sql", "--is_test", "--tags", "bar"], True, True, 0),
+    (["aa/bb/without_tags.sql", "--is_test", "--tags", "foo", "bar"], True, True, 0),
+    (["aa/bb/without_tags.sql", "--is_test", "--tags", "foo", "bar"], False, True, 1),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar"], True, False, 0),
 )
 
 
 @pytest.mark.parametrize(
-    ("input_args", "valid_manifest", "expected_status_code"), TESTS
+    ("input_args", "valid_manifest", "valid_config", "expected_status_code"), TESTS
 )
 def test_check_model_tags(
-    input_args, valid_manifest, expected_status_code, manifest_path_str
+    input_args,
+    valid_manifest,
+    valid_config,
+    expected_status_code,
+    manifest_path_str,
+    config_path_str,
 ):
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])
+
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
+
     status_code = main(input_args)
     assert status_code == expected_status_code
 
@@ -28,7 +38,6 @@ def test_check_model_tags(
 def test_check_model_tags_in_changed(tmpdir, manifest_path_str):
     schema_yml = """
 version: 2
-
 models:
 -   name: in_schema_tags
     tags:
@@ -42,6 +51,7 @@ models:
         argv=[
             "in_schema_tags.sql",
             str(yml_file),
+            "--is_test",
             "--tags",
             "foo",
             "bar",

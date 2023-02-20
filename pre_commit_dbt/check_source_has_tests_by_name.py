@@ -1,4 +1,6 @@
 import argparse
+import os
+import time
 from itertools import groupby
 from pathlib import Path
 from typing import Any
@@ -6,6 +8,7 @@ from typing import Dict
 from typing import Optional
 from typing import Sequence
 
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json

@@ -27,6 +27,7 @@ TESTS = (
         0,
         True,
         True,
+        True,
         SCHEMA1,
         SCHEMA1,
     ),
@@ -35,6 +36,7 @@ TESTS = (
     SELECT * FROM {{ source("src", "src3") }} bb
     """,
         1,
+        True,
         True,
         True,
         SCHEMA1,
@@ -50,6 +52,7 @@ sources:
     SELECT * FROM {{ source("src", "src3") }} bb
     """,
         1,
+        True,
         True,
         True,
         SCHEMA2,
@@ -69,6 +72,7 @@ sources:
         1,
         True,
         True,
+        True,
         SCHEMA2,
         SCHEMA2,
     ),
@@ -79,6 +83,7 @@ sources:
     JOIN {{ source("src", "src1") }} aa ON aa.id = bb.id
     """,
         1,
+        True,
         True,
         True,
         SCHEMA1,
@@ -97,6 +102,7 @@ sources:
         0,
         True,
         True,
+        True,
         SCHEMA1,
         SCHEMA1,
     ),
@@ -110,6 +116,7 @@ sources:
         1,
         False,
         True,
+        True,
         SCHEMA1,
         SCHEMA1,
     ),
@@ -121,6 +128,21 @@ sources:
     JOIN {{ source("src", "src3") }} sr2 ON bb.id = sr2.id
     """,
         1,
+        True,
+        False,
+        True,
+        SCHEMA1,
+        SCHEMA1,
+    ),
+    (
+        """
+    SELECT * FROM {{ ref("ref1") }} bb
+    JOIN {{ ref("ref2") }} r ON bb.id = r.id
+    JOIN {{ source("src", "src1") }} sr1 ON bb.id = sr1.id
+    JOIN {{ source("src", "src2") }} sr2 ON bb.id = sr2.id
+    """,
+        0,
+        True,
         True,
         False,
         SCHEMA1,
@@ -135,6 +157,7 @@ sources:
         "expected_status_code",
         "valid_manifest",
         "valid_schema",
+        "valid_config",
         "input_schema",
         "schema_result",
     ),
@@ -146,21 +169,28 @@ def test_create_missing_sources(
     valid_manifest,
     valid_schema,
     input_schema,
+    valid_config,
     schema_result,
     manifest_path_str,
+    config_path_str,
     tmpdir,
 ):
     path = tmpdir.join("file.sql")
     schema = tmpdir.join("schema.yml")
     path.write_text(input_s, "utf-8")
     schema.write_text(input_schema, "utf-8")
+
     if valid_manifest:
         manifest_args = ["--manifest", manifest_path_str]
     else:
         manifest_args = []
     schema_file = str(schema) if valid_schema else "ff"
-    input_args = [str(path), "--schema-file", schema_file]
+    input_args = [str(path), "--schema-file", schema_file, "--is_test"]
     input_args.extend(manifest_args)
+
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
+
     ret = main(input_args)
 
     assert ret == expected_status_code

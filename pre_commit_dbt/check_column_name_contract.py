@@ -1,12 +1,15 @@
 import argparse
+import os
 import re
+import time
 from typing import Any
 from typing import Dict
 from typing import Optional
 from typing import Sequence
 
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_catalog_args
-from pre_commit_dbt.utils import add_filenames_args
+from pre_commit_dbt.utils import add_default_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_models
@@ -17,7 +20,7 @@ from pre_commit_dbt.utils import yellow
 
 def check_column_name_contract(
     paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
-) -> int:
+) -> Dict[str, Any]:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
@@ -45,12 +48,12 @@ def check_column_name_contract(
                     f"and is of type {yellow(col_type)} instead of {yellow(dtype)}."
                 )
 
-    return status_code
+    return {"status_code": status_code}
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
+    add_default_args(parser)
     add_catalog_args(parser)
 
     parser.add_argument(
@@ -69,17 +72,43 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        manifest = get_json(args.manifest)
+    except JsonOpenError as e:
+        print(f"Unable to load manifest file ({e})")
+        return 1
+
+    try:
         catalog = get_json(args.catalog)
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
 
-    return check_column_name_contract(
+    start_time = time.time()
+    hook_properties = check_column_name_contract(
         paths=args.filenames,
         pattern=args.pattern,
         dtype=args.dtype,
         catalog=catalog,
     )
+
+    end_time = time.time()
+
+    script_args = vars(args)
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": "Check column name abides to contract.",
+            "status": hook_properties.get("status_code"),
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
+
+    return hook_properties.get("status_code")
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ TESTS = (  # type: ignore
     SELECT * FROM AA
     """,
         [],
+        True,
         1,
         {"aa"},
     ),
@@ -22,6 +23,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         1,
         {"aa", "bb"},
     ),
@@ -34,6 +36,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         1,
         {"cc", "bb"},
     ),
@@ -46,6 +49,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         1,
         {"bb"},
     ),
@@ -61,6 +65,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         1,
         {"xx"},
     ),
@@ -76,6 +81,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         1,
         {"xx.xx.xx"},
     ),
@@ -88,6 +94,7 @@ TESTS = (  # type: ignore
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
         [],
+        True,
         0,
         {},
     ),
@@ -101,6 +108,7 @@ TESTS = (  # type: ignore
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
         [],
+        True,
         0,
         {},
     ),
@@ -116,6 +124,7 @@ TESTS = (  # type: ignore
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
         [],
+        True,
         0,
         {},
     ),
@@ -124,22 +133,20 @@ TESTS = (  # type: ignore
     with source as (
         select * from {{ source('aws_lambda', 'purchase_orders') }}
     ),
-
     flattened as (
         select * from source, lateral flatten(line_items)
     )
     """,
         [],
+        True,
         0,
         {},
     ),
     (
         """
-    {# This is a test of the check-script-has-no-table-name hook, from pre-commit-dbt
-
+    {# This is a test of the check-script-has-no-table-name hook, from dbt-gloss
     We would expect the hook to ignore this text because it is in a jinja comment block
     and not actually a join to any other table.
-
     #}
     with source as (
         select * from {{ source('aa', 'bb') }}
@@ -147,16 +154,15 @@ TESTS = (  # type: ignore
     SELECT * FROM source
     """,
         [],
+        True,
         0,
         {},
     ),
     (
         """
-    /* This is a test of the check-script-has-no-table-name hook, from pre-commit-dbt
-
+    /* This is a test of the check-script-has-no-table-name hook, from dbt-gloss
     We would expect the hook to ignore this text because it is in a jinja comment block
     and not actually a join to any other table.
-
     */
     with source as (
         select * from {{ source('aa', 'bb') }}
@@ -164,6 +170,7 @@ TESTS = (  # type: ignore
     SELECT * FROM source
     """,
         [],
+        True,
         0,
         {},
     ),
@@ -177,20 +184,18 @@ TESTS = (  # type: ignore
     SELECT * FROM source
     """,
         [],
+        True,
         0,
         {},
     ),
     (
         """
 with assets as (
-    -- Test for no space in jinja expression
-    select * from {{ref('stg_rse__assets')}}
+    select * from {{ ref('stg_rse__assets') }}
 ),
-
 asset_category as (
     select * from {{ ref('data_asset_category') }}
 ),
-
 final as (
     select
         assets.*,
@@ -201,31 +206,25 @@ final as (
                 then asset_category.asset_category
             else 'unknown'
         end as asset_category
-
     from assets
-
     left join asset_category using (ticker)
 )
-
 select * from final
     """,
         [],
+        True,
         0,
         {},
     ),
     (
         """
     {% set positions = ['left', 'right', 'center'] %}
-
 with
 {% for p in positions %}
-
     cte_{{ p }} as (
         select '{{ p }}' as position
     ),
-
 {% endfor %}
-
 unioned as (
     select * from cte_left
     union all
@@ -233,26 +232,22 @@ unioned as (
     union all
     select * from cte_center
 )
-
 select * from unioned
     """,
         ["--ignore-dotless-table"],
+        True,
         0,
         {},
     ),
     (
         """
     {% set positions = ['left', 'right', 'center'] %}
-
 with
 {% for p in positions %}
-
     cte_{{ p }} as (
         select '{{ p }}' as position
     ),
-
 {% endfor %}
-
 unioned as (
     select * from cte_left
     union all
@@ -262,10 +257,10 @@ unioned as (
     union all
     select * from aa.bb
 )
-
 select * from unioned
     """,
         ["--ignore-dotless-table"],
+        True,
         1,
         {"aa.bb"},
     ),
@@ -277,6 +272,7 @@ select * from unioned
     SELECT * FROM source
     """,
         [],
+        True,
         0,
         {},
     ),
@@ -290,14 +286,26 @@ select * from unioned
     {%- endmacro %}
     """,
         [],
+        True,
         0,
         {},
+    ),
+    (
+        """
+    SELECT * FROM AA
+    """,
+        [],
+        False,
+        1,
+        {"aa"},
     ),
 )
 
 
-@pytest.mark.parametrize(("input_s", "args", "expected_status_code", "output"), TESTS)
-def test_has_table_name(input_s, args, expected_status_code, output):
+@pytest.mark.parametrize(
+    ("input_s", "args", "valid_config", "expected_status_code", "output"), TESTS
+)
+def test_has_table_name(input_s, args, valid_config, expected_status_code, output):
     dotless = True if "--ignore-dotless-table" in args else False
     ret, tables = has_table_name(input_s, "text.sql", dotless)
     diff = tables.symmetric_difference(output)
@@ -305,14 +313,27 @@ def test_has_table_name(input_s, args, expected_status_code, output):
     assert ret == expected_status_code
 
 
-@pytest.mark.parametrize(("input_s", "args", "expected_status_code", "output"), TESTS)
+@pytest.mark.parametrize(
+    ("input_s", "args", "valid_config", "expected_status_code", "output"), TESTS
+)
 def test_has_table_name_integration(
-    input_s, args, expected_status_code, output, tmpdir
+    input_s,
+    args,
+    valid_config,
+    expected_status_code,
+    output,
+    tmpdir,
+    manifest_path_str,
+    config_path_str,
 ):
     path = tmpdir.join("file.txt")
     path.write_text(input_s, "utf-8")
+    input_args = ["--is_test", "--manifest", manifest_path_str, *args]
 
-    ret = main([str(path), *args])
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
+
+    ret = main([str(path), *input_args])
 
     assert ret == expected_status_code
 

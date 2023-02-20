@@ -10,6 +10,7 @@ TESTS = (
         {"name": "catalog_cols", "columns": [{"name": "col1"}, {"name": "col2"}]},
         True,
         True,
+        True,
         1,
         "- name: catalog_cols\n  columns:\n  - name: col1\n  - name: col2\n",
     ),
@@ -17,6 +18,7 @@ TESTS = (
         ["aa/bb/catalog_cols.sql"],
         {"name": "catalog_cols", "columns": [{"name": "col1"}, {"name": "col2"}]},
         False,
+        True,
         True,
         1,
         None,
@@ -26,6 +28,7 @@ TESTS = (
         {"name": "catalog_cols", "columns": [{"name": "col1"}, {"name": "col2"}]},
         True,
         False,
+        True,
         1,
         None,
     ),
@@ -36,6 +39,7 @@ TESTS = (
         },
         True,
         True,
+        True,
         1,
         "- name: without_catalog\n",
     ),
@@ -44,6 +48,16 @@ TESTS = (
         {"name": "with_schema", "columns": [{"name": "col1"}, {"name": "col2"}]},
         True,
         True,
+        True,
+        0,
+        None,
+    ),
+    (
+        ["aa/bb/with_schema.sql"],
+        {"name": "with_schema", "columns": [{"name": "col1"}, {"name": "col2"}]},
+        True,
+        True,
+        False,
         0,
         None,
     ),
@@ -56,6 +70,7 @@ TESTS = (
         "model_prop",
         "valid_manifest",
         "valid_catalog",
+        "valid_config",
         "expected_status_code",
         "expected",
     ),
@@ -66,10 +81,12 @@ def test_generate_model_properties_file(
     model_prop,
     valid_manifest,
     valid_catalog,
+    valid_config,
     expected_status_code,
     expected,
     manifest_path_str,
     catalog_path_str,
+    config_path_str,
     tmpdir_factory,
 ):
     properties_file = tmpdir_factory.mktemp("data").join("schema.yml")
@@ -78,6 +95,8 @@ def test_generate_model_properties_file(
         input_args.extend(["--manifest", manifest_path_str])
     if valid_catalog:
         input_args.extend(["--catalog", catalog_path_str])
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
 
     if expected_status_code == 1:
         with patch(
@@ -113,6 +132,7 @@ models:
         "model_prop",
         "valid_manifest",
         "valid_catalog",
+        "valid_config",
         "expected_status_code",
         "expected",
     ),
@@ -124,19 +144,23 @@ def test_generate_model_properties_file_existing_schema(
     model_prop,
     valid_manifest,
     valid_catalog,
+    valid_config,
     expected_status_code,
     expected,
     manifest_path_str,
     catalog_path_str,
+    config_path_str,
     tmpdir,
 ):
     properties_file = tmpdir.join("/schema.yml")
     properties_file.write(schema)
-    input_args.extend(["--properties-file", str(properties_file)])
+    input_args.extend(["--properties-file", str(properties_file), "--is_test"])
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])
     if valid_catalog:
         input_args.extend(["--catalog", catalog_path_str])
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
     if expected_status_code == 1:
         with patch(
             "pre_commit_dbt.generate_model_properties_file.get_model_properties"
@@ -165,7 +189,7 @@ models:
 - name: aa
 """
     )
-    input_args = ["aa/bb/with_schema.sql"]
+    input_args = ["aa/bb/with_schema.sql", "--is_test"]
     input_args.extend(["--properties-file", str(properties_file)])
     input_args.extend(["--manifest", manifest_path_str])
     input_args.extend(["--catalog", catalog_path_str])
@@ -179,7 +203,7 @@ def test_generate_model_properties_file_path_template(
     directory_tmp = "{database}/{schema}/{alias}/{name}.yml"
     directory = "test/test/test/catalog_cols.yml"
     properties_file = tmpdir.join(directory_tmp)
-    input_args = ["aa/bb/catalog_cols.sql"]
+    input_args = ["aa/bb/catalog_cols.sql", "--is_test"]
     input_args.extend(["--properties-file", str(properties_file)])
     input_args.extend(["--manifest", manifest_path_str])
     input_args.extend(["--catalog", catalog_path_str])

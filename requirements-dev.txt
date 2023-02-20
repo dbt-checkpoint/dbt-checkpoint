@@ -2,3 +2,5 @@ pytest
 pytest-cov
 mutmut
 pre-commit
+mixpanel
+pyyaml

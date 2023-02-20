@@ -1,5 +1,7 @@
 import argparse
+import os
 import re
+import time
 from typing import Any
 from typing import Dict
 from typing import FrozenSet
@@ -8,8 +10,8 @@ from typing import Sequence
 from typing import Set
 from typing import Tuple
 
-from pre_commit_dbt.utils import add_filenames_args
-from pre_commit_dbt.utils import add_manifest_args
+from pre_commit_dbt.tracking import dbtCheckpointTracking
+from pre_commit_dbt.utils import add_default_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import JsonOpenError
@@ -65,13 +67,14 @@ def check_refs_sources(
         status_code = 1
         print(f"Missing model (ref) {red(missing_ref)}")
 
-    return status_code, models, sources
+    hook_properties = {"status_code": status_code, "models": models, "sources": sources}
+
+    return hook_properties
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
-    add_manifest_args(parser)
+    add_default_args(parser)
 
     args = parser.parse_args(argv)
 
@@ -81,8 +84,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Unable to load manifest file ({e})")
         return 1
 
-    status_code, _, _ = check_refs_sources(paths=args.filenames, manifest=manifest)
-    return status_code
+    script_args = vars(args)
+
+    start_time = time.time()
+    hook_properties = check_refs_sources(paths=args.filenames, manifest=manifest)
+    end_time = time.time()
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": " Check the script has only existing refs and sources.",
+            "status": hook_properties.get("status_code"),
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
+
+    return hook_properties.get("status_code")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 import argparse
 import itertools
+import os
 import re
+import time
 from pathlib import Path
 from typing import Any
 from typing import Dict
@@ -11,6 +13,7 @@ from typing import Set
 from typing import Tuple
 
 from pre_commit_dbt.check_script_has_no_table_name import has_table_name
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json

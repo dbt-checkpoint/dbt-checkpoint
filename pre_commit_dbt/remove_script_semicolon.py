@@ -1,8 +1,13 @@
 import argparse
+import os
+import time
+from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Sequence
 
 from pre_commit_dbt.check_script_semicolon import check_semicolon
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_filenames_args
 
 

@@ -1,19 +1,22 @@
 import argparse
+import os
+import time
 from itertools import groupby
+from pathlib import Path
 from typing import Any
 from typing import Dict
 from typing import Optional
 from typing import Sequence
 
-from pathlib import Path
-
-from pre_commit_dbt.utils import get_source_schemas
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_filenames_args
 from pre_commit_dbt.utils import add_manifest_args
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_parent_childs
+from pre_commit_dbt.utils import get_source_schemas
 from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import Test
+
 
 def check_test_cnt(
     paths: Sequence[str],
@@ -23,7 +26,7 @@ def check_test_cnt(
 ) -> int:
     status_code = 0
     ymls = [Path(path) for path in paths]
-    
+
     # if user added schema but did not rerun
     schemas = get_source_schemas(ymls)
 
@@ -46,7 +49,7 @@ def check_test_cnt(
         for test in test_group:
             if test_dict.get(test):
                 required_test_count += 1
-        
+
         if required_test_count < test_cnt:
             print(
                 f"{schema.source_name}.{schema.table_name}: "

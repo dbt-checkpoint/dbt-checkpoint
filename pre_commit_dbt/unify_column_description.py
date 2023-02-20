@@ -1,6 +1,10 @@
 import argparse
+import os
+import time
 from collections import Counter
 from pathlib import Path
+from typing import Any
+from typing import Dict
 from typing import NoReturn
 from typing import Optional
 from typing import Sequence
@@ -8,6 +12,7 @@ from typing import Sequence
 import yaml
 
 from pre_commit_dbt.check_column_desc_are_same import get_grouped
+from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_filenames_args
 
 

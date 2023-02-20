@@ -1,5 +1,7 @@
 import argparse
 import itertools
+import os
+import time
 from typing import Any
 from typing import Dict
 from typing import Optional
@@ -7,8 +9,8 @@ from typing import Sequence
 from typing import Set
 from typing import Tuple
 
-from pre_commit_dbt.utils import add_filenames_args
-from pre_commit_dbt.utils import add_manifest_args
+from pre_commit_dbt.tracking import dbtCheckpointTracking
+from pre_commit_dbt.utils import add_default_args
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_missing_file_paths
@@ -79,8 +81,7 @@ def check_column_desc(
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
-    add_manifest_args(parser)
+    add_default_args(parser)
 
     args = parser.parse_args(argv)
 
@@ -90,7 +91,24 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Unable to load manifest file ({e})")
         return 1
 
+    start_time = time.time()
     status_code, _ = check_column_desc(paths=args.filenames, manifest=manifest)
+    end_time = time.time()
+    script_args = vars(args)
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": "Check the model columns have description",
+            "status": status_code,
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
+
     return status_code
 
 
