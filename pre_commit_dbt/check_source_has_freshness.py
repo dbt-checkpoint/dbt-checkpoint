@@ -9,13 +9,15 @@ from typing import Sequence
 from typing import Set
 
 from pre_commit_dbt.tracking import dbtCheckpointTracking
-from pre_commit_dbt.utils import add_filenames_args
+from pre_commit_dbt.utils import add_default_args
+from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import get_source_schemas
+from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import red
 from pre_commit_dbt.utils import yellow
 
 
-def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> int:
+def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
@@ -51,12 +53,12 @@ def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> int:
                 f"miss some required freshness parameters:"
                 f"\n- {yellow(result)} "
             )
-    return status_code
+    return {"status_code": status_code}
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
+    add_default_args(parser)
 
     parser.add_argument(
         "--freshness",
@@ -68,7 +70,33 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
 
-    return has_freshness(paths=args.filenames, required_freshness=set(args.freshness))
+    try:
+        manifest = get_json(args.manifest)
+    except JsonOpenError as e:
+        print(f"Unable to load manifest file ({e})")
+        return 1
+
+    start_time = time.time()
+    hook_properties = has_freshness(
+        paths=args.filenames, required_freshness=set(args.freshness)
+    )
+    end_time = time.time()
+    script_args = vars(args)
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": "Check the source has the freshness.",
+            "status": hook_properties.get("status_code"),
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
+
+    return hook_properties.get("status_code")
 
 
 if __name__ == "__main__":

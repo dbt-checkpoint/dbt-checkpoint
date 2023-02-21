@@ -352,7 +352,7 @@ def add_filenames_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_config_args(parser: argparse.ArgumentParser) -> None:
+def add_config_args(parser: argparse.ArgumentParser) -> NoReturn:
     parser.add_argument(
         "--config",
         type=str,
@@ -387,7 +387,7 @@ def add_catalog_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_tracking_args(parser: argparse.ArgumentParser) -> None:
+def add_tracking_args(parser: argparse.ArgumentParser) -> NoReturn:
     parser.add_argument(
         "--is_test",
         action="store_true",
@@ -395,7 +395,7 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def add_default_args(parser: argparse.ArgumentParser) -> None:
+def add_default_args(parser: argparse.ArgumentParser) -> NoReturn:
     add_filenames_args(parser)
     add_manifest_args(parser)
     add_config_args(parser)
@@ -438,7 +438,7 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def check_yml_version(file_path, yaml_dct) -> None:
+def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> NoReturn:
     if "version" not in yaml_dct:
         raise_invalid_property_yml_version(
             file_path,
@@ -461,12 +461,13 @@ def check_yml_version(file_path, yaml_dct) -> None:
         )
 
 
-def raise_invalid_property_yml_version(path: str, issue: str) -> None:
-    # TODO: URL AS PLACEHOLDER - LINK TO THE DOC SECTION ON dbt-gloss CONFIG WHEN AVAILABLE
+def raise_invalid_property_yml_version(path: str, issue: str) -> NoReturn:
+    # TODO: URL AS PLACEHOLDER - LINK TO THE DOC SECTION ON dbt-checkpoint CONFIG
+    # WHEN AVAILABLE
     raise CompilationException(
         "The yml property file at {} is invalid because {}. Please consult the "
         "documentation for more information on yml property file syntax:\n\n"
-        "https://github.com/Montreal-Analytics/dbt-gloss/blob/main/HOOKS.md#check-column-desc-are-same".format(
+        "https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same".format(  # noqa: E501, line length
             path, issue
         )
     )

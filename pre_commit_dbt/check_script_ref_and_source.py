@@ -4,11 +4,8 @@ import re
 import time
 from typing import Any
 from typing import Dict
-from typing import FrozenSet
 from typing import Optional
 from typing import Sequence
-from typing import Set
-from typing import Tuple
 
 from pre_commit_dbt.tracking import dbtCheckpointTracking
 from pre_commit_dbt.utils import add_default_args
@@ -20,7 +17,7 @@ from pre_commit_dbt.utils import red
 
 def check_refs_sources(
     paths: Sequence[str], manifest: Dict[str, Any]
-) -> Tuple[int, Set[str], Dict[FrozenSet[str], Dict[str, str]]]:
+) -> Dict[str, Any]:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
 

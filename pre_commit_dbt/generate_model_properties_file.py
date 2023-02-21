@@ -109,7 +109,7 @@ def generate_properties_file(
     return {"status_code": status_code}
 
 
-def main(argv: Optional[Sequence[str]] = None) -> Dict:
+def main(argv: Optional[Sequence[str]] = None) -> Dict[str, Any]:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
     add_catalog_args(parser)

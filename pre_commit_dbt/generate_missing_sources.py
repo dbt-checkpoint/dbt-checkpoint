@@ -20,7 +20,7 @@ from pre_commit_dbt.utils import JsonOpenError
 
 def create_missing_sources(
     sources: Dict[FrozenSet[str], Dict[str, str]], output_path: str
-) -> Dict:
+) -> Dict[str, Any]:
     status_code = 0
     if sources:
         status_code = 1

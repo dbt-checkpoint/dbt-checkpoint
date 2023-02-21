@@ -18,7 +18,7 @@ from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import red
 
 
-def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict:
+def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
     paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0

@@ -16,6 +16,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         0,
     ),
     (
@@ -30,6 +31,7 @@ sources:
         tags:
         -    bar
     """,
+        True,
         0,
     ),
     (
@@ -43,6 +45,7 @@ sources:
         -   bar
         -   foo
     """,
+        True,
         0,
     ),
     (
@@ -55,6 +58,7 @@ sources:
         tags:
         -   bar
     """,
+        True,
         0,
     ),
     (
@@ -67,6 +71,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         0,
     ),
     (
@@ -77,6 +82,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         0,
     ),
     (
@@ -89,6 +95,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         1,
     ),
     (
@@ -102,6 +109,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         1,
     ),
     (
@@ -115,14 +123,43 @@ sources:
         -   foo
         -   ff
     """,
+        True,
         1,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    tags:
+    -   foo
+    -   bar
+    tables:
+    -   name: test
+    """,
+        False,
+        0,
     ),
 )
 
 
-@pytest.mark.parametrize(("input_schema", "expected_status_code"), TESTS)
-def test_check_source_has_tags(input_schema, expected_status_code, tmpdir):
+@pytest.mark.parametrize(
+    ("input_schema", "valid_config", "expected_status_code"), TESTS
+)
+def test_check_source_has_tags(
+    input_schema,
+    valid_config,
+    expected_status_code,
+    tmpdir,
+    manifest_path_str,
+    config_path_str,
+):
+    input_args = ["--tags", "foo", "bar", "--is_test", "--manifest", manifest_path_str]
+
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
+
     yml_file = tmpdir.join("schema.yml")
     yml_file.write(input_schema)
-    status_code = main(argv=[str(yml_file), "--tags", "foo", "bar"])
+    status_code = main(argv=[str(yml_file), *input_args])
     assert status_code == expected_status_code
