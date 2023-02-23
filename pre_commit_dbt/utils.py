@@ -232,21 +232,18 @@ def get_source_schemas(
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
         schema = yaml.safe_load(yml_file.open())
-        try:
-            for source in schema.get("sources", []):
-                source_name = source.get("name")
-                tables = source.pop("tables", [])
-                for table in tables:
-                    table_name = table.get("name")
-                    yield SourceSchema(
-                        source_name=source_name,
-                        table_name=table_name,
-                        filename=yml_file.stem,
-                        source_schema=source,
-                        table_schema=table,
-                    )
-        except AttributeError:
-            pass
+        for source in schema.get("sources", []):
+            source_name = source.get("name")
+            tables = source.pop("tables", [])
+            for table in tables:
+                table_name = table.get("name")
+                yield SourceSchema(
+                    source_name=source_name,
+                    table_name=table_name,
+                    filename=yml_file.stem,
+                    source_schema=source,
+                    table_schema=table,
+                )
 
 
 def obj_in_deps(obj: Any, dep_name: str) -> bool:
