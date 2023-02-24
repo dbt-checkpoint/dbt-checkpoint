@@ -468,9 +468,8 @@ def add_related_ymls(
                 # Remove the project_name from patch_path
                 clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
 
-                target_yml_path = f"{clean_patch_path}"
-                if target_yml_path not in paths_with_missing:
-                    paths_with_missing.append(target_yml_path)
+                if clean_patch_path not in paths_with_missing:
+                    paths_with_missing.append(clean_patch_path)
 
 
 def get_missing_file_paths(
