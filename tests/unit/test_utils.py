@@ -3,7 +3,9 @@ from pathlib import Path
 import pytest
 
 from pre_commit_dbt.utils import CalledProcessError
+from pre_commit_dbt.utils import check_yml_version
 from pre_commit_dbt.utils import cmd_output
+from pre_commit_dbt.utils import CompilationException
 from pre_commit_dbt.utils import get_filenames
 from pre_commit_dbt.utils import get_macro_schemas
 from pre_commit_dbt.utils import get_model_schemas
@@ -117,3 +119,21 @@ macros:
             prefix="macro",
         )
     ]
+
+
+def test_check_yml_version_without_version():
+    yaml_dct = {"test": "test"}
+    with pytest.raises(CompilationException):
+        check_yml_version("file_path", yaml_dct)
+
+
+def test_check_yml_version_with_non_int_version():
+    yaml_dct = {"version": "test"}
+    with pytest.raises(CompilationException):
+        check_yml_version("file_path", yaml_dct)
+
+
+def test_check_yml_version_with_non_1_version():
+    yaml_dct = {"version": 2}
+    with pytest.raises(CompilationException):
+        check_yml_version("file_path", yaml_dct)
