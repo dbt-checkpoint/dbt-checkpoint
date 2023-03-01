@@ -14,6 +14,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         1,
         {"aa"},
     ),
@@ -23,6 +24,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         True,
         1,
         {"aa", "bb"},
@@ -37,6 +39,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         1,
         {"cc", "bb"},
     ),
@@ -49,6 +52,7 @@ TESTS = (  # type: ignore
     LEFT JOIN BB ON AA.A = BB.A
     """,
         [],
+        True,
         True,
         1,
         {"bb"},
@@ -66,6 +70,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         1,
         {"xx"},
     ),
@@ -82,6 +87,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         1,
         {"xx.xx.xx"},
     ),
@@ -94,6 +100,7 @@ TESTS = (  # type: ignore
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
         [],
+        True,
         True,
         0,
         {},
@@ -108,6 +115,7 @@ TESTS = (  # type: ignore
     LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
     """,
         [],
+        True,
         True,
         0,
         {},
@@ -125,6 +133,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         0,
         {},
     ),
@@ -138,6 +147,7 @@ TESTS = (  # type: ignore
     )
     """,
         [],
+        True,
         True,
         0,
         {},
@@ -155,6 +165,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         0,
         {},
     ),
@@ -171,6 +182,7 @@ TESTS = (  # type: ignore
     """,
         [],
         True,
+        True,
         0,
         {},
     ),
@@ -184,6 +196,7 @@ TESTS = (  # type: ignore
     SELECT * FROM source
     """,
         [],
+        True,
         True,
         0,
         {},
@@ -213,6 +226,7 @@ select * from final
     """,
         [],
         True,
+        True,
         0,
         {},
     ),
@@ -235,6 +249,7 @@ unioned as (
 select * from unioned
     """,
         ["--ignore-dotless-table"],
+        True,
         True,
         0,
         {},
@@ -261,6 +276,7 @@ select * from unioned
     """,
         ["--ignore-dotless-table"],
         True,
+        True,
         1,
         {"aa.bb"},
     ),
@@ -272,6 +288,7 @@ select * from unioned
     SELECT * FROM source
     """,
         [],
+        True,
         True,
         0,
         {},
@@ -287,6 +304,7 @@ select * from unioned
     """,
         [],
         True,
+        True,
         0,
         {},
     ),
@@ -296,6 +314,17 @@ select * from unioned
     """,
         [],
         False,
+        True,
+        1,
+        {"aa"},
+    ),
+    (
+        """
+    SELECT * FROM AA
+    """,
+        [],
+        True,
+        False,
         1,
         {"aa"},
     ),
@@ -303,9 +332,19 @@ select * from unioned
 
 
 @pytest.mark.parametrize(
-    ("input_s", "args", "valid_config", "expected_status_code", "output"), TESTS
+    (
+        "input_s",
+        "args",
+        "valid_manifest",
+        "valid_config",
+        "expected_status_code",
+        "output",
+    ),
+    TESTS,
 )
-def test_has_table_name(input_s, args, valid_config, expected_status_code, output):
+def test_has_table_name(
+    input_s, args, valid_manifest, valid_config, expected_status_code, output
+):
     dotless = True if "--ignore-dotless-table" in args else False
     ret, tables = has_table_name(input_s, "text.sql", dotless)
     diff = tables.symmetric_difference(output)
@@ -314,11 +353,20 @@ def test_has_table_name(input_s, args, valid_config, expected_status_code, outpu
 
 
 @pytest.mark.parametrize(
-    ("input_s", "args", "valid_config", "expected_status_code", "output"), TESTS
+    (
+        "input_s",
+        "args",
+        "valid_manifest",
+        "valid_config",
+        "expected_status_code",
+        "output",
+    ),
+    TESTS,
 )
 def test_has_table_name_integration(
     input_s,
     args,
+    valid_manifest,
     valid_config,
     expected_status_code,
     output,
@@ -328,7 +376,10 @@ def test_has_table_name_integration(
 ):
     path = tmpdir.join("file.txt")
     path.write_text(input_s, "utf-8")
-    input_args = ["--is_test", "--manifest", manifest_path_str, *args]
+    input_args = ["--is_test", *args]
+
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
 
     if valid_config:
         input_args.extend(["--config", config_path_str])

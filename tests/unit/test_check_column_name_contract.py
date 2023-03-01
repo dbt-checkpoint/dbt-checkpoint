@@ -11,12 +11,23 @@ TESTS = (
         "boolean",
         True,
         True,
+        True,
         0,
     ),
     (
         ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
+        False,
+        True,
+        True,
+        1,
+    ),
+    (
+        ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
+        "is_.*",
+        "boolean",
+        True,
         False,
         True,
         1,
@@ -27,12 +38,14 @@ TESTS = (
         "boolean",
         True,
         True,
+        True,
         1,
     ),
     (
         ["aa/bb/without_boolean_column_with_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
+        True,
         True,
         True,
         1,
@@ -43,12 +56,14 @@ TESTS = (
         "boolean",
         True,
         True,
+        True,
         0,
     ),
     (
         ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
+        True,
         True,
         False,
         0,
@@ -61,6 +76,7 @@ TESTS = (
         "input_args",
         "pattern",
         "dtype",
+        "valid_manifest",
         "valid_catalog",
         "valid_config",
         "expected_status_code",
@@ -71,6 +87,7 @@ def test_check_column_name_contract(
     input_args,
     pattern,
     dtype,
+    valid_manifest,
     valid_catalog,
     valid_config,
     expected_status_code,
@@ -78,6 +95,9 @@ def test_check_column_name_contract(
     manifest_path_str,
     config_path_str,
 ):
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
+
     if valid_catalog:
         input_args.extend(["--catalog", catalog_path_str])
 
@@ -86,6 +106,5 @@ def test_check_column_name_contract(
 
     input_args.extend(["--pattern", pattern])
     input_args.extend(["--dtype", dtype])
-    input_args.extend(["--manifest", manifest_path_str])
     status_code = main(input_args)
     assert status_code == expected_status_code

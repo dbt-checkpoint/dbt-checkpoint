@@ -21,100 +21,8 @@ sources:
     -   name: with_description
     """,
         True,
-        0,
-    ),
-    (
-        """
-sources:
--   name: test
-    freshness:
-        warn_after:
-            count: 12
-            period: hour
-        error_after:
-            count: 24
-            period: hour
-    tables:
-    -   name: with_description
-    """,
-        True,
-        1,
-    ),
-    (
-        """
-sources:
--   name: test
-    loaded_at_field: aa
-    freshness:
-        warn_after:
-            count: 12
-            period: hour
-    tables:
-    -   name: with_description
-    """,
-        True,
-        1,
-    ),
-    (
-        """
-sources:
--   name: test
-    loaded_at_field: aa
-    tables:
-    -   name: with_description
-    """,
-        True,
-        1,
-    ),
-    (
-        """
-sources:
--   name: test
-    tables:
-    -   name: with_description
-        loaded_at_field: aa
-        freshness:
-            warn_after:
-                count: 12
-                period: hour
-            error_after:
-                count: 24
-                period: hour
-    """,
         True,
         0,
-    ),
-    (
-        """
-sources:
--   name: test
-    tables:
-    -   name: with_description
-        freshness:
-            warn_after:
-                count: 12
-                period: hour
-            error_after:
-                count: 24
-                period: hour
-    """,
-        True,
-        1,
-    ),
-    (
-        """
-sources:
--   name: test
-    tables:
-    -   name: with_description
-        loaded_at_field: aa
-        freshness:
-            warn_after:
-                count: 12
-                period: hour
-    """,
-        True,
-        1,
     ),
     (
         """
@@ -132,16 +40,136 @@ sources:
     -   name: with_description
     """,
         False,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: test
+    freshness:
+        warn_after:
+            count: 12
+            period: hour
+        error_after:
+            count: 24
+            period: hour
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness:
+        warn_after:
+            count: 12
+            period: hour
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: test
+    tables:
+    -   name: with_description
+        loaded_at_field: aa
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+            error_after:
+                count: 24
+                period: hour
+    """,
+        True,
+        True,
+        0,
+    ),
+    (
+        """
+sources:
+-   name: test
+    tables:
+    -   name: with_description
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+            error_after:
+                count: 24
+                period: hour
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: test
+    tables:
+    -   name: with_description
+        loaded_at_field: aa
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness:
+        warn_after:
+            count: 12
+            period: hour
+        error_after:
+            count: 24
+            period: hour
+    tables:
+    -   name: with_description
+    """,
+        True,
+        False,
         0,
     ),
 )
 
 
 @pytest.mark.parametrize(
-    ("input_schema", "valid_config", "expected_status_code"), TESTS
+    ("input_schema", "valid_manifest", "valid_config", "expected_status_code"), TESTS
 )
 def test_check_source_has_freshness(
     input_schema,
+    valid_manifest,
     valid_config,
     expected_status_code,
     tmpdir,
@@ -152,10 +180,11 @@ def test_check_source_has_freshness(
         "--freshness",
         "error_after",
         "warn_after",
-        "--manifest",
-        manifest_path_str,
         "--is_test",
     ]
+
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
 
     if valid_config:
         input_args.extend(["--config", config_path_str])

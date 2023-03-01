@@ -17,7 +17,23 @@ sources:
     -   name: test
     """,
         True,
+        True,
         0,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    meta:
+        foo: test
+        bar: test
+    tables:
+    -   name: test
+    """,
+        False,
+        True,
+        1,
     ),
     (
         """
@@ -31,6 +47,7 @@ sources:
         meta:
             bar: test
     """,
+        True,
         True,
         0,
     ),
@@ -46,6 +63,7 @@ sources:
             foo: test
     """,
         True,
+        True,
         0,
     ),
     (
@@ -58,6 +76,7 @@ sources:
         meta:
             bar: test
     """,
+        True,
         True,
         1,
     ),
@@ -72,6 +91,7 @@ sources:
     -   name: test
     """,
         True,
+        True,
         1,
     ),
     (
@@ -82,6 +102,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         True,
         1,
     ),
@@ -96,6 +117,7 @@ sources:
     tables:
     -   name: test
     """,
+        True,
         False,
         0,
     ),
@@ -103,10 +125,11 @@ sources:
 
 
 @pytest.mark.parametrize(
-    ("input_schema", "valid_config", "expected_status_code"), TESTS
+    ("input_schema", "valid_manifest", "valid_config", "expected_status_code"), TESTS
 )
 def test_check_source_has_meta_keys(
     input_schema,
+    valid_manifest,
     valid_config,
     expected_status_code,
     tmpdir,
@@ -118,9 +141,10 @@ def test_check_source_has_meta_keys(
         "foo",
         "bar",
         "--is_test",
-        "--manifest",
-        manifest_path_str,
     ]
+
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
 
     if valid_config:
         input_args.extend(["--config", config_path_str])

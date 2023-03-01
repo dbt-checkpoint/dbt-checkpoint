@@ -27,6 +27,7 @@ models:
         description: test2
     """,
         True,
+        True,
         1,
         """version: 2
 models:
@@ -74,6 +75,7 @@ models:
     -   name: test2
         description: test2
     """,
+        True,
         True,
         1,
         """version: 2
@@ -123,7 +125,58 @@ models:
         description: test
     """,
         True,
+        True,
         0,
+        """
+version: 2
+models:
+-   name: same_col_desc_1
+    columns:
+    -   name: test1
+        description: test
+    -   name: test2
+        description: test
+-   name: same_col_desc_2
+    columns:
+    -   name: test1
+        description: test2
+    -   name: test2
+        description: test
+-   name: same_col_desc_3
+    columns:
+    -   name: test1
+        description: test1
+    -   name: test2
+        description: test
+    """,
+        ["--ignore", "test1"],
+    ),
+    (
+        """
+version: 2
+models:
+-   name: same_col_desc_1
+    columns:
+    -   name: test1
+        description: test
+    -   name: test2
+        description: test
+-   name: same_col_desc_2
+    columns:
+    -   name: test1
+        description: test2
+    -   name: test2
+        description: test
+-   name: same_col_desc_3
+    columns:
+    -   name: test1
+        description: test1
+    -   name: test2
+        description: test
+    """,
+        False,
+        True,
+        1,
         """
 version: 2
 models:
@@ -169,6 +222,7 @@ models:
     -   name: test1
     -   name: test2
     """,
+        True,
         True,
         1,
         """version: 2
@@ -218,6 +272,7 @@ models:
         description: test
     """,
         True,
+        True,
         0,
         """
 version: 2
@@ -266,6 +321,7 @@ models:
     -   name: test2
         description: test
     """,
+        True,
         False,
         0,
         """
@@ -296,11 +352,19 @@ models:
 
 
 @pytest.mark.parametrize(
-    ("schema_yml", "valid_config", "expected_status_code", "expected_result", "ignore"),
+    (
+        "schema_yml",
+        "valid_manifest",
+        "valid_config",
+        "expected_status_code",
+        "expected_result",
+        "ignore",
+    ),
     TESTS,
 )
 def test_replace_column_description(
     schema_yml,
+    valid_manifest,
     valid_config,
     expected_status_code,
     expected_result,
@@ -314,10 +378,11 @@ def test_replace_column_description(
     input_args = [
         str(yml_file),
         "--is_test",
-        "--manifest",
-        manifest_path_str,
     ]
     input_args.extend(ignore)
+
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
 
     if valid_config:
         input_args.extend(["--config", config_path_str])

@@ -14,7 +14,20 @@ sources:
         description: test description
     """,
         True,
+        True,
         0,
+    ),
+    (
+        """
+sources:
+-   name: test
+    tables:
+    -   name: with_description
+        description: test description
+    """,
+        False,
+        True,
+        1,
     ),
     (
         """
@@ -23,6 +36,7 @@ sources:
     tables:
     -   name: without_description
     """,
+        True,
         True,
         1,
     ),
@@ -34,6 +48,7 @@ sources:
     -   name: with_description
         description: test description
     """,
+        True,
         False,
         0,
     ),
@@ -41,17 +56,21 @@ sources:
 
 
 @pytest.mark.parametrize(
-    ("input_schema", "valid_config", "expected_status_code"), TESTS
+    ("input_schema", "valid_manifest", "valid_config", "expected_status_code"), TESTS
 )
 def test_check_source_table_has_description(
     input_schema,
+    valid_manifest,
     valid_config,
     expected_status_code,
     tmpdir,
     manifest_path_str,
     config_path_str,
 ):
-    input_args = ["--manifest", manifest_path_str, "--is_test"]
+    input_args = ["--is_test"]
+
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
 
     if valid_config:
         input_args.extend(["--config", config_path_str])

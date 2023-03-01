@@ -18,6 +18,7 @@ sources:
     """,
         True,
         True,
+        True,
         0,
     ),
     (
@@ -30,6 +31,22 @@ sources:
            - name: col1
            - name: col2
     """,
+        False,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: catalog
+    tables:
+    -   name: with_catalog_columns
+        columns:
+           - name: col1
+           - name: col2
+    """,
+        True,
         False,
         True,
         1,
@@ -45,6 +62,7 @@ sources:
     """,
         True,
         True,
+        True,
         1,
     ),
     (
@@ -56,6 +74,7 @@ sources:
     """,
         True,
         True,
+        True,
         1,
     ),
     (
@@ -65,6 +84,7 @@ sources:
     tables:
     -   name: without_catalog_columns
     """,
+        True,
         True,
         True,
         0,
@@ -78,6 +98,7 @@ sources:
         columns:
            - name: col1
     """,
+        True,
         True,
         True,
         1,
@@ -93,6 +114,7 @@ sources:
     """,
         True,
         True,
+        True,
         1,
     ),
     (
@@ -106,6 +128,7 @@ sources:
            - name: col2
     """,
         True,
+        True,
         False,
         0,
     ),
@@ -113,10 +136,18 @@ sources:
 
 
 @pytest.mark.parametrize(
-    ("input_schema", "valid_catalog", "valid_config", "expected_status_code"), TESTS
+    (
+        "input_schema",
+        "valid_manifest",
+        "valid_catalog",
+        "valid_config",
+        "expected_status_code",
+    ),
+    TESTS,
 )
 def test_check_source_columns_have_desc(
     input_schema,
+    valid_manifest,
     valid_catalog,
     valid_config,
     expected_status_code,
@@ -126,8 +157,11 @@ def test_check_source_columns_have_desc(
     config_path_str,
 ):
     yml_file = tmpdir.join("schema.yml")
-    input_args = [str(yml_file), "--manifest", manifest_path_str, "--is_test"]
+    input_args = [str(yml_file), "--is_test"]
     yml_file.write(input_schema)
+
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
 
     if valid_catalog:
         input_args.extend(["--catalog", catalog_path_str])
