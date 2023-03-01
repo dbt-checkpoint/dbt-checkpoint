@@ -5,11 +5,6 @@ from pre_commit_dbt.utils import get_config_file
 
 
 class TestDbtCheckpointTracking:
-    @pytest.fixture
-    def config_path(self, config_path_str):
-        config_file = get_config_file(config_path_str)
-        return str(config_file)
-
     def test_init(self, config_path_str):
         script_args = {"config": config_path_str}
         tracker = dbtCheckpointTracking(script_args)
@@ -21,18 +16,6 @@ class TestDbtCheckpointTracking:
     def test_init_raises_value_error_if_config_path_not_str(self):
         with pytest.raises(ValueError):
             dbtCheckpointTracking({})
-
-    # def test_track_hook_event(self, config_path):
-    #     script_args = {"config": config_path}
-    #     tracker = dbtCheckpointTracking(script_args)
-
-    #     tracker.track_hook_event(
-    #         "hook_name",
-    #         {"status": 0, "metadata": {"user_id": "abc123"}},
-    #         {"metadata": {"user_id": "abc123"}},
-    #     )
-
-    #     # TODO: assert that the Mixpanel API is called with the correct arguments
 
     def test_property_transformations_nones(self, config_path_str):
         script_args = {"config": config_path_str}
