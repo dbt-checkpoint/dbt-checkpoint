@@ -419,11 +419,20 @@ CATALOG = {
 
 
 CONFIG_FILE = {"version": 1, "disable-tracking": True, "is-test": True}
+CONFIG_WITH_TRACKING_FILE = {"version": 1, "disable-tracking": False, "is-test": True}
 
 
 @pytest.fixture(scope="function")
 def config_path_str(tmpdir):
     yaml_config = yaml.dump(CONFIG_FILE)
+    file = tmpdir.mkdir("temp").join(".dbt-gloss.yaml")
+    file.write(yaml_config)
+    yield str(file)
+
+
+@pytest.fixture(scope="function")
+def config_with_tracking_path_str(tmpdir):
+    yaml_config = yaml.dump(CONFIG_WITH_TRACKING_FILE)
     file = tmpdir.mkdir("temp").join(".dbt-gloss.yaml")
     file.write(yaml_config)
     yield str(file)

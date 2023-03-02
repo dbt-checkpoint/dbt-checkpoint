@@ -45,8 +45,9 @@ class dbtCheckpointTracking:
                     event_name=event_name,
                     properties=event_properties,
                 )
-            except Exception as error:
-                print(f"Mixpanel Error: {error}")
+            except Exception as e:
+                print(f"Mixpanel Error: {e}")
+                raise
 
     def _property_transformations(
         self,

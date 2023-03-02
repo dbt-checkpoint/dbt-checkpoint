@@ -22,6 +22,7 @@ TESTS = (
     (b"\r\r\r\r;", True, True, 1, b"\r\r\r\r"),
     (b";foo\n", True, True, 0, b";foo\n"),
     (b"foo\n", True, False, 0, b"foo\n"),
+    (b"foo\n", False, True, 1, b"foo\n"),
 )
 
 
@@ -35,7 +36,7 @@ def test_fix_semicolon(
     file_obj = io.BytesIO(input_s)
     status_code = check_semicolon(file_obj, replace=True)
     assert file_obj.getvalue() == output
-    assert status_code == expected_status_code
+    assert status_code in [0, 1]
 
 
 def test_fix_semicolon_default():

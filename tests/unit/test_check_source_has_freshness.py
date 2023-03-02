@@ -17,6 +17,7 @@ sources:
         error_after:
             count: 24
             period: hour
+        filter: x > y
     tables:
     -   name: with_description
     """,

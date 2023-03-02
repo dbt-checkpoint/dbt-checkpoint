@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+import mixpanel
 import pytest
 
 from pre_commit_dbt.tracking import dbtCheckpointTracking
@@ -12,6 +15,19 @@ class TestDbtCheckpointTracking:
         assert tracker.config == get_config_file(config_path_str)
         assert tracker.script_args == script_args
         assert tracker.disable_tracking is True
+
+    def test_track_hook_event(self, config_with_tracking_path_str):
+        script_args = {"config": config_with_tracking_path_str}
+        print(script_args)
+        tracker = dbtCheckpointTracking(script_args)
+
+        with patch.object(mixpanel.Mixpanel, "track") as mock_track:
+            # set the side_effect to raise an exception
+            mock_track.side_effect = Exception("Test")
+
+            # call your function that uses Mixpanel's track function
+            with pytest.raises(Exception):
+                tracker.track_hook_event("name", {}, {})
 
     def test_init_raises_value_error_if_config_path_not_str(self):
         with pytest.raises(ValueError):
