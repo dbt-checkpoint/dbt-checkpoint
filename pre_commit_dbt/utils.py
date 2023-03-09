@@ -430,13 +430,19 @@ def add_related_sqls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> NoReturn:
+    yml_path_class = Path(yml_path)
+    yml_path_parts = list(yml_path_class.parts)
+    # Remove the first 'project' component
+    yml_path_parts.pop(0)
+    dbt_patch_path = "/".join(yml_path_parts)
+
     for key, node in nodes.items():  # pragma: no cover
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
-        if node.get("patch_path") and yml_path in node.get("patch_path"):
+        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
             if ".sql" in node.get("path", "").lower():
                 for related_sql_file in Path().glob(f"**/{node.get('path')}"):
                     paths_with_missing.add(related_sql_file.as_posix())
