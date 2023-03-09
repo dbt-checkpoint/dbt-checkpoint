@@ -437,8 +437,6 @@ def add_related_sqls(
         ):
             continue
         if node.get("patch_path") and yml_path in node.get("patch_path"):
-            import ipdb
-            ipdb.set_trace()
             if ".sql" in node.get("path", "").lower():
                 for related_sql_file in Path().glob(f"**/{node.get('path')}"):
                     paths_with_missing.add(related_sql_file.as_posix())
