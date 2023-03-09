@@ -443,7 +443,7 @@ def add_related_sqls(
         ):
             continue
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
-            if ".sql" in node.get("path", "").lower():
+            if ".sql" in node.get("original_file_path", "").lower():
                 for related_sql_file in Path().glob(f"**/{node.get('path')}"):
                     paths_with_missing.add(related_sql_file.as_posix())
 
