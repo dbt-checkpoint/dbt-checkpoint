@@ -445,7 +445,9 @@ def add_related_sqls(
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
             if ".sql" in node.get("original_file_path", "").lower():
                 for related_sql_file in Path().glob(f"**/{node.get('original_file_path')}"):
-                    paths_with_missing.add(related_sql_file.as_posix())
+                    sql_as_string = related_sql_file.as_posix()
+                    if 'target/' not in sql_as_string.lower():
+                        paths_with_missing.add(sql_as_string)
 
 
 def add_related_ymls(
