@@ -480,7 +480,6 @@ def get_missing_file_paths(
 ) -> List[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
-    print(paths)
     if nodes:  # pragma: no cover
         for path in paths:
             suffix = Path(path).suffix.lower()
@@ -490,7 +489,6 @@ def get_missing_file_paths(
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
-    print(paths_with_missing)
     return paths_with_missing
 
 
