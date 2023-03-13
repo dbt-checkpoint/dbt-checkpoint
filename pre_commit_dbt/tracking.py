@@ -12,6 +12,7 @@ MIXPANEL_DEV_ENV = "34ffa16dc37f248c18ad6d1b9ea9c3a8"
 MIXPANEL_PROD_ENV = "3fa3db873f6950d10bd770a49c57e33e"
 
 
+# TODO: replace this tracking class with a tracking decorator
 class dbtCheckpointTracking:
     def __init__(self, script_args: Dict[str, Any]):
         config_path = script_args.get("config")
