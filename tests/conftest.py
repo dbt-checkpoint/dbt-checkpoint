@@ -1,10 +1,20 @@
 import json
 
 import pytest
+import yaml
 
 from pre_commit_dbt.utils import cmd_output
 
 MANIFEST = {
+    "metadata": {
+        "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v6.json",
+        "dbt_version": "1.2.1",
+        "generated_at": "2022-10-04T16:19:51.780894Z",
+        "project_id": "test_project_id",
+        "user_id": "test_user_id",
+        "send_anonymous_usage_stats": True,
+        "adapter_type": "snowflake",
+    },
     "nodes": {
         "model.with_schema": {
             "patch_path": "project://bb/with_schema.yml",
@@ -406,6 +416,26 @@ CATALOG = {
         },
     },
 }
+
+
+CONFIG_FILE = {"version": 1, "disable-tracking": True, "is-test": True}
+CONFIG_WITH_TRACKING_FILE = {"version": 1, "disable-tracking": False, "is-test": True}
+
+
+@pytest.fixture(scope="function")
+def config_path_str(tmpdir):
+    yaml_config = yaml.dump(CONFIG_FILE)
+    file = tmpdir.mkdir("temp").join(".dbt-gloss.yaml")
+    file.write(yaml_config)
+    yield str(file)
+
+
+@pytest.fixture(scope="function")
+def config_with_tracking_path_str(tmpdir):
+    yaml_config = yaml.dump(CONFIG_WITH_TRACKING_FILE)
+    file = tmpdir.mkdir("temp").join(".dbt-gloss.yaml")
+    file.write(yaml_config)
+    yield str(file)
 
 
 @pytest.fixture(scope="function")

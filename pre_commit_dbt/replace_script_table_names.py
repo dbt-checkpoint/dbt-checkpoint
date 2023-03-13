@@ -1,6 +1,8 @@
 import argparse
 import itertools
+import os
 import re
+import time
 from pathlib import Path
 from typing import Any
 from typing import Dict
@@ -11,8 +13,8 @@ from typing import Set
 from typing import Tuple
 
 from pre_commit_dbt.check_script_has_no_table_name import has_table_name
-from pre_commit_dbt.utils import add_filenames_args
-from pre_commit_dbt.utils import add_manifest_args
+from pre_commit_dbt.tracking import dbtCheckpointTracking
+from pre_commit_dbt.utils import add_default_args
 from pre_commit_dbt.utils import get_json
 from pre_commit_dbt.utils import JsonOpenError
 
@@ -73,8 +75,7 @@ def get_unknown_source(tables: Set[str]) -> Generator[Tuple[str, str], None, Non
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
-    add_manifest_args(parser)
+    add_default_args(parser)
 
     args = parser.parse_args(argv)
 
@@ -86,6 +87,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     status_code = 0
 
+    start_time = time.time()
     for filename in args.filenames:
         file = Path(filename)
         sql = file.read_text()
@@ -102,6 +104,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 new = r"\1" + replacement[1] + r"\2"
                 sql = re.sub(old, new, sql, re.IGNORECASE)
             file.write_text(sql, encoding="utf-8")
+    end_time = time.time()
+    script_args = vars(args)
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": "Replace table names with source() or ref() macros in the script.",  # noqa: E501, line length
+            "status": status_code,
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
 
     return status_code
 

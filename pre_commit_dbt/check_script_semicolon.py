@@ -1,10 +1,14 @@
 import argparse
 import os
+import time
 from typing import IO
 from typing import Optional
 from typing import Sequence
 
-from pre_commit_dbt.utils import add_filenames_args
+from pre_commit_dbt.tracking import dbtCheckpointTracking
+from pre_commit_dbt.utils import add_default_args
+from pre_commit_dbt.utils import get_json
+from pre_commit_dbt.utils import JsonOpenError
 from pre_commit_dbt.utils import red
 
 
@@ -38,11 +42,18 @@ def check_semicolon(file_obj: IO[bytes], replace: bool = False) -> int:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
+    add_default_args(parser)
 
     args = parser.parse_args(argv)
     status_code = 0
 
+    try:
+        manifest = get_json(args.manifest)
+    except JsonOpenError as e:
+        print(f"Unable to load manifest file ({e})")
+        return 1
+
+    start_time = time.time()
     for filename in args.filenames:
         # Read as binary so we can read byte-by-byte
         with open(filename, "rb+") as file_obj:
@@ -53,6 +64,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     f"dbt does not support that."
                 )
                 status_code = status_code_file
+
+    end_time = time.time()
+    script_args = vars(args)
+
+    tracker = dbtCheckpointTracking(script_args=script_args)
+    tracker.track_hook_event(
+        event_name="Hook Executed",
+        manifest=manifest,
+        event_properties={
+            "hook_name": os.path.basename(__file__),
+            "description": "Check the script does not contain a semicolon.",
+            "status": status_code,
+            "execution_time": end_time - start_time,
+            "is_pytest": script_args.get("is_test"),
+        },
+    )
 
     return status_code
 

@@ -89,7 +89,7 @@ def test_check_model_columns_have_desc(
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])
     with patch("builtins.open", mock_open(read_data="data")):
-        with patch("pre_commit_dbt.utils.yaml.safe_load") as mock_safe_load:
+        with patch("pre_commit_dbt.utils.safe_load") as mock_safe_load:
             mock_safe_load.return_value = schema
             status_code = main(input_args)
     assert status_code == expected_status_code

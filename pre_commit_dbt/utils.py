@@ -14,7 +14,7 @@ from typing import Set
 from typing import Text
 from typing import Union
 
-import yaml
+from yaml import safe_load
 
 
 class CalledProcessError(RuntimeError):
@@ -22,6 +22,10 @@ class CalledProcessError(RuntimeError):
 
 
 class JsonOpenError(RuntimeError):
+    pass
+
+
+class CompilationException(RuntimeError):
     pass
 
 
@@ -123,6 +127,16 @@ def get_json(json_filename: str) -> Dict[str, Any]:
         raise JsonOpenError(e)
 
 
+def get_config_file(config_file_path: str) -> Dict[str, Any]:
+    try:
+        path = Path(config_file_path)
+        config = safe_load(path.open())
+        check_yml_version(config_file_path, config)
+    except FileNotFoundError:
+        config = {}
+    return config
+
+
 def get_models(
     manifest: Dict[str, Any],
     filenames: Set[str],
@@ -197,7 +211,7 @@ def get_model_schemas(
 ) -> Generator[ModelSchema, None, None]:
     for yml_file in yml_files:
         with open(yml_file, "r") as file:
-            schema = yaml.safe_load(file)
+            schema = safe_load(file)
             for model in schema.get("models", []):
                 if isinstance(model, dict) and model.get("name"):
                     model_name = model.get("name", "")  # pragma: no mutate
@@ -214,7 +228,7 @@ def get_macro_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[MacroSchema, None, None]:
     for yml_file in yml_files:
-        schema = yaml.safe_load(yml_file.open())
+        schema = safe_load(yml_file.open())
         for macro in schema.get("macros", []):
             if isinstance(macro, dict) and macro.get("name"):
                 macro_name = macro.get("name", "")  # pragma: no mutate
@@ -231,7 +245,7 @@ def get_source_schemas(
     yml_files: Sequence[Path],
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
-        schema = yaml.safe_load(yml_file.open())
+        schema = safe_load(yml_file.open())
         for source in schema.get("sources", []):
             source_name = source.get("name")
             tables = source.pop("tables", [])
@@ -338,6 +352,17 @@ def add_filenames_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
+def add_config_args(parser: argparse.ArgumentParser) -> NoReturn:
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=".dbt-gloss.yaml",
+        help="""Location of .dbt-gloss.yaml. Usually at the dbt root directory.
+        This file contains the global config for dbt-gloss.
+        """,
+    )
+
+
 def add_manifest_args(parser: argparse.ArgumentParser) -> NoReturn:
     parser.add_argument(
         "--manifest",
@@ -360,6 +385,21 @@ def add_catalog_args(parser: argparse.ArgumentParser) -> NoReturn:
         operations.
         """,
     )
+
+
+def add_tracking_args(parser: argparse.ArgumentParser) -> NoReturn:
+    parser.add_argument(
+        "--is_test",
+        action="store_true",
+        help="True the execution is a test.",
+    )
+
+
+def add_default_args(parser: argparse.ArgumentParser) -> NoReturn:
+    add_filenames_args(parser)
+    add_manifest_args(parser)
+    add_config_args(parser)
+    add_tracking_args(parser)
 
 
 def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:
@@ -395,6 +435,41 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
         help="""pre-commit-dbt is by default running changed files.
         If you need to override that, e.g. in case of Slim CI (state:modified),
         you can use this option.""",
+    )
+
+
+def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> NoReturn:
+    if "version" not in yaml_dct:
+        raise_invalid_property_yml_version(
+            file_path,
+            "the yml property file {} is missing a version tag".format(file_path),
+        )
+
+    version = yaml_dct["version"]
+    # if it's not an integer, the version is malformed, or not
+    # set. Either way, only 'version: 2' is supported.
+    if not isinstance(version, int):
+        raise_invalid_property_yml_version(
+            file_path,
+            "its 'version:' tag must be an integer (e.g. version: 2)."
+            " {} is not an integer".format(version),
+        )
+    if version != 1:
+        raise_invalid_property_yml_version(
+            file_path,
+            "its 'version:' tag is set to {}.  Only 1 is supported".format(version),
+        )
+
+
+def raise_invalid_property_yml_version(path: str, issue: str) -> NoReturn:
+    # TODO: URL AS PLACEHOLDER - LINK TO THE DOC SECTION ON dbt-checkpoint CONFIG
+    # WHEN AVAILABLE
+    raise CompilationException(
+        "The yml property file at {} is invalid because {}. Please consult the "
+        "documentation for more information on yml property file syntax:\n\n"
+        "https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same".format(  # noqa: E501, line length
+            path, issue
+        )
     )
 
 
