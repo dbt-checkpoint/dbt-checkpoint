@@ -3,18 +3,20 @@ import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import NoReturn
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Text
-from typing import Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    List,
+    NoReturn,
+    Optional,
+    Sequence,
+    Set,
+    Text,
+    Union,
+)
 
-from yaml import safe_load
+import yaml
 
 
 class CalledProcessError(RuntimeError):
@@ -22,10 +24,6 @@ class CalledProcessError(RuntimeError):
 
 
 class JsonOpenError(RuntimeError):
-    pass
-
-
-class CompilationException(RuntimeError):
     pass
 
 
@@ -127,16 +125,6 @@ def get_json(json_filename: str) -> Dict[str, Any]:
         raise JsonOpenError(e)
 
 
-def get_config_file(config_file_path: str) -> Dict[str, Any]:
-    try:
-        path = Path(config_file_path)
-        config = safe_load(path.open())
-        check_yml_version(config_file_path, config)
-    except FileNotFoundError:
-        config = {}
-    return config
-
-
 def get_models(
     manifest: Dict[str, Any],
     filenames: Set[str],
@@ -211,7 +199,7 @@ def get_model_schemas(
 ) -> Generator[ModelSchema, None, None]:
     for yml_file in yml_files:
         with open(yml_file, "r") as file:
-            schema = safe_load(file)
+            schema = yaml.safe_load(file)
             for model in schema.get("models", []):
                 if isinstance(model, dict) and model.get("name"):
                     model_name = model.get("name", "")  # pragma: no mutate
@@ -228,7 +216,7 @@ def get_macro_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[MacroSchema, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = yaml.safe_load(yml_file.open())
         for macro in schema.get("macros", []):
             if isinstance(macro, dict) and macro.get("name"):
                 macro_name = macro.get("name", "")  # pragma: no mutate
@@ -245,7 +233,7 @@ def get_source_schemas(
     yml_files: Sequence[Path],
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = yaml.safe_load(yml_file.open())
         for source in schema.get("sources", []):
             source_name = source.get("name")
             tables = source.pop("tables", [])
@@ -352,17 +340,6 @@ def add_filenames_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_config_args(parser: argparse.ArgumentParser) -> NoReturn:
-    parser.add_argument(
-        "--config",
-        type=str,
-        default=".dbt-gloss.yaml",
-        help="""Location of .dbt-gloss.yaml. Usually at the dbt root directory.
-        This file contains the global config for dbt-gloss.
-        """,
-    )
-
-
 def add_manifest_args(parser: argparse.ArgumentParser) -> NoReturn:
     parser.add_argument(
         "--manifest",
@@ -385,21 +362,6 @@ def add_catalog_args(parser: argparse.ArgumentParser) -> NoReturn:
         operations.
         """,
     )
-
-
-def add_tracking_args(parser: argparse.ArgumentParser) -> NoReturn:
-    parser.add_argument(
-        "--is_test",
-        action="store_true",
-        help="True the execution is a test.",
-    )
-
-
-def add_default_args(parser: argparse.ArgumentParser) -> NoReturn:
-    add_filenames_args(parser)
-    add_manifest_args(parser)
-    add_config_args(parser)
-    add_tracking_args(parser)
 
 
 def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:
@@ -438,41 +400,6 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> NoReturn:
-    if "version" not in yaml_dct:
-        raise_invalid_property_yml_version(
-            file_path,
-            "the yml property file {} is missing a version tag".format(file_path),
-        )
-
-    version = yaml_dct["version"]
-    # if it's not an integer, the version is malformed, or not
-    # set. Either way, only 'version: 2' is supported.
-    if not isinstance(version, int):
-        raise_invalid_property_yml_version(
-            file_path,
-            "its 'version:' tag must be an integer (e.g. version: 2)."
-            " {} is not an integer".format(version),
-        )
-    if version != 1:
-        raise_invalid_property_yml_version(
-            file_path,
-            "its 'version:' tag is set to {}.  Only 1 is supported".format(version),
-        )
-
-
-def raise_invalid_property_yml_version(path: str, issue: str) -> NoReturn:
-    # TODO: URL AS PLACEHOLDER - LINK TO THE DOC SECTION ON dbt-checkpoint CONFIG
-    # WHEN AVAILABLE
-    raise CompilationException(
-        "The yml property file at {} is invalid because {}. Please consult the "
-        "documentation for more information on yml property file syntax:\n\n"
-        "https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same".format(  # noqa: E501, line length
-            path, issue
-        )
-    )
-
-
 class ParseDict(argparse.Action):  # pragma: no cover
     """Parse a KEY=VALUE string-list into a dictionary"""
 
@@ -500,13 +427,13 @@ class ParseDict(argparse.Action):  # pragma: no cover
 def add_related_sqls(
     yml_path: str,
     nodes: Dict[Any, Any],
-    paths_with_missing: List[str],
+    paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> NoReturn:
     yml_path_class = Path(yml_path)
     yml_path_parts = list(yml_path_class.parts)
-
-    root_path = yml_path_parts.pop(0)
+    # Remove the first 'project' component
+    yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
     for key, node in nodes.items():  # pragma: no cover
@@ -516,16 +443,17 @@ def add_related_sqls(
         ):
             continue
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
-            if ".sql" in node["original_file_path"].lower():
-                target_sql_name = f"{root_path}/{node['original_file_path']}"
-                if target_sql_name not in paths_with_missing:
-                    paths_with_missing.append(target_sql_name)
+            if ".sql" in node.get("original_file_path", "").lower():
+                for related_sql_file in Path().glob(f"**/{node.get('original_file_path')}"):
+                    sql_as_string = related_sql_file.as_posix()
+                    if 'target/' not in sql_as_string.lower():
+                        paths_with_missing.add(sql_as_string)
 
 
 def add_related_ymls(
     sql_path: str,
     nodes: Dict[Any, Any],
-    paths_with_missing: List[str],
+    paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> NoReturn:
     for key, node in nodes.items():  # pragma: no cover
@@ -538,17 +466,12 @@ def add_related_ymls(
         if node.get("path") and (node.get("path") in sql_path):
             patch_path = node.get("patch_path", None)
             if patch_path:
-                root_folder = Path(node["root_path"]).name
-
                 # Original patch_path has 'project\\path\to\yml.yml'
+                # Remove `project_name\\` from patch_path
                 patch_path = Path(patch_path)
-                # Remove the project_name from patch_path
-                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
-
-                target_yml_path = f"{root_folder}/{clean_patch_path}"
-                if target_yml_path not in paths_with_missing:
-                    paths_with_missing.append(target_yml_path)
-
+                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1]).as_posix()
+                for related_yml_file in Path().glob(f'**/{clean_patch_path}'):
+                    paths_with_missing.add(related_yml_file.as_posix())
 
 def get_missing_file_paths(
     paths: Sequence[str],
@@ -556,8 +479,7 @@ def get_missing_file_paths(
     include_ephemeral: bool = False,
 ) -> List[str]:
     nodes = manifest.get("nodes", {})
-    paths_with_missing = list(paths)
-
+    paths_with_missing = set(paths)
     if nodes:  # pragma: no cover
         for path in paths:
             suffix = Path(path).suffix.lower()
