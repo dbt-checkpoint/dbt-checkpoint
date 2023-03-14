@@ -3,16 +3,18 @@ import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import NoReturn
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Text
-from typing import Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    List,
+    NoReturn,
+    Optional,
+    Sequence,
+    Set,
+    Text,
+    Union,
+)
 
 from yaml import safe_load
 
@@ -500,13 +502,13 @@ class ParseDict(argparse.Action):  # pragma: no cover
 def add_related_sqls(
     yml_path: str,
     nodes: Dict[Any, Any],
-    paths_with_missing: List[str],
+    paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> NoReturn:
     yml_path_class = Path(yml_path)
     yml_path_parts = list(yml_path_class.parts)
-
-    root_path = yml_path_parts.pop(0)
+    # Remove the first 'project' component
+    yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
     for key, node in nodes.items():  # pragma: no cover
@@ -516,16 +518,17 @@ def add_related_sqls(
         ):
             continue
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
-            if ".sql" in node["original_file_path"].lower():
-                target_sql_name = f"{root_path}/{node['original_file_path']}"
-                if target_sql_name not in paths_with_missing:
-                    paths_with_missing.append(target_sql_name)
+            if ".sql" in node.get("original_file_path", "").lower():
+                for related_sql_file in Path().glob(f"**/{node.get('original_file_path')}"):
+                    sql_as_string = related_sql_file.as_posix()
+                    if 'target/' not in sql_as_string.lower():
+                        paths_with_missing.add(sql_as_string)
 
 
 def add_related_ymls(
     sql_path: str,
     nodes: Dict[Any, Any],
-    paths_with_missing: List[str],
+    paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> NoReturn:
     for key, node in nodes.items():  # pragma: no cover
@@ -538,17 +541,14 @@ def add_related_ymls(
         if node.get("path") and (node.get("path") in sql_path):
             patch_path = node.get("patch_path", None)
             if patch_path:
-                root_folder = Path(node["root_path"]).name
-
                 # Original patch_path has 'project\\path\to\yml.yml'
+                # Remove `project_name\\` from patch_path
                 patch_path = Path(patch_path)
-                # Remove the project_name from patch_path
-                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1])
-
-                target_yml_path = f"{root_folder}/{clean_patch_path}"
-                if target_yml_path not in paths_with_missing:
-                    paths_with_missing.append(target_yml_path)
-
+                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1]).as_posix()
+                for related_yml_file in Path().glob(f'**/{clean_patch_path}'):
+                    yml_as_string = related_yml_file.as_posix()
+                    if 'target/' not in yml_as_string.lower():
+                        paths_with_missing.add(yml_as_string)
 
 def get_missing_file_paths(
     paths: Sequence[str],
@@ -556,8 +556,7 @@ def get_missing_file_paths(
     include_ephemeral: bool = False,
 ) -> List[str]:
     nodes = manifest.get("nodes", {})
-    paths_with_missing = list(paths)
-
+    paths_with_missing = set(paths)
     if nodes:  # pragma: no cover
         for path in paths:
             suffix = Path(path).suffix.lower()
