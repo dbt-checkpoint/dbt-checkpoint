@@ -19,14 +19,11 @@
 
 ## Sponsors
 
-This repository was moved from [offbi/pre-commit-dbt](https://github.com/offbi/pre-commit-dbt) on Jan 11th.
+<img src=".github/datacoves-logo.png" alt="Datacoves" width="150"/><br>
+The turnkey analytics stack, find out more at [datacoves.com](https://datacoves.com/).
 
-This new version is maintained by [Datacoves](https://datacoves.com) and [Montreal Analytics](https://www.montrealanalytics.com/).
-
-<p align="center">
-  <img style="margin-right: 100px" src=".github/montreal-analytics-logo.png" alt="montreal-analytics" width=300/> 
-  <img  src=".github/datacoves-logo.png" alt="datacoves" width=300/>
-</p>
+<img src=".github/montreal-analytics-logo.png" alt="Montreal Analytics" width="150"/><br>
+The turnkey analytics stack, find out more at [montrealanalytics.com](https://montrealanalytics.com/).
 
 ## Goal
 
