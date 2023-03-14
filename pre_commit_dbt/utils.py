@@ -471,7 +471,9 @@ def add_related_ymls(
                 patch_path = Path(patch_path)
                 clean_patch_path = patch_path.relative_to(*patch_path.parts[:1]).as_posix()
                 for related_yml_file in Path().glob(f'**/{clean_patch_path}'):
-                    paths_with_missing.add(related_yml_file.as_posix())
+                    yml_as_string = related_yml_file.as_posix()
+                    if 'target/' not in yml_as_string.lower():
+                        paths_with_missing.add(yml_as_string)
 
 def get_missing_file_paths(
     paths: Sequence[str],
