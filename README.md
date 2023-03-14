@@ -21,9 +21,11 @@
 
 <img src=".github/datacoves-logo.png" alt="Datacoves" width="150"/><br>
 The turnkey analytics stack, find out more at [datacoves.com](https://datacoves.com/).
+
 <br>
-<img src=".github/montreal-analytics-logo.png" alt="Montreal Analytics" width="150"/><br>
-The turnkey analytics stack, find out more at [montrealanalytics.com](https://montrealanalytics.com/).
+
+<img style="margin-top: 20px;" src=".github/montreal-analytics-logo.png" alt="Montreal Analytics" width="150"/><br>
+[Montreal Analytics](https://www.montrealanalytics.com/?utm_source=blog&utm_medium=medium&utm_campaign=dbt-checkpoint) is a full-stack data consultancy servicing North America, and are both a dbt Preferred Consulting Partner and Platinum dbt Certification Award winner.
 
 ## Goal
 
