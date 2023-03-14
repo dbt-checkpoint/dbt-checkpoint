@@ -21,7 +21,7 @@
 
 <img src=".github/datacoves-logo.png" alt="Datacoves" width="150"/><br>
 The turnkey analytics stack, find out more at [datacoves.com](https://datacoves.com/).
-
+<br>
 <img src=".github/montreal-analytics-logo.png" alt="Montreal Analytics" width="150"/><br>
 The turnkey analytics stack, find out more at [montrealanalytics.com](https://montrealanalytics.com/).
 
