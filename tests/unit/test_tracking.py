@@ -3,8 +3,8 @@ from unittest.mock import patch
 import mixpanel
 import pytest
 
-from pre_commit_dbt.tracking import dbtCheckpointTracking
-from pre_commit_dbt.utils import get_config_file
+from dbt_checkpoint.tracking import dbtCheckpointTracking
+from dbt_checkpoint.utils import get_config_file
 
 
 class TestDbtCheckpointTracking:

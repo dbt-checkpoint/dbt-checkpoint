@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_source_childs import main
-
+from dbt_checkpoint.check_source_childs import main
 
 # Input schema, input_args, valid_manifest, expected return value
 # Input args, valid manifest, expected return value

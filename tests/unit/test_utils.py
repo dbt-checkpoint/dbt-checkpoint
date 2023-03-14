@@ -2,19 +2,21 @@ from pathlib import Path
 
 import pytest
 
-from pre_commit_dbt.utils import CalledProcessError
-from pre_commit_dbt.utils import check_yml_version
-from pre_commit_dbt.utils import cmd_output
-from pre_commit_dbt.utils import CompilationException
-from pre_commit_dbt.utils import get_filenames
-from pre_commit_dbt.utils import get_macro_schemas
-from pre_commit_dbt.utils import get_model_schemas
-from pre_commit_dbt.utils import MacroSchema
-from pre_commit_dbt.utils import Model
-from pre_commit_dbt.utils import ModelSchema
-from pre_commit_dbt.utils import obj_in_deps
-from pre_commit_dbt.utils import paths_to_dbt_models
-from pre_commit_dbt.utils import SourceSchema
+from dbt_checkpoint.utils import (
+    CalledProcessError,
+    CompilationException,
+    MacroSchema,
+    Model,
+    ModelSchema,
+    SourceSchema,
+    check_yml_version,
+    cmd_output,
+    get_filenames,
+    get_macro_schemas,
+    get_model_schemas,
+    obj_in_deps,
+    paths_to_dbt_models,
+)
 
 
 def test_cmd_output_error():

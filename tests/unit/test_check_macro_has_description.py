@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_macro_has_description import main
-
+from dbt_checkpoint.check_macro_has_description import main
 
 # Input args, valid manifest, expected return value
 TESTS = (

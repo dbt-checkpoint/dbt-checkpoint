@@ -3,7 +3,7 @@ import json
 import pytest
 import yaml
 
-from pre_commit_dbt.utils import cmd_output
+from dbt_checkpoint.utils import cmd_output
 
 MANIFEST = {
     "metadata": {

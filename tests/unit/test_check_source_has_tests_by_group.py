@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_source_has_tests_by_group import main
-
+from dbt_checkpoint.check_source_has_tests_by_group import main
 
 # Input schema, valid_manifest, input_args, expected return value
 TESTS = (

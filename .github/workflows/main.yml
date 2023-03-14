@@ -88,4 +88,4 @@ jobs:
       - name: "Install in dev mode"
         run: "python -m pip install -e .[dev]"
       - name: "Import package"
-        run: "python -c 'import pre_commit_dbt; print(pre_commit_dbt.__version__)'"
+        run: "python -c 'import dbt_checkpoint; print(dbt_checkpoint.__version__)'"

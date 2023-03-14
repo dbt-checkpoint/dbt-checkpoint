@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_model_has_properties_file import main
-
+from dbt_checkpoint.check_model_has_properties_file import main
 
 TESTS = (
     (["aa/bb/with_schema.sql", "--is_test"], True, True, 0),

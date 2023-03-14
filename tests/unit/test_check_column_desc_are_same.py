@@ -1,6 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_column_desc_are_same import main
+from dbt_checkpoint.check_column_desc_are_same import main
 
 TESTS = (  # type: ignore
     (

@@ -1,18 +1,6 @@
-## IMPORTANT NOTE
-
-This repository was moved from [offbi/pre-commit-dbt](https://github.com/offbi/pre-commit-dbt) on Jan 11th, originally created by [Radek Tomšej](https://github.com/tomsej).
-This new version is maintained by [Datacoves](https://datacoves.com) and [Montreal Analytics](https://www.montrealanalytics.com/).
-Please update any reference to the old repo.
-
-### Acknowledgements
-
-Thank you to [Radek Tomšej](https://github.com/tomsej) for initial development and maintenance of this great package, and for sharing your work with the community!
-
----
-
 <p align="center">
  <img src=".github/pre-commit-dbt.png" alt="dbt-pre-commit" width=600/>
- <h1 align="center">pre-commit-dbt</h1>
+ <h1 align="center">dbt-checkpoint</h1>
 </p>
 <p align="center">
  <a href="https://github.com/dbt-checkpoint/dbt-checkpoint/actions?workflow=CI">
@@ -33,74 +21,82 @@ List of [pre-commit](https://pre-commit.com) hooks to ensure the quality of your
 
 ## Goal
 
-*Quick ensure the quality of your `dbt` projects*.
+_Quick ensure the quality of your `dbt` projects_.
 
 `dbt` is awesome, but when a number of models, sources, and macros grow it starts to be challenging to maintain quality. People often forget to update columns in schema files, add descriptions, or test. Besides, with the growing number of objects, dbt slows down, users stop running models/tests (because they want to deploy the feature quickly), and the demands on reviews increase.
 
-If this is the case, `pre-commit-dbt` is here to help you!
+If this is the case, `dbt-checkpoint` is here to help you!
 
-## List of `pre-commit-dbt` hooks
+## List of `dbt-checkpoint` hooks
 
 :bulb: Click on hook name to view the details.
 
 **Model checks:**
- * [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
- * [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
- * [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
- * [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
- * [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
- * [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
- * [`check-model-has-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-properties-file): Check the model has properties file.
- * [`check-model-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-name): Check the model has a number of tests by test name.
- * [`check-model-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
- * [`check-model-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
- * [`check-model-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
- * [`check-model-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
- * [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
- * [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
- * [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
- * [`check-model-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
+
+- [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
+- [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
+- [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
+- [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
+- [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
+- [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
+- [`check-model-has-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-properties-file): Check the model has properties file.
+- [`check-model-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-name): Check the model has a number of tests by test name.
+- [`check-model-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
+- [`check-model-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
+- [`check-model-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
+- [`check-model-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
+- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
+- [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
+- [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
+- [`check-model-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
 
 **Script checks:**
- * [`check-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-semicolon): Check the script does not contain a semicolon.
- * [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has not table name (is not using `source()` or `ref()` macro for all tables).
- * [`check-script-ref-and-source`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-ref-and-source): Check the script has only existing refs and sources.
+
+- [`check-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-semicolon): Check the script does not contain a semicolon.
+- [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has not table name (is not using `source()` or `ref()` macro for all tables).
+- [`check-script-ref-and-source`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-ref-and-source): Check the script has only existing refs and sources.
 
 **Source checks:**
- * [`check-source-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-columns-have-desc): Check for source column descriptions.
- * [`check-source-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-all-columns): Check the source has all columns in the properties file.
- * [`check-source-table-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-table-has-description): Check the source table has description.
- * [`check-source-has-freshness`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-freshness): Check the source has the freshness.
- * [`check-source-has-loader`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-loader): Check the source has loader option.
- * [`check-source-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-meta-keys): Check the source has keys in the meta part.
- * [`check-source-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-group): Check the source has a number of tests from a group of tests.
- * [`check-source-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-name): Check the source has a number of tests by test name.
- * [`check-source-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
- * [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
- * [`check-source-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
- * [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
+
+- [`check-source-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-columns-have-desc): Check for source column descriptions.
+- [`check-source-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-all-columns): Check the source has all columns in the properties file.
+- [`check-source-table-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-table-has-description): Check the source table has description.
+- [`check-source-has-freshness`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-freshness): Check the source has the freshness.
+- [`check-source-has-loader`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-loader): Check the source has loader option.
+- [`check-source-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-meta-keys): Check the source has keys in the meta part.
+- [`check-source-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-group): Check the source has a number of tests from a group of tests.
+- [`check-source-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-name): Check the source has a number of tests by test name.
+- [`check-source-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
+- [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
+- [`check-source-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
+- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
 
 **Macro checks:**
- * [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
- * [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
+
+- [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
+- [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
 
 **Modifiers:**
- * [`generate-missing-sources`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
- * [`generate-model-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-model-properties-file): Generate model properties file.
- * [`unify-column-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#unify-column-description): Unify column descriptions across all models.
- * [`replace-script-table-names`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#replace-script-table-names): Replace table names with `source()` or `ref()` macros in the script.
- * [`remove-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#remove-script-semicolon): Remove the semicolon at the end of the script.
+
+- [`generate-missing-sources`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
+- [`generate-model-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-model-properties-file): Generate model properties file.
+- [`unify-column-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#unify-column-description): Unify column descriptions across all models.
+- [`replace-script-table-names`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#replace-script-table-names): Replace table names with `source()` or `ref()` macros in the script.
+- [`remove-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#remove-script-semicolon): Remove the semicolon at the end of the script.
 
 **dbt commands:**
- * [`dbt-clean`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-clean): Run `dbt clean` command.
- * [`dbt-compile`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-compile): Run `dbt compile` command.
- * [`dbt-deps`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-deps): Run `dbt deps` command.
- * [`dbt-docs-generate`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-docs-generate): Run `dbt docs generate` command.
- * [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
- * [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
+
+- [`dbt-clean`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-clean): Run `dbt clean` command.
+- [`dbt-compile`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-compile): Run `dbt compile` command.
+- [`dbt-deps`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-deps): Run `dbt deps` command.
+- [`dbt-docs-generate`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-docs-generate): Run `dbt docs generate` command.
+- [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
+- [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
 
 ---
+
 :exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
+
 ## Install
 
 For detailed installation and usage, instructions see [pre-commit.com](https://pre-commit.com) site.
@@ -108,10 +104,12 @@ For detailed installation and usage, instructions see [pre-commit.com](https://p
 ```
 pip install pre-commit
 ```
+
 ## Setup
 
 1. Create a file named `.pre-commit-config.yaml` in your `dbt` root folder.
-2. Add [list of hooks](#list-of-pre-commit-dbt-hooks) you want to run befor every commit. E.g.:
+2. Add [list of hooks](#list-of-dbt-checkpoint-hooks) you want to run befor every commit. E.g.:
+
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
@@ -130,13 +128,14 @@ repos:
   - id: check-model-columns-have-desc
     files: ^models/mart
 ```
+
 3. Optionally, run `pre-commit install` to set up the git hook scripts. With this, `pre-commit` will run automatically on `git commit`! You can also manually run `pre-commit run` after you `stage` all files you want to run. Or `pre-commit run --all-files` to run the hooks against all of the files (not only `staged`).
 
 ## Run as Github Action
 
-Unfortunately, you cannot natively use `pre-commit-dbt` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
+Unfortunately, you cannot natively use `dbt-checkpoint` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
 
-`pre-commit-dbt` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run `dbt-compile` (or `dbt-run`) command.
+`dbt-checkpoint` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run `dbt-compile` (or `dbt-run`) command.
 To be able to compile dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example).
 
 So you want to e.g. run chach on number of tests:
@@ -185,7 +184,6 @@ jaffle_shop:
 
 and store this file in project root `./profiles.yml`.
 
-
 ### Create new workflow
 
 - inside your Github repository create folder `.github/workflows` (unless it already exists).
@@ -216,3 +214,7 @@ jobs:
     with:
       args: run --files ${{ steps.file_changes.outputs.files}}
 ```
+
+### Acknowledgements
+
+Thank you to [Radek Tomšej](https://github.com/tomsej) for initial development and maintenance of this great package, and for sharing your work with the community!

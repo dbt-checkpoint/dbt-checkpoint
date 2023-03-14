@@ -1,6 +1,6 @@
 import pytest
 
-from pre_commit_dbt.unify_column_description import main
+from dbt_checkpoint.unify_column_description import main
 
 TESTS = (  # type: ignore
     (

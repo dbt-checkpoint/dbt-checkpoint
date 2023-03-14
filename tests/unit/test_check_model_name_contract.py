@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_model_name_contract import main
-
+from dbt_checkpoint.check_model_name_contract import main
 
 # Input args, valid manifest, valid_config, expected return value
 TESTS = (
