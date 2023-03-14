@@ -1,5 +1,6 @@
 repos:
-- repo: https://github.com/offbi/pre-commit-dbt
-  rev: v1.0.0
-  hooks:
-  - id: dbt-test
+    - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+      rev: v1.0.0
+      hooks:
+      - id: dbt-test
+    

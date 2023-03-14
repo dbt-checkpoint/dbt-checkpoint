@@ -34,21 +34,21 @@ Bump version in Dockerfile - .github/.pre-commit-config-action.yaml
 Build:
 
 ```
-docker build . -t dbt-checkpoint/dbt-checkpoint
-docker tag dbt-checkpoint/dbt-checkpoint:latest dbt-checkpoint/dbt-checkpoint:<version>
+docker build . -t dbtcheckpoint/dbt-checkpoint
+docker tag dbtcheckpoint/dbt-checkpoint:latest dbtcheckpoint/dbt-checkpoint:<version>
 ```
 
 Test:
 
 ```
-docker run dbt-checkpoint/dbt-checkpoint
+docker run dbtcheckpoint/dbt-checkpoint
 ```
 
 Publish to Docker Hub
 
 ```
-docker push dbt-checkpoint/dbt-checkpoint
-docker push dbt-checkpoint/dbt-checkpoint:<version>
+docker push dbtcheckpoint/dbt-checkpoint
+docker push dbtcheckpoint/dbt-checkpoint:<version>
 ```
 
 ## 3. Github Action

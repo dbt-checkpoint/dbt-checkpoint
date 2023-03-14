@@ -1,5 +1,5 @@
 <p align="center">
- <img src=".github/pre-commit-dbt.png" alt="dbt-pre-commit" width=600/>
+ <!-- <img src=".github/pre-commit-dbt.png" alt="dbt-pre-commit" width=600/> -->
  <h1 align="center">dbt-checkpoint</h1>
 </p>
 <p align="center">
@@ -17,11 +17,20 @@
  </a>
 </p>
 
-List of [pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects.
+## Sponsors
+
+This repository was moved from [offbi/pre-commit-dbt](https://github.com/offbi/pre-commit-dbt) on Jan 11th.
+
+This new version is maintained by [Datacoves](https://datacoves.com) and [Montreal Analytics](https://www.montrealanalytics.com/).
+
+<p align="center">
+  <img style="margin-right: 100px" src=".github/montreal-analytics-logo.png" alt="montreal-analytics" width=300/> 
+  <img  src=".github/datacoves-logo.png" alt="datacoves" width=300/>
+</p>
 
 ## Goal
 
-_Quick ensure the quality of your `dbt` projects_.
+[pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects.
 
 `dbt` is awesome, but when a number of models, sources, and macros grow it starts to be challenging to maintain quality. People often forget to update columns in schema files, add descriptions, or test. Besides, with the growing number of objects, dbt slows down, users stop running models/tests (because they want to deploy the feature quickly), and the demands on reviews increase.
 
