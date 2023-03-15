@@ -1,5 +1,4 @@
 <p align="center">
- <!-- <img src=".github/pre-commit-dbt.png" alt="dbt-pre-commit" width=600/> -->
  <h1 align="center">dbt-checkpoint</h1>
 </p>
 <p align="center">
@@ -29,11 +28,9 @@ The turnkey analytics stack, find out more at [datacoves.com](https://datacoves.
 
 ## Goal
 
-[pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects.
+dbt-checkpoint provides [pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects.
 
-`dbt` is awesome, but when a number of models, sources, and macros grow it starts to be challenging to maintain quality. People often forget to update columns in schema files, add descriptions, or test. Besides, with the growing number of objects, dbt slows down, users stop running models/tests (because they want to deploy the feature quickly), and the demands on reviews increase.
-
-If this is the case, `dbt-checkpoint` is here to help you!
+`dbt` is awesome, but when the number of models, sources, and macros in a project grows, it becomes challenging to maintain the same level of quality across developers.. Users forget to update columns in property(yml) files or add table and column add descriptions. Without automation the reviewer workload increases and unintentional errors may be missed. dbt-checkpoint allows organizations to add automated validations improving your code review and release process.
 
 ## List of `dbt-checkpoint` hooks
 
@@ -103,7 +100,7 @@ If this is the case, `dbt-checkpoint` is here to help you!
 
 ---
 
-:exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
+:exclamation:**If you have a suggestion for a new hook or you find a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
 
 ## Install
 
@@ -115,13 +112,13 @@ pip install pre-commit
 
 ## Setup
 
-1. Create a file named `.pre-commit-config.yaml` in your `dbt` root folder.
+1. Create a file named `.pre-commit-config.yaml` in your project root folder.
 2. Add [list of hooks](#list-of-dbt-checkpoint-hooks) you want to run befor every commit. E.g.:
 
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-  rev: v1.0.0
+  rev: v1.1.0
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
@@ -146,12 +143,12 @@ Unfortunately, you cannot natively use `dbt-checkpoint` if you are using **dbt C
 `dbt-checkpoint` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run `dbt-compile` (or `dbt-run`) command.
 To be able to compile dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example).
 
-So you want to e.g. run chach on number of tests:
+Say you want to check that a model contains at least two tests, you would use this configuration:
 
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
+ rev: v1.1.0
  hooks:
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
@@ -162,7 +159,7 @@ To be able to run this in Github actions you need to modified it to:
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
+ rev: v1.1.0
  hooks:
  - id: dbt-compile
    args: ["--cmd-flags", "++profiles-dir", "."]
@@ -195,16 +192,17 @@ and store this file in project root `./profiles.yml`.
 ### Create new workflow
 
 - inside your Github repository create folder `.github/workflows` (unless it already exists).
-- create new file e.g. `main.yml`
+- create new file e.g. `pr.yml`
 - specify your workflow e.g.:
 
 ```
 name: pre-commit
 
 on:
-  pull_request:
   push:
-  branches: [main]
+  pull_request:
+    branches:
+      - main
 
 jobs:
   pre-commit:
@@ -216,7 +214,7 @@ jobs:
     uses: trilom/file-changes-action@v1.2.4
     with:
       output: ' '
-  - uses: dbt-checkpoint/dbt-checkpoint@v1.0.0
+  - uses: dbt-checkpoint/dbt-checkpoint@v1.1.0
     env:
       DB_PASSWORD: ${{ secrets.SuperSecret }}
     with:
