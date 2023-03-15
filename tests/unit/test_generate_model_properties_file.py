@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from pre_commit_dbt.generate_model_properties_file import main
+from dbt_checkpoint.generate_model_properties_file import main
 
 TESTS = (
     (
@@ -100,7 +100,7 @@ def test_generate_model_properties_file(
 
     if expected_status_code == 1:
         with patch(
-            "pre_commit_dbt.generate_model_properties_file.get_model_properties"
+            "dbt_checkpoint.generate_model_properties_file.get_model_properties"
         ) as mock_get_model_properties:
             mock_get_model_properties.return_value = model_prop
             status_code = main(input_args)
@@ -163,7 +163,7 @@ def test_generate_model_properties_file_existing_schema(
         input_args.extend(["--config", config_path_str])
     if expected_status_code == 1:
         with patch(
-            "pre_commit_dbt.generate_model_properties_file.get_model_properties"
+            "dbt_checkpoint.generate_model_properties_file.get_model_properties"
         ) as mock_get_model_properties:
             mock_get_model_properties.return_value = model_prop
             status_code = main(input_args)

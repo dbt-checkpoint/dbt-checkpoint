@@ -1,9 +1,7 @@
 import pytest
 
-from pre_commit_dbt.check_script_ref_and_source import check_refs_sources
-from pre_commit_dbt.check_script_ref_and_source import main
-from pre_commit_dbt.utils import get_json
-
+from dbt_checkpoint.check_script_ref_and_source import check_refs_sources, main
+from dbt_checkpoint.utils import get_json
 
 # Input, expected return value, expected output
 TESTS = (  # type: ignore

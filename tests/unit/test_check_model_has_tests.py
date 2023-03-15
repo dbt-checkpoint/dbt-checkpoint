@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_model_has_tests import main
-
+from dbt_checkpoint.check_model_has_tests import main
 
 # Input schema, input_args, valid_manifest, valid_config, expected return value
 # Input args, valid manifest, expected return value

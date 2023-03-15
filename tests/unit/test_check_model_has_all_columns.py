@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_model_has_all_columns import main
-
+from dbt_checkpoint.check_model_has_all_columns import main
 
 # Input args, valid manifest, valid_config, expected return value
 TESTS = (

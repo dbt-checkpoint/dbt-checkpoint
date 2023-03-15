@@ -2,12 +2,11 @@ from unittest.mock import patch
 
 import pytest
 
-from pre_commit_dbt.dbt_test import main
-from pre_commit_dbt.dbt_test import prepare_cmd
+from dbt_checkpoint.dbt_test import main, prepare_cmd
 
 
 def test_dbt_test():
-    with patch("pre_commit_dbt.utils.subprocess.Popen") as mock_popen:
+    with patch("dbt_checkpoint.utils.subprocess.Popen") as mock_popen:
         mock_popen.return_value.communicate.return_value = (
             b"stdout",
             b"stderr",
@@ -18,7 +17,7 @@ def test_dbt_test():
 
 
 def test_dbt_test_error():
-    with patch("pre_commit_dbt.utils.subprocess.Popen") as mock_popen:
+    with patch("dbt_checkpoint.utils.subprocess.Popen") as mock_popen:
         mock_popen.return_value.communicate.return_value = (
             b"stdout",
             b"stderr",

@@ -1,6 +1,6 @@
 import pytest
 
-from pre_commit_dbt.generate_missing_sources import main
+from dbt_checkpoint.generate_missing_sources import main
 
 SCHEMA1 = """version: 2
 sources:

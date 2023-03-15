@@ -1,8 +1,6 @@
 import pytest
 
-from pre_commit_dbt.replace_script_table_names import get_source_from_name
-from pre_commit_dbt.replace_script_table_names import main
-
+from dbt_checkpoint.replace_script_table_names import get_source_from_name, main
 
 # Input, expected return value, expected output
 TESTS = (  # type: ignore

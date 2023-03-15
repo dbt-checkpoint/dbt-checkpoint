@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_model_tags import main
-
+from dbt_checkpoint.check_model_tags import main
 
 TESTS = (
     (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar"], True, True, 0),

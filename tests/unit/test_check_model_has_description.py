@@ -1,10 +1,8 @@
-from unittest.mock import mock_open
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
 
 import pytest
 
-from pre_commit_dbt.check_model_has_description import main
-
+from dbt_checkpoint.check_model_has_description import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
@@ -44,7 +42,7 @@ def test_check_model_description(
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])
     with patch("builtins.open", mock_open(read_data="data")):
-        with patch("pre_commit_dbt.utils.safe_load") as mock_safe_load:
+        with patch("dbt_checkpoint.utils.safe_load") as mock_safe_load:
             mock_safe_load.return_value = schema
             status_code = main(input_args)
     assert status_code == expected_status_code

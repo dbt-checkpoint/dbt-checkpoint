@@ -1,7 +1,6 @@
 import pytest
 
-from pre_commit_dbt.check_source_has_tests_by_type import main
-
+from dbt_checkpoint.check_source_has_tests_by_type import main
 
 # Input schema, input_args, valid_manifest, expected return value
 TESTS = (

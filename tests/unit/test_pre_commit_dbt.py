@@ -1,6 +1,6 @@
 import configparser
 
-from pre_commit_dbt import __version__
+from dbt_checkpoint import __version__
 
 
 def test_version():

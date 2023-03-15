@@ -2,9 +2,8 @@ import io
 
 import pytest
 
-from pre_commit_dbt.check_script_semicolon import check_semicolon
-from pre_commit_dbt.remove_script_semicolon import main
-
+from dbt_checkpoint.check_script_semicolon import check_semicolon
+from dbt_checkpoint.remove_script_semicolon import main
 
 # Input, expected return value, expected output
 TESTS = (

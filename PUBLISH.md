@@ -5,14 +5,14 @@ Tutorial of publishing to help me not to forgot to anything :D
 ## 0. Bump new version
 
 - setup.cfg
-- __init__.py
+- **init**.py
 
 ## 1. Run tests
 
 Run pytests:
 
 ```
-pytest -vvv --cov=pre_commit_dbt --cov-config=setup.cfg --cov-report=term-missing --cov-report=html
+pytest -vvv --cov=dbt_checkpoint --cov-config=setup.cfg --cov-report=term-missing --cov-report=html
 ```
 
 Run pre-commit:
@@ -34,21 +34,21 @@ Bump version in Dockerfile - .github/.pre-commit-config-action.yaml
 Build:
 
 ```
-docker build . -t offbi/pre-commit-dbt
-docker tag offbi/pre-commit-dbt:latest offbi/pre-commit-dbt:<version>
+docker build . -t dbtcheckpoint/dbt-checkpoint
+docker tag dbtcheckpoint/dbt-checkpoint:latest dbtcheckpoint/dbt-checkpoint:<version>
 ```
 
 Test:
 
 ```
-docker run offbi/pre-commit-dbt
+docker run dbtcheckpoint/dbt-checkpoint
 ```
 
 Publish to Docker Hub
 
 ```
-docker push offbi/pre-commit-dbt
-docker push offbi/pre-commit-dbt:<version>
+docker push dbtcheckpoint/dbt-checkpoint
+docker push dbtcheckpoint/dbt-checkpoint:<version>
 ```
 
 ## 3. Github Action
