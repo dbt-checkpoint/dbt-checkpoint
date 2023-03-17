@@ -499,56 +499,56 @@ class ParseDict(argparse.Action):  # pragma: no cover
         setattr(namespace, self.dest, result)
 
 
-def add_related_sqls(
-    yml_path: str,
-    nodes: Dict[Any, Any],
-    paths_with_missing: Set[str],
-    include_ephemeral: bool = False,
-) -> NoReturn:
-    yml_path_class = Path(yml_path)
-    yml_path_parts = list(yml_path_class.parts)
-    # Remove the first 'project' component
-    yml_path_parts.pop(0)
-    dbt_patch_path = "/".join(yml_path_parts)
-
-    for key, node in nodes.items():  # pragma: no cover
-        if (
-            not include_ephemeral
-            and node.get("config", {}).get("materialized") == "ephemeral"
-        ):
-            continue
-        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
-            if ".sql" in node.get("original_file_path", "").lower():
-                for related_sql_file in Path().glob(f"**/{node.get('original_file_path')}"):
-                    sql_as_string = related_sql_file.as_posix()
-                    if 'target/' not in sql_as_string.lower():
-                        paths_with_missing.add(sql_as_string)
-
-
-def add_related_ymls(
-    sql_path: str,
-    nodes: Dict[Any, Any],
-    paths_with_missing: Set[str],
-    include_ephemeral: bool = False,
-) -> NoReturn:
-    for key, node in nodes.items():  # pragma: no cover
-        if (
-            not include_ephemeral
-            and node.get("config", {}).get("materialized") == "ephemeral"
-        ):
-            continue
-
-        if node.get("path") and (node.get("path") in sql_path):
-            patch_path = node.get("patch_path", None)
-            if patch_path:
-                # Original patch_path has 'project\\path\to\yml.yml'
-                # Remove `project_name\\` from patch_path
-                patch_path = Path(patch_path)
-                clean_patch_path = patch_path.relative_to(*patch_path.parts[:1]).as_posix()
-                for related_yml_file in Path().glob(f'**/{clean_patch_path}'):
-                    yml_as_string = related_yml_file.as_posix()
-                    if 'target/' not in yml_as_string.lower():
-                        paths_with_missing.add(yml_as_string)
+# def add_related_sqls(
+#     yml_path: str,
+#     nodes: Dict[Any, Any],
+#     paths_with_missing: Set[str],
+#     include_ephemeral: bool = False,
+# ) -> NoReturn:
+#     yml_path_class = Path(yml_path)
+#     yml_path_parts = list(yml_path_class.parts)
+#     # Remove the first 'project' component
+#     yml_path_parts.pop(0)
+#     dbt_patch_path = "/".join(yml_path_parts)
+#
+#     for key, node in nodes.items():  # pragma: no cover
+#         if (
+#             not include_ephemeral
+#             and node.get("config", {}).get("materialized") == "ephemeral"
+#         ):
+#             continue
+#         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+#             if ".sql" in node.get("original_file_path", "").lower():
+#                 for related_sql_file in Path().glob(f"**/{node.get('original_file_path')}"):
+#                     sql_as_string = related_sql_file.as_posix()
+#                     if 'target/' not in sql_as_string.lower():
+#                         paths_with_missing.add(sql_as_string)
+#
+#
+# def add_related_ymls(
+#     sql_path: str,
+#     nodes: Dict[Any, Any],
+#     paths_with_missing: Set[str],
+#     include_ephemeral: bool = False,
+# ) -> NoReturn:
+#     for key, node in nodes.items():  # pragma: no cover
+#         if (
+#             not include_ephemeral
+#             and node.get("config", {}).get("materialized") == "ephemeral"
+#         ):
+#             continue
+#
+#         if node.get("path") and (node.get("path") in sql_path):
+#             patch_path = node.get("patch_path", None)
+#             if patch_path:
+#                 # Original patch_path has 'project\\path\to\yml.yml'
+#                 # Remove `project_name\\` from patch_path
+#                 patch_path = Path(patch_path)
+#                 clean_patch_path = patch_path.relative_to(*patch_path.parts[:1]).as_posix()
+#                 for related_yml_file in Path().glob(f'**/{clean_patch_path}'):
+#                     yml_as_string = related_yml_file.as_posix()
+#                     if 'target/' not in yml_as_string.lower():
+#                         paths_with_missing.add(yml_as_string)
 
 def get_missing_file_paths(
     paths: Sequence[str],
