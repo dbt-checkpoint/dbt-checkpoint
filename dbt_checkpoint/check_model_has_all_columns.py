@@ -30,9 +30,10 @@ def compare_columns(
 def check_model_columns(
     paths: Sequence[str], manifest: Dict[str, Any], catalog: Dict[str, Any], include_missing: bool
 ) -> int:
+    print(paths)
     if include_missing:
         paths = get_missing_file_paths(paths, manifest)
-
+    print(paths)
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
