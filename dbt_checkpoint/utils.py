@@ -397,11 +397,20 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
+def add_missing_filenames_args(parser: argparse.ArgumentParser) -> NoReturn:
+    parser.add_argument(
+        "--include-missing",
+        action="store_true",
+        help="Discover sql/yml files related to the ones subject of hooks"
+    )
+
+
 def add_default_args(parser: argparse.ArgumentParser) -> NoReturn:
     add_filenames_args(parser)
     add_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
+    add_missing_filenames_args(parser)
 
 
 def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:

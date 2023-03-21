@@ -28,9 +28,10 @@ def compare_columns(
 
 
 def check_model_columns(
-    paths: Sequence[str], manifest: Dict[str, Any], catalog: Dict[str, Any]
+    paths: Sequence[str], manifest: Dict[str, Any], catalog: Dict[str, Any], include_missing: bool
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    if include_missing:
+        paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
@@ -103,7 +104,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     status_code = check_model_columns(
-        paths=args.filenames, manifest=manifest, catalog=catalog
+        paths=args.filenames, manifest=manifest, catalog=catalog, include_missing=args.include_missing
     )
     end_time = time.time()
     script_args = vars(args)
