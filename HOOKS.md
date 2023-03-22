@@ -702,7 +702,7 @@ You want to be sure that certain models are using only models from specified dat
 - Hook takes all changed `SQL` files.
 - The model name is obtained from the `SQL` file name.
 - The manifest is scanned for a parent models/sources.
-- If any marent model does not have allowed or has disabled databases, the hook fails.
+- If any parent model does not have allowed or has disabled databases, the hook fails.
 
 ---
 
@@ -747,7 +747,7 @@ You want to be sure that certain models are using only models from specified sch
 - Hook takes all changed `SQL` files.
 - The model name is obtained from the `SQL` file name.
 - The manifest is scanned for a parent models/sources.
-- If any marent model does not have allowed or has disabled schemas, the hook fails.
+- If any parent model does not have allowed or has disabled schemas, the hook fails.
 
 ---
 
