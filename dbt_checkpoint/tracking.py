@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, NoReturn, Optional
+from typing import Any, Dict, Optional
 
 from mixpanel import Mixpanel
 
@@ -27,7 +27,7 @@ class dbtCheckpointTracking:
         event_name: str,
         event_properties: Dict[str, Any],
         manifest: Dict[str, Any],
-    ) -> NoReturn:
+    ) -> None:
         if not self.disable_tracking:
             dbt_metadata = manifest.get("metadata")
             distinct_id = (
