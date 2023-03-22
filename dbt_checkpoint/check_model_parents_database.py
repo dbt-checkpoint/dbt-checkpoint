@@ -20,9 +20,9 @@ def check_parents_database(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
-    include_missing: bool
+    discover_files: bool
 ) -> int:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -91,6 +91,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         blacklist=args.blacklist,
         whitelist=args.whitelist,
+        discover_files=args.discover_files
     )
     end_time = time.time()
     script_args = vars(args)

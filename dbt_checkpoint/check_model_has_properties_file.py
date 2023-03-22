@@ -16,9 +16,9 @@ from dbt_checkpoint.utils import (
 
 
 def has_properties_file(
-    paths: Sequence[str], manifest: Dict[str, Any], include_missing: bool
+    paths: Sequence[str], manifest: Dict[str, Any], discover_files: bool
 ) -> Tuple[int, Set[str]]:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -53,7 +53,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code, _ = has_properties_file(paths=args.filenames, manifest=manifest)
+    status_code, _ = has_properties_file(
+        paths=args.filenames, 
+        manifest=manifest,
+        discover_files=args.discover_files)
     end_time = time.time()
     script_args = vars(args)
 

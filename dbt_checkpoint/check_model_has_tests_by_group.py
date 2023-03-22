@@ -22,9 +22,9 @@ def check_test_cnt(
     manifest: Dict[str, Any],
     test_group: Dict[str, int],
     test_cnt: int,
-    include_missing: bool
+    discover_files: bool
 ) -> int:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -91,6 +91,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         test_group=args.tests,
         test_cnt=args.test_cnt,
+        discover_files=args.discover_files
     )
     end_time = time.time()
     script_args = vars(args)

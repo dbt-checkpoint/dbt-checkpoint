@@ -17,9 +17,9 @@ from dbt_checkpoint.utils import (
 
 
 def check_test_cnt(
-    paths: Sequence[str], manifest: Dict[str, Any], test_cnt: int, include_missing: bool
+    paths: Sequence[str], manifest: Dict[str, Any], test_cnt: int, discover_files: bool
 ) -> int:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -70,7 +70,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     status_code = check_test_cnt(
-        paths=args.filenames, manifest=manifest, test_cnt=args.test_cnt, include_missing=args.include_missing
+        paths=args.filenames, manifest=manifest, test_cnt=args.test_cnt, discover_files=args.discover_files
     )
     end_time = time.time()
     script_args = vars(args)

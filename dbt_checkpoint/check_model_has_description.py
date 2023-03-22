@@ -17,8 +17,8 @@ from dbt_checkpoint.utils import (
 )
 
 
-def has_description(paths: Sequence[str], manifest: Dict[str, Any], include_missing: bool) -> Dict[str, Any]:
-    if include_missing:
+def has_description(paths: Sequence[str], manifest: Dict[str, Any], discover_files: bool) -> Dict[str, Any]:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -60,7 +60,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = has_description(paths=args.filenames, manifest=manifest)
+    hook_properties = has_description(paths=args.filenames, manifest=manifest, discover_files=args.discover_files)
     end_time = time.time()
     script_args = vars(args)
 

@@ -20,9 +20,9 @@ def check_child_parent_cnt(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     required_cnt: Sequence[Dict[str, Any]],
-    include_missing: bool
+    discover_files: bool
 ) -> int:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -133,7 +133,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ]
     start_time = time.time()
     status_code = check_child_parent_cnt(
-        paths=args.filenames, manifest=manifest, required_cnt=required_cnt
+        paths=args.filenames, manifest=manifest, required_cnt=required_cnt, discover_files=args.discover_files
     )
     end_time = time.time()
     script_args = vars(args)

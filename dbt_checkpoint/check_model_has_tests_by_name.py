@@ -19,9 +19,9 @@ from dbt_checkpoint.utils import (
 
 
 def check_test_cnt(
-    paths: Sequence[str], manifest: Dict[str, Any], required_tests: Dict[str, int], include_missing: bool
+    paths: Sequence[str], manifest: Dict[str, Any], required_tests: Dict[str, int], discover_files: bool
 ) -> int:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
@@ -94,7 +94,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     end_time = time.time()
 
     status_code = check_test_cnt(
-        paths=args.filenames, manifest=manifest, required_tests=required_tests
+        paths=args.filenames, manifest=manifest, required_tests=required_tests, discover_files=args.discover_files
     )
     script_args = vars(args)
 

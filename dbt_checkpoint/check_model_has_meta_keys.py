@@ -33,9 +33,9 @@ def has_meta_key(
     manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
-    include_missing: bool
+    discover_files: bool
 ) -> int:
-    if include_missing:
+    if discover_files:
         paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -103,6 +103,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
+        discover_files=args.discover_files
     )
     end_time = time.time()
     script_args = vars(args)

@@ -388,15 +388,7 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> None:
 
 def add_missing_filenames_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
-        "--include-missing",
-        action="store_true",
-        help="Discover sql/yml files related to the ones subject of hooks"
-    )
-
-
-def add_missing_filenames_args(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "--include-missing",
+        "--discover-files",
         action="store_true",
         help="Discover sql/yml files related to the ones subject of hooks"
     )
