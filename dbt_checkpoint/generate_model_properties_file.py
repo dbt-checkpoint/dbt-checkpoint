@@ -2,7 +2,7 @@ import argparse
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, NoReturn, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from yaml import dump, safe_load
 
@@ -18,7 +18,7 @@ from dbt_checkpoint.utils import (
 )
 
 
-def append_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoReturn:
+def append_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> None:
     file = safe_load(path.open())
     if file.get("models"):
         model = file.get("models")
@@ -34,7 +34,7 @@ def append_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoRet
         )
 
 
-def write_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoReturn:
+def write_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     file = {"version": 2, "models": [model_schema]}
     model_name = model_schema.get("name")  # pragma: no mutate
@@ -47,7 +47,7 @@ def write_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> NoRetu
 
 def write_model_properties(
     path: str, model: Dict[str, Any], path_template: Dict[str, str]
-) -> NoReturn:
+) -> None:
     path_form = path.format(**path_template)
     model_path = Path(path_form)
     # It is a file and it exists

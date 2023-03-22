@@ -3,7 +3,7 @@ import os
 import time
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, NoReturn, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 import yaml
 
@@ -12,7 +12,7 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_json
 
 
-def _replace_desc(path: Path, column_name: str, description: str) -> NoReturn:
+def _replace_desc(path: Path, column_name: str, description: str) -> None:
     file = yaml.safe_load(path.open())
     for model in file.get("models", []):
         for column in model.get("columns", []):

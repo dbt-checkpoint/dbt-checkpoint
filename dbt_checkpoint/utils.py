@@ -8,7 +8,6 @@ from typing import (
     Dict,
     Generator,
     List,
-    NoReturn,
     Optional,
     Sequence,
     Set,
@@ -346,7 +345,7 @@ def run_dbt_cmd(cmd: Sequence[Any]) -> int:
     return status_code
 
 
-def add_filenames_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_filenames_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "filenames",
         nargs="*",
@@ -354,7 +353,7 @@ def add_filenames_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_config_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_config_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--config",
         type=str,
@@ -365,7 +364,7 @@ def add_config_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_manifest_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_manifest_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--manifest",
         type=str,
@@ -376,7 +375,7 @@ def add_manifest_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_catalog_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_catalog_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--catalog",
         type=str,
@@ -389,7 +388,7 @@ def add_catalog_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_tracking_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_tracking_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--is_test",
         action="store_true",
@@ -397,14 +396,14 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_default_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)
     add_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
 
 
-def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--global-flags",
         nargs="*",
@@ -418,7 +417,7 @@ def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
+def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--model-prefix",
         type=str,
@@ -440,7 +439,7 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> NoReturn:
     )
 
 
-def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> NoReturn:
+def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
     if "version" not in yaml_dct:
         raise_invalid_property_yml_version(
             file_path,
@@ -463,7 +462,7 @@ def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> NoReturn:
         )
 
 
-def raise_invalid_property_yml_version(path: str, issue: str) -> NoReturn:
+def raise_invalid_property_yml_version(path: str, issue: str) -> None:
     # TODO: URL AS PLACEHOLDER - LINK TO THE DOC SECTION ON dbt-checkpoint CONFIG
     # WHEN AVAILABLE
     raise CompilationException(
@@ -484,7 +483,7 @@ class ParseDict(argparse.Action):  # pragma: no cover
         namespace: argparse.Namespace,
         values: Union[Text, Sequence[Any], None],
         option_string: Optional[str] = None,
-    ) -> NoReturn:
+    ) -> None:
         """Perform the parsing"""
         result = {}
 
@@ -504,7 +503,7 @@ class ParseDict(argparse.Action):  # pragma: no cover
 #     nodes: Dict[Any, Any],
 #     paths_with_missing: Set[str],
 #     include_ephemeral: bool = False,
-# ) -> NoReturn:
+# ) -> None:
 #     yml_path_class = Path(yml_path)
 #     yml_path_parts = list(yml_path_class.parts)
 #     # Remove the first 'project' component
@@ -530,7 +529,7 @@ class ParseDict(argparse.Action):  # pragma: no cover
 #     nodes: Dict[Any, Any],
 #     paths_with_missing: Set[str],
 #     include_ephemeral: bool = False,
-# ) -> NoReturn:
+# ) -> None:
 #     for key, node in nodes.items():  # pragma: no cover
 #         if (
 #             not include_ephemeral
@@ -550,11 +549,12 @@ class ParseDict(argparse.Action):  # pragma: no cover
 #                     if 'target/' not in yml_as_string.lower():
 #                         paths_with_missing.add(yml_as_string)
 
+
 def get_missing_file_paths(
     paths: Sequence[str],
     manifest: Dict[Any, Any] = {},
     include_ephemeral: bool = False,
-) -> List[str]:
+) -> Set[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
     # if nodes:  # pragma: no cover
