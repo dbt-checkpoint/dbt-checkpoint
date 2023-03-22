@@ -39,8 +39,7 @@ dbt-checkpoint has telemetry built into some of its hooks to help the maintainer
 By default this is turned on – you can opt out of event tracking at any time by adding the following to your `.dbt-checkpoint.yaml` file:
 
 ```
-config:
-    disable-tracking: true
+disable-tracking: true
 ```
 
 

@@ -32,7 +32,6 @@ class dbtCheckpointTracking:
         manifest: Dict[str, Any],
     ) -> NoReturn:
         if not self.disable_tracking:
-            print("tracking")
             dbt_metadata = manifest.get("metadata")
             distinct_id = (
                 dbt_metadata.get("user_id") if dbt_metadata is not None else None
