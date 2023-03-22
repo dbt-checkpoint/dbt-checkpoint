@@ -10,7 +10,6 @@ MANIFEST = {
         "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v6.json",
         "dbt_version": "1.2.1",
         "generated_at": "2022-10-04T16:19:51.780894Z",
-        "project_id": "test_project_id",
         "user_id": "test_user_id",
         "send_anonymous_usage_stats": True,
         "adapter_type": "snowflake",
@@ -425,7 +424,7 @@ CONFIG_WITH_TRACKING_FILE = {"version": 1, "disable-tracking": False, "is-test":
 @pytest.fixture(scope="function")
 def config_path_str(tmpdir):
     yaml_config = yaml.dump(CONFIG_FILE)
-    file = tmpdir.mkdir("temp").join(".dbt-gloss.yaml")
+    file = tmpdir.mkdir("temp").join(".dbt-checkpoint.yaml")
     file.write(yaml_config)
     yield str(file)
 
@@ -433,7 +432,7 @@ def config_path_str(tmpdir):
 @pytest.fixture(scope="function")
 def config_with_tracking_path_str(tmpdir):
     yaml_config = yaml.dump(CONFIG_WITH_TRACKING_FILE)
-    file = tmpdir.mkdir("temp").join(".dbt-gloss.yaml")
+    file = tmpdir.mkdir("temp").join(".dbt-checkpoint.yaml")
     file.write(yaml_config)
     yield str(file)
 
