@@ -22,8 +22,10 @@ def check_test_cnt(
     manifest: Dict[str, Any],
     test_group: Dict[str, int],
     test_cnt: int,
+    include_missing: bool
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    if include_missing:
+        paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)

@@ -17,8 +17,9 @@ from dbt_checkpoint.utils import (
 )
 
 
-def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
-    paths = get_missing_file_paths(paths, manifest)
+def has_description(paths: Sequence[str], manifest: Dict[str, Any], include_missing: bool) -> Dict[str, Any]:
+    if include_missing:
+        paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])

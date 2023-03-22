@@ -20,8 +20,10 @@ def check_child_parent_cnt(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     required_cnt: Sequence[Dict[str, Any]],
+    include_missing: bool
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    if include_missing:
+        paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)

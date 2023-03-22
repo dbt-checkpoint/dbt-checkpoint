@@ -33,8 +33,10 @@ def has_meta_key(
     manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
+    include_missing: bool
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    if include_missing:
+        paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])

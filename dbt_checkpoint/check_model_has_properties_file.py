@@ -16,9 +16,10 @@ from dbt_checkpoint.utils import (
 
 
 def has_properties_file(
-    paths: Sequence[str], manifest: Dict[str, Any]
+    paths: Sequence[str], manifest: Dict[str, Any], include_missing: bool
 ) -> Tuple[int, Set[str]]:
-    paths = get_missing_file_paths(paths, manifest)
+    if include_missing:
+        paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
