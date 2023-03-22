@@ -131,6 +131,7 @@ def get_config_file(config_file_path: str) -> Dict[str, Any]:
     try:
         path = Path(config_file_path)
         config = safe_load(path.open())
+        check_yml_version(config_file_path, config)
     except FileNotFoundError:
         config = {}
     return config
