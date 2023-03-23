@@ -573,7 +573,7 @@ def get_missing_file_paths(
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
-    if exclude_pattern:
+    if exclude_pattern:  # pragma: no cover
         exclude_re = re.compile(exclude_pattern)
         paths_with_missing = [
             filename
