@@ -390,9 +390,9 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> None:
 def add_exclude_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--exclude",
-        action="store_true",
-        help="True the execution is a test.",
+        type=str,
         default="",
+        help="True the execution is a test.",
     )
 
 
