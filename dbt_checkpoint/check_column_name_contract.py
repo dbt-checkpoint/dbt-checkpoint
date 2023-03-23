@@ -11,6 +11,7 @@ from dbt_checkpoint.utils import (
     add_default_args,
     get_filenames,
     get_json,
+    get_missing_file_paths,
     get_models,
     red,
     yellow,
@@ -18,9 +19,9 @@ from dbt_checkpoint.utils import (
 
 
 def check_column_name_contract(
-    paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
+    paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any], manifest: Dict[str, Any]
 ) -> Dict[str, Any]:
-    # paths = get_missing_file_paths(paths, manifest, extensions=[".sql"])
+    paths = get_missing_file_paths(paths, manifest, extensions=[".sql"])
 
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
@@ -90,6 +91,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         pattern=args.pattern,
         dtype=args.dtype,
         catalog=catalog,
+        manifest=manifest
     )
 
     end_time = time.time()
