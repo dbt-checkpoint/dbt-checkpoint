@@ -20,8 +20,11 @@ def check_parents_database(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
+    exclude_pattern: str,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest, [".sql"])
+    paths = get_missing_file_paths(
+        paths, manifest, [".sql"], exclude_pattern=exclude_pattern
+    )
 
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
@@ -89,6 +92,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         blacklist=args.blacklist,
         whitelist=args.whitelist,
+        exclude_pattern=args.exclude,
     )
     end_time = time.time()
     script_args = vars(args)

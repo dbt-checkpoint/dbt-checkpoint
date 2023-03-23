@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -386,12 +387,21 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_exclude_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--exclude",
+        action="store_true",
+        help="True the execution is a test.",
+        default="",
+    )
+
+
 def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)
     add_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
-    # add_excluded_files_arg(parser)
+    add_exclude_args(parser)
 
 
 def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> None:
@@ -550,18 +560,26 @@ def get_missing_file_paths(
     manifest: Dict[Any, Any] = {},
     include_ephemeral: bool = False,
     extensions: Sequence[str] = [".sql", ".yml", ".yaml"],
+    exclude_pattern: str = "",
 ) -> Set[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
     if nodes:  # pragma: no cover
         for path in paths:
             suffix = Path(path).suffix.lower()
-            if suffix == ".sql" and suffix in extensions:
+            if suffix == ".sql" and (".yml" in extensions or ".yaml" in extensions):
                 add_related_ymls(path, nodes, paths_with_missing, include_ephemeral)
-            elif (suffix == ".yml" or suffix == ".yaml") and suffix in extensions:
+            elif (suffix == ".yml" or suffix == ".yaml") and ".sql" in extensions:
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
+    if exclude_pattern:
+        exclude_re = re.compile(exclude_pattern)
+        paths_with_missing = [
+            filename
+            for filename in paths_with_missing
+            if not exclude_re.search(filename)
+        ]
     return paths_with_missing
 
 

@@ -9,7 +9,6 @@ from dbt_checkpoint.utils import (
     add_default_args,
     get_filenames,
     get_json,
-    get_missing_file_paths,
     get_models,
     get_parent_childs,
 )

@@ -15,9 +15,14 @@ from dbt_checkpoint.utils import (
 
 
 def validate_tags(
-    paths: Sequence[str], manifest: Dict[str, Any], tags: Sequence[str]
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    tags: Sequence[str],
+    exclude_pattern: str,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest, extensions=[".sql"])
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+    )
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
@@ -60,7 +65,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = validate_tags(paths=args.filenames, manifest=manifest, tags=args.tags)
+    status_code = validate_tags(
+        paths=args.filenames,
+        manifest=manifest,
+        tags=args.tags,
+        exclude_pattern=args.exclude,
+    )
     end_time = time.time()
     script_args = vars(args)
 

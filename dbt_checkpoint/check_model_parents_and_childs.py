@@ -9,7 +9,6 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
     get_json,
-    get_missing_file_paths,
     get_model_sqls,
     get_models,
     get_parent_childs,
