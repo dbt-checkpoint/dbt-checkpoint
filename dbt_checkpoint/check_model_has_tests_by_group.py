@@ -23,7 +23,7 @@ def check_test_cnt(
     test_group: Dict[str, int],
     test_cnt: int,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    paths = get_missing_file_paths(paths, manifest, extensions=[".sql"])
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)

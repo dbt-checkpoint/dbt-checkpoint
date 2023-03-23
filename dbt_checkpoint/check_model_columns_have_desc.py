@@ -24,8 +24,6 @@ from dbt_checkpoint.utils import (
 def check_column_desc(
     paths: Sequence[str], manifest: Dict[str, Any]
 ) -> Tuple[int, Dict[str, Any]]:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest)

@@ -17,7 +17,7 @@ from dbt_checkpoint.utils import (
 def validate_tags(
     paths: Sequence[str], manifest: Dict[str, Any], tags: Sequence[str]
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    paths = get_missing_file_paths(paths, manifest, extensions=[".sql"])
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)

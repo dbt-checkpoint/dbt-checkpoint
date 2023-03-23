@@ -20,6 +20,8 @@ from dbt_checkpoint.utils import (
 def check_column_name_contract(
     paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
 ) -> Dict[str, Any]:
+    # paths = get_missing_file_paths(paths, manifest, extensions=[".sql"])
+
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())

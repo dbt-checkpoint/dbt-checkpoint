@@ -21,7 +21,7 @@ def check_parents_database(
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    paths = get_missing_file_paths(paths, manifest, [".sql"])
 
     status_code = 0
     sqls = get_filenames(paths, [".sql"])

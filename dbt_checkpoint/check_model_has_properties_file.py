@@ -18,8 +18,6 @@ from dbt_checkpoint.utils import (
 def has_properties_file(
     paths: Sequence[str], manifest: Dict[str, Any]
 ) -> Tuple[int, Set[str]]:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
