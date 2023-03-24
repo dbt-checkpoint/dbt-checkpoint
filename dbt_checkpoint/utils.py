@@ -392,7 +392,7 @@ def add_exclude_args(parser: argparse.ArgumentParser) -> None:
         "--exclude",
         type=str,
         default="",
-        help="True the execution is a test.",
+        help="Pattern to exclude files from missing filepath discovery",
     )
 
 
