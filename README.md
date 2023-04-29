@@ -18,12 +18,16 @@
 
 ## Sponsors
 
-<img src=".github/datacoves-logo.png" alt="Datacoves" width="150"/><br>
-The turnkey analytics stack, find out more at [datacoves.com](https://datacoves.com/).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="images/datacoves-dark.png">
+  <img alt="Datacoves" src="images/datacoves-light.png" width="150">
+</picture>
+
+Hosted VS Code, dbt-core, SqlFluff, and Airflow, find out more at [Datacoves.com](https://datacoves.com/product).
 
 <br>
 
-<img style="margin-top: 20px;" src=".github/montreal-analytics-logo.png" alt="Montreal Analytics" width="150"/><br>
+<img style="margin-top: 20px;" src="images/montreal-analytics-logo.png" alt="Montreal Analytics" width="150"/><br>
 [Montreal Analytics](https://www.montrealanalytics.com/?utm_source=blog&utm_medium=medium&utm_campaign=dbt-checkpoint) is a full-stack data consultancy servicing North America, and are both a dbt Preferred Consulting Partner and Platinum dbt Certification Award winner.
 
 ## Goal
