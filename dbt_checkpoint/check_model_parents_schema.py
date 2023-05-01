@@ -42,7 +42,7 @@ def check_parents_schema(
             )
         )
         for parent in parents:
-            db = parent.node.get("schema")
+            db = parent.node.get("config").get("schema")
             if (whitelist and db not in whitelist) or db in blacklist:
                 status_code = 1
                 print(
