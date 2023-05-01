@@ -94,6 +94,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         blacklist=args.blacklist,
         whitelist=args.whitelist,
+        schema_location=args.schema_location,
     )
     end_time = time.time()
     script_args = vars(args)
