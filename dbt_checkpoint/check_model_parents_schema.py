@@ -29,6 +29,7 @@ def check_parents_schema(
     filenames = set(sqls.keys())
     blacklist = blacklist or []
     whitelist = whitelist or []
+    schema_location = schema_location or []
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
