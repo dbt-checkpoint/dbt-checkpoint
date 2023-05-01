@@ -20,6 +20,7 @@ def check_parents_schema(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
+    schema_location: Optional[str],
 ) -> int:
     paths = get_missing_file_paths(paths, manifest)
 
@@ -42,7 +43,10 @@ def check_parents_schema(
             )
         )
         for parent in parents:
-            db = parent.node.get("schema")
+            if schema_location == "config":
+                db = parent.node.get("config").get("schema")
+            else:
+                db = parent.node.get("schema")
             if (whitelist and db not in whitelist) or db in blacklist:
                 status_code = 1
                 print(
