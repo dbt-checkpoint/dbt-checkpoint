@@ -20,7 +20,7 @@ def check_parents_schema(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
-    schema_location: Optional[str],
+    schema_location: Optional[Sequence[str]],
 ) -> int:
     paths = get_missing_file_paths(paths, manifest)
 
