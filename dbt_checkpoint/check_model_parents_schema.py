@@ -80,8 +80,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--schema_location",
         type=str,
         nargs="?",
-        required=False,
+        required=True,
         default="",
+        const="",
         help="Location of the schema",
     ),
 
