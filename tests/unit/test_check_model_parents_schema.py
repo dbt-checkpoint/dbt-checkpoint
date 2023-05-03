@@ -86,6 +86,7 @@ TESTS = (  # type: ignore
     (["aa/bb/parent_child.sql", "--is_test"], ["--blacklist", "test"], True, True, 1),
     (["aa/bb/parent_child.sql", "--is_test"], ["--blacklist", "dev"], True, True, 0),
     (["aa/bb/parent_child.sql", "--is_test"], ["--blacklist", "dev"], True, False, 0),
+    (["aa/bb/parent_child.sql", "--is_test"], ["--schema_location", "config"], True, True, 0),
 )
 
 
