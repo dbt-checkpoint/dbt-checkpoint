@@ -20,7 +20,7 @@ def check_parents_schema(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
-    schema_location: Optional[str],
+    schema_location: str,
 ) -> int:
     paths = get_missing_file_paths(paths, manifest)
 
@@ -29,7 +29,7 @@ def check_parents_schema(
     filenames = set(sqls.keys())
     blacklist = blacklist or []
     whitelist = whitelist or []
-    schema_location = schema_location or []
+    schema_location = schema_location
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
@@ -79,6 +79,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "--schema_location",
         type=str,
+        nargs="?",
         required=False,
         default="",
         help="Location of the schema",
