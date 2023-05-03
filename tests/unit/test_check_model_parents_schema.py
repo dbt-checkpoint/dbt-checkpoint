@@ -93,6 +93,7 @@ TESTS = (  # type: ignore
     (
         "input_schema",
         "input_args",
+        "schema_location",
         "valid_manifest",
         "valid_config",
         "expected_status_code",
@@ -102,6 +103,7 @@ TESTS = (  # type: ignore
 def test_check_model_parents_schema(
     input_schema,
     input_args,
+    schema_location,
     valid_manifest,
     valid_config,
     expected_status_code,
@@ -113,6 +115,8 @@ def test_check_model_parents_schema(
 
     if valid_config:
         input_args.extend(["--config", config_path_str])
+
+    input_args.extend(["--schema_location", schema_location])
 
     input_schema.extend(input_args)
     status_code = main(input_schema)
