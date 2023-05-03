@@ -94,7 +94,6 @@ TESTS = (  # type: ignore
     (
         "input_schema",
         "input_args",
-        "schema_location",
         "valid_manifest",
         "valid_config",
         "expected_status_code",
