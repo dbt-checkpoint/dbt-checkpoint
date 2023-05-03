@@ -44,9 +44,12 @@ def check_parents_schema(
             )
         )
         for parent in parents:
+            # Selecting the location of the model schema
             if schema_location == "config":
+                # Chooses the schema inside in the model config (nodes -> model -> config -> schema)
                 db = parent.node.get("config").get("schema")
             else:
+                # Chooses the schema outside the model config (nodes -> model -> schema)
                 db = parent.node.get("schema")
             if (whitelist and db not in whitelist) or db in blacklist:
                 status_code = 1
@@ -82,7 +85,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         nargs="?",
         required=False,
         default="",
-        help="Location of the schema",
+        help="Location of the model schema.",
     ),
 
     args = parser.parse_args(argv)
