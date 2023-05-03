@@ -20,7 +20,7 @@ def check_parents_schema(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
-    schema_location: Optional[Sequence[str]],
+    schema_location: Optional[str],
 ) -> int:
     paths = get_missing_file_paths(paths, manifest)
 
@@ -75,6 +75,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         nargs="+",
         help="Blacklisted schemas.",
     )
+
+    parser.add_argument(
+        "--schema_location",
+        type=str,
+        required=False,
+        help="Location of the schema",
+    ),
 
     args = parser.parse_args(argv)
 
