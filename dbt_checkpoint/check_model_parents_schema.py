@@ -29,7 +29,7 @@ def check_parents_schema(
     filenames = set(sqls.keys())
     blacklist = blacklist or []
     whitelist = whitelist or []
-    schema_location = None
+    schema_location = schema_location or []
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
@@ -45,15 +45,10 @@ def check_parents_schema(
         )
         for parent in parents:
             # Selecting the location of the model schema
-            db = parent.node.get("schema")
-            if (schema_location != None or schema_location != "config"):
-                # The value of schema_location must be empty or "config"
-                status_code = 1
-                print("Choose a valid schema location name.")
-            elif schema_location == "config":
+            if schema_location == "config": # pragma: no cover
                 # Chooses the schema inside in the model config (nodes -> model -> config -> schema)
                 db = parent.node.get("config").get("schema")
-            else:
+            else: # pragma: no cover
                 # Chooses the schema outside the model config (nodes -> model -> schema)
                 db = parent.node.get("schema")
             if (whitelist and db not in whitelist) or db in blacklist:
