@@ -549,10 +549,14 @@ def add_related_ymls(
                 clean_patch_path = patch_path.relative_to(
                     *patch_path.parts[:1]
                 ).as_posix()
-                for related_yml_file in Path().glob(f"**/{clean_patch_path}"):
+                for related_yml_file in _discover_prop_files(clean_patch_path):
                     yml_as_string = related_yml_file.as_posix()
                     if "target/" not in yml_as_string.lower():
                         paths_with_missing.add(yml_as_string)
+
+
+def _discover_prop_files(model_path):
+    return Path().glob(f"**/{model_path}")
 
 
 def get_missing_file_paths(
