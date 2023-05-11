@@ -117,7 +117,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check the script has not table name (is not using source() or ref() macro for all tables).",  # pragma: no mutate
+            "description": "Check the script has no table name (is not using source() or ref() macro for all tables).",  # pragma: no mutate
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

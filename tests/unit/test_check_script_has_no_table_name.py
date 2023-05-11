@@ -1,11 +1,9 @@
 import pytest
 
-from dbt_checkpoint.check_script_has_no_table_name import (
-    has_table_name,
-    main,
-    prev_cur_next_iter,
-    replace_comments,
-)
+from dbt_checkpoint.check_script_has_no_table_name import has_table_name
+from dbt_checkpoint.check_script_has_no_table_name import main
+from dbt_checkpoint.check_script_has_no_table_name import prev_cur_next_iter
+from dbt_checkpoint.check_script_has_no_table_name import replace_comments
 
 # Input, args, expected return value, expected output
 TESTS = (  # type: ignore
@@ -155,7 +153,7 @@ TESTS = (  # type: ignore
     ),
     (
         """
-    {# This is a test of the check-script-has-no-table-name hook, from dbt-gloss
+    {# This is a test of the check-script-has-no-table-name hook, from dbt-checkpoint
     We would expect the hook to ignore this text because it is in a jinja comment block
     and not actually a join to any other table.
     #}
@@ -172,7 +170,7 @@ TESTS = (  # type: ignore
     ),
     (
         """
-    /* This is a test of the check-script-has-no-table-name hook, from dbt-gloss
+    /* This is a test of the check-script-has-no-table-name hook, from dbt-checkpoint
     We would expect the hook to ignore this text because it is in a jinja comment block
     and not actually a join to any other table.
     */

@@ -348,9 +348,9 @@ def add_config_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--config",
         type=str,
-        default=".dbt-gloss.yaml",
-        help="""Location of .dbt-gloss.yaml. Usually at the dbt root directory.
-        This file contains the global config for dbt-gloss.
+        default=".dbt-checkpoint.yaml",
+        help="""Location of .dbt-checkpoint.yaml. Usually at the dbt root directory.
+        This file contains the global config for dbt-checkpoint.
         """,
     )
 
