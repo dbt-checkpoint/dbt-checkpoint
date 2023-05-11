@@ -564,7 +564,7 @@ def get_missing_file_paths(
 ) -> Set[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
-    if nodes:  # pragma: no cover
+    if nodes:
         for path in paths:
             suffix = Path(path).suffix.lower()
             if suffix == ".sql" and (".yml" in extensions or ".yaml" in extensions):
@@ -573,7 +573,7 @@ def get_missing_file_paths(
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
-    if exclude_pattern:  # pragma: no cover
+    if exclude_pattern:
         exclude_re = re.compile(exclude_pattern)
         paths_with_missing = [
             filename

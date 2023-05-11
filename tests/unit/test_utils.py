@@ -13,6 +13,7 @@ from dbt_checkpoint.utils import (
     cmd_output,
     get_filenames,
     get_macro_schemas,
+    get_missing_file_paths,
     get_model_schemas,
     obj_in_deps,
     paths_to_dbt_models,
@@ -139,3 +140,53 @@ def test_check_yml_version_with_non_1_version():
     yaml_dct = {"version": 2}
     with pytest.raises(CompilationException):
         check_yml_version("file_path", yaml_dct)
+
+
+# Input files, valid manifest, expected files
+TESTS = (
+    (
+        ["aa/bb/with_description.sql"],
+        True,
+        "",
+        ["aa/bb/with_description.sql", "bb/with_description.yml"],
+    ),
+    (
+        ["aa/bb/with_description.sql"],
+        False,
+        "",
+        ["aa/bb/with_description.sql"],
+    ),
+    (
+        ["aa/bb/with_description.sql"],
+        True,
+        "aa/bb",
+        [],
+    ),
+    (
+        ["bb/with_description.yml"],
+        True,
+        ["bb/with_description.yml", "aa/bb/with_description.sql"],
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("input_files", "valid_manifest", "exclude_regex", "expected_files"),
+    TESTS,
+)
+def test_get_missing_file_paths(
+    input_files,
+    valid_manifest,
+    exclude_regex,
+    expected_files,
+    manifest_path_str,
+):
+    manifest = {}
+    if valid_manifest:
+        import json
+
+        manifest = json.load(open(manifest_path_str))
+    resulting_files = get_missing_file_paths(
+        paths=input_files, manifest=manifest, exclude_pattern=exclude_regex
+    )
+    assert set(resulting_files) == set(expected_files)
