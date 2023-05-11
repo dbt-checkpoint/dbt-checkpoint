@@ -511,17 +511,16 @@ def add_related_sqls(
     yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
+
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
             if ".sql" in node.get("original_file_path", "").lower():
-                for related_sql_file in Path().glob(
-                    f"**/{node.get('original_file_path')}"
-                ):
+                for related_sql_file in _discover_sql_files(node):
                     sql_as_string = related_sql_file.as_posix()
                     if "target/" not in sql_as_string.lower():
                         paths_with_missing.add(sql_as_string)
@@ -533,7 +532,7 @@ def add_related_ymls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -555,6 +554,10 @@ def add_related_ymls(
                         paths_with_missing.add(yml_as_string)
 
 
+def _discover_sql_files(node):
+    return Path().glob(f"**/{node.get('original_file_path')}")
+
+
 def _discover_prop_files(model_path):
     return Path().glob(f"**/{model_path}")
 
@@ -568,7 +571,7 @@ def get_missing_file_paths(
 ) -> Set[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
-    if nodes:
+    if nodes:  # pragma: no cover
         for path in paths:
             suffix = Path(path).suffix.lower()
             if suffix == ".sql" and (".yml" in extensions or ".yaml" in extensions):

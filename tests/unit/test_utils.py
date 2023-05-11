@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -146,36 +147,48 @@ def test_check_yml_version_with_non_1_version():
 TESTS = (
     (
         ["aa/bb/with_description.sql"],
+        "bb/with_description.yml",
         True,
         "",
         ["aa/bb/with_description.sql", "bb/with_description.yml"],
     ),
     (
         ["aa/bb/with_description.sql"],
+        "",
         False,
         "",
         ["aa/bb/with_description.sql"],
     ),
     (
         ["aa/bb/with_description.sql"],
+        "aa/bb/with_description.yml",
         True,
-        "aa/bb",
+        r"^(.+)\/([^\/]+)$",
         [],
     ),
     (
-        ["bb/with_description.yml"],
+        ["aa/bb/with_description.yml"],
+        "bb/with_description.sql",
         True,
-        ["bb/with_description.yml", "aa/bb/with_description.sql"],
+        "",
+        ["aa/bb/with_description.yml", "bb/with_description.sql"],
     ),
 )
 
 
 @pytest.mark.parametrize(
-    ("input_files", "valid_manifest", "exclude_regex", "expected_files"),
+    (
+        "input_files",
+        "discovered_files",
+        "valid_manifest",
+        "exclude_regex",
+        "expected_files",
+    ),
     TESTS,
 )
 def test_get_missing_file_paths(
     input_files,
+    discovered_files,
     valid_manifest,
     exclude_regex,
     expected_files,
@@ -186,7 +199,13 @@ def test_get_missing_file_paths(
         import json
 
         manifest = json.load(open(manifest_path_str))
-    resulting_files = get_missing_file_paths(
-        paths=input_files, manifest=manifest, exclude_pattern=exclude_regex
-    )
+    with patch("dbt_checkpoint.utils._discover_prop_files") as mock_discover_prop_files:
+        with patch(
+            "dbt_checkpoint.utils._discover_sql_files"
+        ) as mock_discover_sql_files:
+            mock_discover_sql_files.return_value = [Path(discovered_files)]
+            mock_discover_prop_files.return_value = [Path(discovered_files)]
+            resulting_files = get_missing_file_paths(
+                paths=input_files, manifest=manifest, exclude_pattern=exclude_regex
+            )
     assert set(resulting_files) == set(expected_files)
