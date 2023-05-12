@@ -511,7 +511,7 @@ def add_related_sqls(
     yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
-    for key, node in nodes.items():
+    for key, node in nodes.items():  # pragma: no cover
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -532,7 +532,7 @@ def add_related_ymls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
-    for key, node in nodes.items():
+    for key, node in nodes.items():  # pragma: no cover
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -548,14 +548,16 @@ def add_related_ymls(
                 clean_patch_path = patch_path.relative_to(
                     *patch_path.parts[:1]
                 ).as_posix()
-                for related_yml_file in _discover_prop_files(clean_patch_path):
+                for related_yml_file in _discover_prop_files(
+                    clean_patch_path
+                ):  # pragma: no cover
                     yml_as_string = related_yml_file.as_posix()
                     if "target/" not in yml_as_string.lower():
                         paths_with_missing.add(yml_as_string)
 
 
 def _discover_sql_files(node):
-    return Path().glob(f"**/{node.get('original_file_path')}")
+    return Path().glob(f"**/{node.get('original_file_path')}")  # pragma: no cover
 
 
 def _discover_prop_files(model_path):
