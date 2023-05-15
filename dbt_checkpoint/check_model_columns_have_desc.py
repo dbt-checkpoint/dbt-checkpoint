@@ -52,7 +52,7 @@ def check_column_desc(
                 if (isinstance(value, dict) and not value.get("description"))
             }
         else:
-            continue  # pragma: no cover, no mutate
+            continue
         seen = missing.get(model_name)
         if seen:
             if not missing_cols:

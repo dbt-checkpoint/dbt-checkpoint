@@ -135,7 +135,7 @@ def get_models(
     include_ephemeral: bool = False,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         # Ephemeral models break many tests and should be wholly excluded,
         # someone can make an argument for their inclusion on a case by case basis
         # in which case we would pass `include_ephemeral`
@@ -155,7 +155,7 @@ def get_ephemeral(
 ) -> List[str]:
     output = []
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if not node.get("config", {}).get("materialized") == "ephemeral":
             continue
         split_key = key.split(".")
@@ -475,7 +475,7 @@ def raise_invalid_property_yml_version(path: str, issue: str) -> None:
     )
 
 
-class ParseDict(argparse.Action):  # pragma: no cover
+class ParseDict(argparse.Action):
     """Parse a KEY=VALUE string-list into a dictionary"""
 
     def __call__(
@@ -511,7 +511,7 @@ def add_related_sqls(
     yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -532,7 +532,7 @@ def add_related_ymls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -548,16 +548,14 @@ def add_related_ymls(
                 clean_patch_path = patch_path.relative_to(
                     *patch_path.parts[:1]
                 ).as_posix()
-                for related_yml_file in _discover_prop_files(
-                    clean_patch_path
-                ):  # pragma: no cover
+                for related_yml_file in _discover_prop_files(clean_patch_path):
                     yml_as_string = related_yml_file.as_posix()
                     if "target/" not in yml_as_string.lower():
                         paths_with_missing.add(yml_as_string)
 
 
 def _discover_sql_files(node):
-    return Path().glob(f"**/{node.get('original_file_path')}")  # pragma: no cover
+    return Path().glob(f"**/{node.get('original_file_path')}")
 
 
 def _discover_prop_files(model_path):
@@ -573,7 +571,7 @@ def get_missing_file_paths(
 ) -> Set[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
-    if nodes:  # pragma: no cover
+    if nodes:
         for path in paths:
             suffix = Path(path).suffix.lower()
             if suffix == ".sql" and (".yml" in extensions or ".yaml" in extensions):
