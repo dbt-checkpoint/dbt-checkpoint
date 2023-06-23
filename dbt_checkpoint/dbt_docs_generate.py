@@ -19,8 +19,6 @@ def docs_generate_cmd(
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_dbt_cmd_args(parser)
-    for key, value in os.environ.items():
-        print(f"{key}: {value}")
 
     args = parser.parse_args(argv)
 
