@@ -4,13 +4,7 @@ import time
 from typing import IO, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_config_file,
-    get_json,
-    red,
-)
+from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_dbt_manifest, red
 
 
 def check_semicolon(file_obj: IO[bytes], replace: bool = False) -> int:
@@ -46,14 +40,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_default_args(parser)
 
     args = parser.parse_args(argv)
-    config = get_config_file(args.config)
-    dbt_project_dir = config.get("dbt-project-dir")
 
     status_code = 0
     try:
-        manifest_path = f"{dbt_project_dir}/target/manifest.json" if dbt_project_dir else args.manifest
-        print(f"Checking manifest file: {manifest_path}")
-        manifest = get_json(manifest_path)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1

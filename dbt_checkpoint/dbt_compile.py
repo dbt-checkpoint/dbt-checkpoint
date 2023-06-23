@@ -7,6 +7,7 @@ from dbt_checkpoint.utils import (
     add_dbt_cmd_args,
     add_dbt_cmd_model_args,
     add_filenames_args,
+    get_config_file,
     get_flags,
     paths_to_dbt_models,
     run_dbt_cmd,
@@ -20,14 +21,18 @@ def prepare_cmd(
     prefix: str = "",
     postfix: str = "",
     models: Optional[Sequence[str]] = None,
+    config: Dict[str, Any] = {},
 ) -> List[str]:
     global_flags = get_flags(global_flags)
     cmd_flags = get_flags(cmd_flags)
+    dbt_project_dir = config.get("dbt-project-dir")
     if models:
         dbt_models = models
     else:
         dbt_models = paths_to_dbt_models(paths, prefix, postfix)
     cmd = ["dbt", *global_flags, "compile", "-m", *dbt_models, *cmd_flags]
+    if dbt_project_dir and not "--project-dir" in cmd_flags:
+        cmd.extend(["--project-dir", dbt_project_dir])
     return cmd
 
 
@@ -38,6 +43,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_dbt_cmd_model_args(parser)
 
     args = parser.parse_args(argv)
+    config = get_config_file(args.config)
 
     cmd = prepare_cmd(
         args.filenames,
@@ -46,6 +52,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         args.model_prefix,
         args.model_postfix,
         args.models,
+        config
     )
     return run_dbt_cmd(cmd)
 

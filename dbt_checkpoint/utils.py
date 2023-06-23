@@ -589,3 +589,15 @@ def add_dbt_project_dir_args(parser: argparse.ArgumentParser) -> None:
         default="",
         help="Dbt project root path",
     )
+
+def get_dbt_manifest(args):
+    dbt_checkpoint_config = get_config_file(args.config)
+    dbt_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    manifest_path = f"{dbt_project_dir}/target/manifest.json" if dbt_project_dir else args.manifest
+    return get_json(manifest_path)
+
+def get_dbt_catalog(args):
+    dbt_checkpoint_config = get_config_file(args.config)
+    dbt_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    catalog_path = f"{dbt_project_dir}/target/catalog.json" if dbt_project_dir else args.catalog
+    return get_json(catalog_path)
