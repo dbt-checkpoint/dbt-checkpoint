@@ -280,3 +280,4 @@
   description: Set dbt project root directory
   entry: set-project-root
   language: python
+  types_or: [yaml, sql]
