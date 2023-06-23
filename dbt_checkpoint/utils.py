@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -591,13 +592,27 @@ def add_dbt_project_dir_args(parser: argparse.ArgumentParser) -> None:
     )
 
 def get_dbt_manifest(args):
+    """
+    Get dbt manifest following the new config file approach
+    Flag precedence:
+        - default: target/manifest.json
+        - --manifest myproject/target/manifest.json
+        - .dbt-checkpoint-yaml dbt-project-dir key:value
+    """
+    manifest_path = args.manifest
     dbt_checkpoint_config = get_config_file(args.config)
-    dbt_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
-    manifest_path = f"{dbt_project_dir}/target/manifest.json" if dbt_project_dir else args.manifest
+    config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    if not os.path.exists(manifest_path) and config_project_dir:
+        manifest_path = f"{config_project_dir}/target/manifest.json"
     return get_json(manifest_path)
 
 def get_dbt_catalog(args):
+    """
+    Get dbt catalog following the new config file approach
+    """
+    catalog_path = args.catalog
     dbt_checkpoint_config = get_config_file(args.config)
-    dbt_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
-    catalog_path = f"{dbt_project_dir}/target/catalog.json" if dbt_project_dir else args.catalog
+    config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    if not os.path.exists(catalog_path) and config_project_dir:
+        catalog_path = f"{config_project_dir}/target/catalog.json"
     return get_json(catalog_path)
