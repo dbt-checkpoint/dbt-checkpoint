@@ -3,16 +3,18 @@ import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import NoReturn
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Text
-from typing import Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    List,
+    NoReturn,
+    Optional,
+    Sequence,
+    Set,
+    Text,
+    Union,
+)
 
 from yaml import safe_load
 
@@ -578,3 +580,12 @@ def red(string: Optional[Any]) -> str:
 
 def yellow(string: Optional[Any]) -> str:
     return "\033[93m" + str(string) + "\033[0m"
+
+
+def add_dbt_project_dir_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--project-dir",
+        type=str,
+        default="",
+        help="Dbt project root path",
+    )
