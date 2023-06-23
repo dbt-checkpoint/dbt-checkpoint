@@ -4,6 +4,7 @@ import time
 from typing import Any, Dict, List, Optional, Sequence
 
 from dbt_checkpoint.utils import (
+    add_config_args,
     add_dbt_cmd_args,
     add_dbt_cmd_model_args,
     add_filenames_args,
@@ -41,6 +42,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_filenames_args(parser)
     add_dbt_cmd_args(parser)
     add_dbt_cmd_model_args(parser)
+    add_config_args(parser)
 
     args = parser.parse_args(argv)
     config = get_config_file(args.config)
