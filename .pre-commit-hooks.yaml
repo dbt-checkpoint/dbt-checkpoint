@@ -275,9 +275,3 @@
   entry: remove-script-semicolon
   language: python
   types_or: [sql]
-- id: set-project-root
-  name: Set dbt project
-  description: Set dbt project root directory
-  entry: set-project-root
-  language: python
-  types_or: [yaml, sql]
