@@ -19,6 +19,8 @@ from typing import (
 
 from yaml import safe_load
 
+DEFAULT_MANIFEST_PATH = "target/manifest.json"
+DEFAULT_CATALOG_PATH = "target/catalog.json"
 
 class CalledProcessError(RuntimeError):
     pass
@@ -370,18 +372,17 @@ def add_manifest_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--manifest",
         type=str,
-        default="target/manifest.json",
+        default=DEFAULT_MANIFEST_PATH,
         help="""Location of manifest.json file. Usually target/manifest.json.
         This file contains a full representation of dbt project.
         """,
     )
 
-
 def add_catalog_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--catalog",
         type=str,
-        default="target/catalog.json",
+        default=DEFAULT_CATALOG_PATH,
         help="""Location of catalog.json file. Usually target/catalog.json.
         dbt uses this file to render information like column types and table
         statistics into the docs site. In pre-commit-dbt is used for columns
@@ -601,7 +602,7 @@ def get_dbt_manifest(args):
     manifest_path = args.manifest
     dbt_checkpoint_config = get_config_file(args.config)
     config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
-    if manifest_path != "target/manifest.json":
+    if manifest_path != DEFAULT_MANIFEST_PATH:
         return get_json(manifest_path)
     elif config_project_dir:
         return get_json(f"{config_project_dir}/target/manifest.json")
@@ -615,7 +616,7 @@ def get_dbt_catalog(args):
     catalog_path = args.catalog
     dbt_checkpoint_config = get_config_file(args.config)
     config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
-    if catalog_path != "target/catalog.json":
+    if catalog_path != DEFAULT_CATALOG_PATH:
         return get_json(catalog_path)
     elif config_project_dir:
         return get_json(f"{config_project_dir}/target/catalog.json")
