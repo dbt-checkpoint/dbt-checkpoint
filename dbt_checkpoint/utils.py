@@ -584,7 +584,7 @@ def yellow(string: Optional[Any]) -> str:
     return "\033[93m" + str(string) + "\033[0m"
 
 
-def extend_dbt_cmd_flags(cmd: List[str], cmd_flags: List[str], dbt_project_dir: str = "") -> List[str]:
+def extend_dbt_project_dir_flag(cmd: List[str], cmd_flags: List[str], dbt_project_dir: str = "") -> List[str]:
     if dbt_project_dir and not "--project-dir" in cmd_flags:
         cmd.extend(["--project-dir", dbt_project_dir])
     return cmd

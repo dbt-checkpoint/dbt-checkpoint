@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from dbt_checkpoint.utils import (
     add_config_args,
     add_dbt_cmd_args,
-    extend_dbt_cmd_flags,
+    extend_dbt_project_dir_flag,
     get_config_file,
     get_flags,
     run_dbt_cmd,
@@ -22,7 +22,7 @@ def prepare_cmd(
     cmd_flags = get_flags(cmd_flags)
     dbt_project_dir = config.get("dbt-project-dir")
     cmd = ["dbt", *global_flags, "deps", *cmd_flags]
-    return extend_dbt_cmd_flags(cmd, cmd_flags, dbt_project_dir)
+    return extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
     
 
 
