@@ -22,8 +22,11 @@ def check_test_cnt(
     manifest: Dict[str, Any],
     test_group: Dict[str, int],
     test_cnt: int,
+    exclude_pattern: str,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+    )
 
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
@@ -89,6 +92,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         test_group=args.tests,
         test_cnt=args.test_cnt,
+        exclude_pattern=args.exclude,
     )
     end_time = time.time()
     script_args = vars(args)

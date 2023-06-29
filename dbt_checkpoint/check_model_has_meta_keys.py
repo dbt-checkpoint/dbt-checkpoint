@@ -9,7 +9,6 @@ from dbt_checkpoint.utils import (
     add_default_args,
     get_filenames,
     get_json,
-    get_missing_file_paths,
     get_model_schemas,
     get_model_sqls,
     get_models,
@@ -34,8 +33,6 @@ def has_meta_key(
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest)

@@ -12,11 +12,15 @@ from dbt_checkpoint.utils import (
     get_macro_schemas,
     get_macro_sqls,
     get_macros,
+    get_missing_file_paths,
     red,
 )
 
 
-def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
+def has_description(
+    paths: Sequence[str], manifest: Dict[str, Any], exclude_pattern: str
+) -> Dict[str, Any]:
+    paths = get_missing_file_paths(paths, manifest, exclude_pattern=exclude_pattern)
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_macro_sqls(paths, manifest)
@@ -55,7 +59,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = has_description(paths=args.filenames, manifest=manifest)
+    hook_properties = has_description(
+        paths=args.filenames, manifest=manifest, exclude_pattern=args.exclude
+    )
     end_time = time.time()
     script_args = vars(args)
 

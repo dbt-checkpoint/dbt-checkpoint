@@ -7,7 +7,7 @@
 **Model checks:**
 
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
-- [`check-column-name-contract`](): Check column name abides to contract.
+- [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
@@ -68,6 +68,29 @@
 
 ---
 
+:warning: Since v1.1.0, we've implemented a file discovery logic that "fills in" the missing files so that if the yml file is changed we find the corresponding sql file, to make sure we do the proper check.
+With this implementation, certain Hooks now can receive a `--exclude <pattern>` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
+
+Instead of doing this
+
+```
+- id: check-model-has-tests
+  description: "Ensures that the model has a number of tests"
+  args: ["--test-cnt", "1", "--"]
+  exclude: |
+    (?x)(
+      models/demo
+    )
+```
+
+Hooks that use `--exclude` in their args, should receive it this way:
+
+```
+- id: check-model-has-tests
+  description: "Ensures that the model has a number of tests"
+  args: ["--test-cnt", "1", "--exclude models/demo", "--"]
+```
+
 :exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
 
 ## Available Hooks
@@ -122,6 +145,7 @@ Check that column name abides to a contract, as described in [this blog post](ht
 
 `--pattern`: Regex pattern to match column names.
 `--dtype`: Data type.
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -210,7 +234,8 @@ Ensures that all columns in the database are also specified in the properties fi
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**
+`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -255,7 +280,8 @@ Ensures that the model has a description in the properties file (usually `schema
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -399,7 +425,8 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -443,7 +470,8 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -487,8 +515,9 @@ Ensures that the model has a number of tests from a group of tests.
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: list of test names.
-`--test_cnt`: number of tests required across test group.
+`--tests`: list of test names.<br/>
+`--test_cnt`: number of tests required across test group.<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -532,7 +561,8 @@ Ensures that the model has a number of tests.
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--test-cnt`: Minimum number of tests required.
+`--test-cnt`: Minimum number of tests required.<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -575,7 +605,8 @@ Check that model name abides to a contract (similar to [`check-column-name-contr
 
 #### Arguments
 
-`--pattern`: Regex pattern to match model names.
+`--pattern`: Regex pattern to match model names.<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -670,6 +701,7 @@ Ensures the parent models or sources are from certain database.
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--whitelist`: list of allowed databases.
 `--blacklist`: list of disabled databases.
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -759,6 +791,7 @@ Ensures that the model has only valid tags from the provided list.
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tags`: A list of tags that models can have.
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -1398,6 +1431,7 @@ Ensures that the macro has a description in the properties file (usually `macro.
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
