@@ -1,26 +1,16 @@
 import argparse
 import json
-import os
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Generator,
-    List,
-    NoReturn,
-    Optional,
-    Sequence,
-    Set,
-    Text,
-    Union,
-)
+from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
 
 from yaml import safe_load
 
 DEFAULT_MANIFEST_PATH = "target/manifest.json"
 DEFAULT_CATALOG_PATH = "target/catalog.json"
+
 
 class CalledProcessError(RuntimeError):
     pass
@@ -148,7 +138,7 @@ def get_models(
     include_ephemeral: bool = False,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         # Ephemeral models break many tests and should be wholly excluded,
         # someone can make an argument for their inclusion on a case by case basis
         # in which case we would pass `include_ephemeral`
@@ -168,7 +158,7 @@ def get_ephemeral(
 ) -> List[str]:
     output = []
     nodes = manifest.get("nodes", {})
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if not node.get("config", {}).get("materialized") == "ephemeral":
             continue
         split_key = key.split(".")
@@ -378,6 +368,7 @@ def add_manifest_args(parser: argparse.ArgumentParser) -> None:
         """,
     )
 
+
 def add_catalog_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--catalog",
@@ -399,11 +390,21 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_exclude_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--exclude",
+        type=str,
+        default="",
+        help="Pattern to exclude files from missing filepath discovery",
+    )
+
+
 def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)
     add_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
+    add_exclude_args(parser)
 
 
 def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> None:
@@ -477,7 +478,7 @@ def raise_invalid_property_yml_version(path: str, issue: str) -> None:
     )
 
 
-class ParseDict(argparse.Action):  # pragma: no cover
+class ParseDict(argparse.Action):
     """Parse a KEY=VALUE string-list into a dictionary"""
 
     def __call__(
@@ -513,17 +514,16 @@ def add_related_sqls(
     yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
+
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
             if ".sql" in node.get("original_file_path", "").lower():
-                for related_sql_file in Path().glob(
-                    f"**/{node.get('original_file_path')}"
-                ):
+                for related_sql_file in _discover_sql_files(node):
                     sql_as_string = related_sql_file.as_posix()
                     if "target/" not in sql_as_string.lower():
                         paths_with_missing.add(sql_as_string)
@@ -535,7 +535,7 @@ def add_related_ymls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
-    for key, node in nodes.items():  # pragma: no cover
+    for key, node in nodes.items():
         if (
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
@@ -551,28 +551,45 @@ def add_related_ymls(
                 clean_patch_path = patch_path.relative_to(
                     *patch_path.parts[:1]
                 ).as_posix()
-                for related_yml_file in Path().glob(f"**/{clean_patch_path}"):
+                for related_yml_file in _discover_prop_files(clean_patch_path):
                     yml_as_string = related_yml_file.as_posix()
                     if "target/" not in yml_as_string.lower():
                         paths_with_missing.add(yml_as_string)
+
+
+def _discover_sql_files(node):
+    return Path().glob(f"**/{node.get('original_file_path')}")
+
+
+def _discover_prop_files(model_path):
+    return Path().glob(f"**/{model_path}")
 
 
 def get_missing_file_paths(
     paths: Sequence[str],
     manifest: Dict[Any, Any] = {},
     include_ephemeral: bool = False,
+    extensions: Sequence[str] = [".sql", ".yml", ".yaml"],
+    exclude_pattern: str = "",
 ) -> Set[str]:
     nodes = manifest.get("nodes", {})
     paths_with_missing = set(paths)
-    if nodes:  # pragma: no cover
+    if nodes:
         for path in paths:
             suffix = Path(path).suffix.lower()
-            if suffix == ".sql":
+            if suffix == ".sql" and (".yml" in extensions or ".yaml" in extensions):
                 add_related_ymls(path, nodes, paths_with_missing, include_ephemeral)
-            elif suffix == ".yml" or suffix == ".yaml":
+            elif (suffix == ".yml" or suffix == ".yaml") and ".sql" in extensions:
                 add_related_sqls(path, nodes, paths_with_missing, include_ephemeral)
             else:
                 continue
+    if exclude_pattern:
+        exclude_re = re.compile(exclude_pattern)
+        paths_with_missing = [
+            filename
+            for filename in paths_with_missing
+            if not exclude_re.search(filename)
+        ]
     return paths_with_missing
 
 
@@ -584,10 +601,13 @@ def yellow(string: Optional[Any]) -> str:
     return "\033[93m" + str(string) + "\033[0m"
 
 
-def extend_dbt_project_dir_flag(cmd: List[str], cmd_flags: List[str], dbt_project_dir: str = "") -> List[str]:
+def extend_dbt_project_dir_flag(
+    cmd: List[str], cmd_flags: List[str], dbt_project_dir: str = ""
+) -> List[str]:
     if dbt_project_dir and not "--project-dir" in cmd_flags:
         cmd.extend(["--project-dir", dbt_project_dir])
     return cmd
+
 
 def get_dbt_manifest(args):
     """
@@ -605,6 +625,7 @@ def get_dbt_manifest(args):
         return get_json(f"{config_project_dir}/target/manifest.json")
     else:
         return get_json(manifest_path)
+
 
 def get_dbt_catalog(args):
     """

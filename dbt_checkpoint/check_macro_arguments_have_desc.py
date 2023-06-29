@@ -52,7 +52,7 @@ def check_argument_desc(
                 if not value.get("description")
             }
         else:
-            continue  # pragma: no cover, no mutate
+            continue
         seen = missing.get(macro_name)
         if seen:
             if not missing_args:

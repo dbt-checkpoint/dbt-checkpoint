@@ -30,6 +30,7 @@ MANIFEST = {
             "patch_path": "project://bb/with_description.yml",
             "path": "aa/bb/with_description.sql",
             "root_path": "/path/to/aa",
+            "original_file_path": "bb/with_description.sql",
         },
         "model.without_description": {
             "description": "",

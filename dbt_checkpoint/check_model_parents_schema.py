@@ -9,7 +9,6 @@ from dbt_checkpoint.utils import (
     add_default_args,
     get_dbt_manifest,
     get_filenames,
-    get_missing_file_paths,
     get_models,
     get_parent_childs,
 )
@@ -21,8 +20,6 @@ def check_parents_schema(
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())

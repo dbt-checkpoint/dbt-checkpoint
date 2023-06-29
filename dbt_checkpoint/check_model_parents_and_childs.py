@@ -9,7 +9,6 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
     get_dbt_manifest,
-    get_missing_file_paths,
     get_model_sqls,
     get_models,
     get_parent_childs,
@@ -21,8 +20,6 @@ def check_child_parent_cnt(
     manifest: Dict[str, Any],
     required_cnt: Sequence[Dict[str, Any]],
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
