@@ -47,6 +47,20 @@ version: 1
 disable-tracking: true
 ```
 
+## Setting dbt project root
+
+You can specify a dbt project root directory for all hooks. This is particularly useful when your dbt project is not located at the root of your repository but in a sub-directory of it.
+
+In that situation, you previously had to specify a `--manifest` flag in each hook.
+
+Now, you can avoid repeating yourself by adding the `dbt-project-dir` key to your `.dbt-checkpoint.yaml` config file:
+
+```yaml
+version: 1
+dbt-project-dir: my_dbt_project
+```
+
+This way, we will automatically look for the required manifest/catalog inside your `my_dbt_project` project folder.
 
 ## List of `dbt-checkpoint` hooks
 
