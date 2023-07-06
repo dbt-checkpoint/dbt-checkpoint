@@ -4,7 +4,15 @@ import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Text
+from typing import Union
 
 from yaml import safe_load
 
@@ -554,11 +562,11 @@ def add_related_ymls(
                         paths_with_missing.add(yml_as_string)
 
 
-def _discover_sql_files(node):
+def _discover_sql_files(node):  # type: ignore
     return Path().glob(f"**/{node.get('original_file_path')}")
 
 
-def _discover_prop_files(model_path):
+def _discover_prop_files(model_path):  # type: ignore
     return Path().glob(f"**/{model_path}")
 
 
@@ -582,7 +590,7 @@ def get_missing_file_paths(
                 continue
     if exclude_pattern:
         exclude_re = re.compile(exclude_pattern)
-        paths_with_missing = [
+        paths_with_missing = [  # type: ignore
             filename
             for filename in paths_with_missing
             if not exclude_re.search(filename)
