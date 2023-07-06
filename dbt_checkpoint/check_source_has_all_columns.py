@@ -9,6 +9,8 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_catalog_args,
     add_default_args,
+    get_dbt_catalog,
+    get_dbt_manifest,
     get_json,
     get_source_schemas,
 )
@@ -99,13 +101,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        catalog = get_json(args.catalog)
+        catalog = get_dbt_catalog(args)
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1

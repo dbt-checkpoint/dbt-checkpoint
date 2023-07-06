@@ -16,6 +16,9 @@ from typing import Union
 
 from yaml import safe_load
 
+DEFAULT_MANIFEST_PATH = "target/manifest.json"
+DEFAULT_CATALOG_PATH = "target/catalog.json"
+
 
 class CalledProcessError(RuntimeError):
     pass
@@ -367,7 +370,7 @@ def add_manifest_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--manifest",
         type=str,
-        default="target/manifest.json",
+        default=DEFAULT_MANIFEST_PATH,
         help="""Location of manifest.json file. Usually target/manifest.json.
         This file contains a full representation of dbt project.
         """,
@@ -378,7 +381,7 @@ def add_catalog_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--catalog",
         type=str,
-        default="target/catalog.json",
+        default=DEFAULT_CATALOG_PATH,
         help="""Location of catalog.json file. Usually target/catalog.json.
         dbt uses this file to render information like column types and table
         statistics into the docs site. In pre-commit-dbt is used for columns
@@ -604,3 +607,44 @@ def red(string: Optional[Any]) -> str:
 
 def yellow(string: Optional[Any]) -> str:
     return "\033[93m" + str(string) + "\033[0m"
+
+
+def extend_dbt_project_dir_flag(
+    cmd: List[str], cmd_flags: List[str], dbt_project_dir: str = ""
+) -> List[str]:
+    if dbt_project_dir and not "--project-dir" in cmd_flags:  # noqa
+        cmd.extend(["--project-dir", dbt_project_dir])
+    return cmd
+
+
+def get_dbt_manifest(args):  # type: ignore
+    """
+    Get dbt manifest following the new config file approach. Precedence:
+        - custom `--manifest` flag
+        - .dbt-checkpoint.yaml `dbt-project-dir` key
+        - default `--manifest` flag
+    """
+    manifest_path = args.manifest
+    dbt_checkpoint_config = get_config_file(args.config)
+    config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    if manifest_path != DEFAULT_MANIFEST_PATH:
+        return get_json(manifest_path)
+    elif config_project_dir:
+        return get_json(f"{config_project_dir}/target/manifest.json")
+    else:
+        return get_json(manifest_path)
+
+
+def get_dbt_catalog(args):  # type: ignore
+    """
+    Get dbt catalog following the new config file approach
+    """
+    catalog_path = args.catalog
+    dbt_checkpoint_config = get_config_file(args.config)
+    config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    if catalog_path != DEFAULT_CATALOG_PATH:
+        return get_json(catalog_path)
+    elif config_project_dir:
+        return get_json(f"{config_project_dir}/target/catalog.json")
+    else:
+        return get_json(catalog_path)
