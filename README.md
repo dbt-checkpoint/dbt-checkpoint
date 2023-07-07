@@ -62,6 +62,14 @@ dbt-project-dir: my_dbt_project
 
 This way, we will automatically look for the required manifest/catalog inside your `my_dbt_project` project folder.
 
+## General `exclude` and per-hook excluding
+
+Since `dbt-checkpoint 1.1.0`, certain hooks implement an implicit logic that "discover" their sql/yml equivalent for checking.
+
+For a complete background please refer to [#118](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/118).
+
+Since the root-level `exclude` statement is handled by pre-commit, when those hooks discover their related sql/yml files, this root exclusion is ommitted (dbt-checkpoint re-includes files that may have been excluded). To exclude files from being discovered by this logic, the `exclude` path/regex must be provided in each hook ([#119](https://github.com/dbt-checkpoint/dbt-checkpoint/pull/119))
+
 ## List of `dbt-checkpoint` hooks
 
 :bulb: Click on hook name to view the details.
