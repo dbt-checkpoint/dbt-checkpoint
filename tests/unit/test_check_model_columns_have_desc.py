@@ -1,8 +1,10 @@
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_model_columns_have_desc import check_column_desc, main
+from dbt_checkpoint.check_model_columns_have_desc import check_column_desc
+from dbt_checkpoint.check_model_columns_have_desc import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
@@ -21,6 +23,7 @@ TESTS = (
             ]
         },
         True,
+        True,
         0,
     ),
     (
@@ -38,6 +41,7 @@ TESTS = (
             ]
         },
         False,
+        True,
         1,
     ),
     (
@@ -54,6 +58,7 @@ TESTS = (
                 }
             ]
         },
+        True,
         True,
         1,
     ),
@@ -72,23 +77,33 @@ TESTS = (
             ]
         },
         True,
+        True,
         1,
     ),
 )
 
 
 @pytest.mark.parametrize(
-    ("input_args", "schema", "valid_manifest", "expected_status_code"), TESTS
+    ("input_args", "schema", "valid_manifest", "valid_config", "expected_status_code"),
+    TESTS,
 )
 def test_check_model_columns_have_desc(
-    input_args, schema, valid_manifest, expected_status_code, manifest_path_str
+    input_args,
+    schema,
+    valid_manifest,
+    valid_config,
+    expected_status_code,
+    manifest_path_str,
+    config_path_str,
 ):
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
     with patch("builtins.open", mock_open(read_data="data")):
         with patch("dbt_checkpoint.utils.safe_load") as mock_safe_load:
             mock_safe_load.return_value = schema
-            status_code = main(input_args)
+    status_code = main(input_args)
     assert status_code == expected_status_code
 
 
