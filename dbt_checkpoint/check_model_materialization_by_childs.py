@@ -70,7 +70,7 @@ def check_model_materialization_by_childs(
     return status_code
 
 
-def main(argv: List[str] | None = None) -> int:
+def main(argv: List[str] = None) -> int:
     """Run the pre-commit hook to check the materialization of the models.
 
     :param args: Command line arguments that are parsed, defaults to None.
