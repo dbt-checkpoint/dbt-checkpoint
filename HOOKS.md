@@ -22,6 +22,7 @@
 - [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
 - [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
 - [`check-model-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
+- [`check-model-materialization-by-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-materialization-by-childs): Check the materialization of models given a threshold of child models.
 
 **Script checks:**
 
@@ -827,6 +828,37 @@ Make sure you did not typo in tags.
 - If any model has different tags than specified, the hook fails.
 
 ---
+
+### `check-model-materialization-by-childs`
+
+Checks the model materialization by a given threshold of child models. All models with less child models then the treshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
+
+#### Arguments
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--threshold-childs`: An integer threshold of the number of child models.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-materialization-by-childs
+```
+
+#### When to use it
+
+Make sure to increase the efficiency within your dbt run and make use of good materialization choices.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 ### `check-script-ref-and-source`
 
