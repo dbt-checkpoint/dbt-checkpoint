@@ -14,7 +14,7 @@ TESTS = (
             "foo",
             "bar",
         ],
-        {"models": [{"name": "with_labels", "labels": {"foo": "bar", "bar": "baz"}}]},
+        {"models": [{"name": "with_labels", "config": {"labels": {"foo": "bar"}}}]},
         True,
         True,
         0,
@@ -26,7 +26,7 @@ TESTS = (
             "foo",
             "bar",
         ],
-        {"models": [{"name": "with_labels", "labels": {"foo": "bar"}}]},
+        {"models": [{"name": "with_labels", "config": {"labels": {"foo": "bar"}}}]},
         False,
         True,
         1,
@@ -45,14 +45,14 @@ TESTS = (
     ),
     (
         ["aa/bb/with_labels.sql", "--labels-keys", "foo", "--allow-extra-keys"],
-        {"models": [{"name": "with_labels", "labels": {"foo": "bar", "baz": "test"}}]},
+        {"models": [{"name": "with_labels", "config":{"labels": {"foo": "bar", "baz": "test"}}}]},
         True,
         True,
         0,
     ),
     (
         ["aa/bb/with_labels.sql", "--labels-keys", "baz"],
-        {"models": [{"name": "with_labels", "labels": {"foo": "bar", "baz": "test"}}]},
+        {"models": [{"name": "with_labels", "config":{"labels": {"foo": "bar", "baz": "test"}}}]},
         True,
         True,
         1,
@@ -91,9 +91,10 @@ version: 2
 
 models:
 -   name: in_schema_labels
-    labels:
-        foo: test
-        bar: test
+    config:
+        labels:
+            foo: test
+            bar: test
 -   name: xxx
     """
     yml_file = tmpdir.join(f"schema.{extension}")

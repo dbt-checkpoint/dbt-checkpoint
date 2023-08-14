@@ -44,15 +44,22 @@ def has_labels_key(
 
     in_models = set()
     for model in models:
-        model_config = model.node.get("config", {})
-        model_labels = set(model_config.get("labels", {}).keys())
+        model_config = model.node.get("config")
+        if model_config is not None:
+            model_labels_data = model_config.get("labels")
+        else:
+            model_labels_data = None
+        model_labels = set(model_labels_data.keys()) if model_labels_data else set()
+        
         if validate_keys(model_labels, labels_keys, allow_extra_keys):
             in_models.add(model.filename)
 
+
     in_schemas = set()
     for schema in schemas:
-        schema_config = schema.schema.get("config", {})
-        schema_labels = set(schema_config.get("labels", {}).keys())
+        schema_config = schema.schema.get("config")
+        schema_labels_data = schema_config.get("labels")
+        schema_labels = set(schema_labels_data.keys()) if schema_labels_data else set()
         
         if validate_keys(schema_labels, labels_keys, allow_extra_keys):
             in_schemas.add(schema.model_name)
@@ -68,6 +75,7 @@ def has_labels_key(
         )
 
     return status_code
+
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
