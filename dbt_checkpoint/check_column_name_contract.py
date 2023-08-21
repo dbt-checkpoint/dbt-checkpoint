@@ -21,8 +21,8 @@ from dbt_checkpoint.utils import (
 
 def check_column_name_contract(
     paths: Sequence[str],
-    pattern: str,
-    dtype: str,
+    column_pattern: str,
+    dtype_pattern: str,
     catalog: Dict[str, Any],
     manifest: Dict[str, Any],
     exclude_pattern: str,
@@ -42,20 +42,20 @@ def check_column_name_contract(
             col_type = col.get("type")
 
             # Check all files of type dtype follow naming pattern
-            if re.match(dtype, col_type) is Not None:
-                if re.match(pattern, col_name) is None:
+            if re.match(dtype_pattern, col_type) is Not None:
+                if re.match(column_pattern, col_name) is None:
                     status_code = 1
                     print(
-                        f"{red(col_name)}: column is of type {yellow(dtype)} and "
-                        f"does not match regex pattern {yellow(pattern)}."
+                        f"{red(col_name)}: column is of type {yellow(dtype_pattern)} and "
+                        f"does not match regex pattern {yellow(column_pattern)}."
                     )
 
             # Check all files with naming pattern are of type dtype
-            elif re.match(pattern, col_name):
+            elif re.match(column_pattern, col_name):
                 status_code = 1
                 print(
-                    f"{red(col_name)}: name matches regex pattern {yellow(pattern)} "
-                    f"and is of type {yellow(col_type)} instead of {yellow(dtype)}."
+                    f"{red(col_name)}: name matches regex pattern {yellow(column_pattern)} "
+                    f"and is of type {yellow(col_type)} instead of {yellow(dtype_pattern)}."
                 )
 
     return {"status_code": status_code}
@@ -67,13 +67,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_catalog_args(parser)
 
     parser.add_argument(
-        "--pattern",
+        "--column_pattern",
         type=str,
         required=True,
         help="Regex pattern to match column names.",
     )
     parser.add_argument(
-        "--dtype",
+        "--dtype_pattern",
         type=str,
         required=True,
         help="Expected data type for the matching columns.",
@@ -96,8 +96,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     start_time = time.time()
     hook_properties = check_column_name_contract(
         paths=args.filenames,
-        pattern=args.pattern,
-        dtype=args.dtype,
+        column_pattern=args.column_pattern,
+        dtype_pattern=args.dtype_pattern,
         catalog=catalog,
         manifest=manifest,
         exclude_pattern=args.exclude,
