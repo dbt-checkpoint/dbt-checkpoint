@@ -143,8 +143,8 @@ Check that column name abides to a contract, as described in [this blog post](ht
 
 #### Arguments
 
-`--pattern`: Regex pattern to match column names.
-`--dtype`: Data type.
+`--column_pattern`: Regex pattern to match column names.
+`--dtype_pattern`: Regex pattern to match data type.
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -155,7 +155,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+   args: [--column_pattern, "(is|has|do)_.*", --dtype_pattern, "(boolean)"]
 ```
 
 #### When to use it
