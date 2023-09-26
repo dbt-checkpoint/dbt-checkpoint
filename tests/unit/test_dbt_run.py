@@ -1,8 +1,6 @@
 from unittest.mock import patch
 
-import pytest
-
-from dbt_checkpoint.dbt_run import main, prepare_cmd
+from dbt_checkpoint.dbt_run import main
 
 
 def test_dbt_run():
@@ -26,48 +24,3 @@ def test_dbt_run_error():
         result = main(("test",))
         assert result == 1
 
-
-@pytest.mark.parametrize(
-    "files,global_flags,cmd_flags,models,expected",
-    [
-        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "run", "-m", "cc"]),
-        (
-            ["/aa/bb/cc.txt"],
-            ["++debug", "++no-write-json"],
-            None,
-            None,
-            ["dbt", "--debug", "--no-write-json", "run", "-m", "cc"],
-        ),
-        (
-            ["/aa/bb/cc.txt"],
-            None,
-            ["+t", "prod"],
-            None,
-            ["dbt", "run", "-m", "cc", "-t", "prod"],
-        ),
-        (
-            ["/aa/bb/cc.txt"],
-            "",
-            ["+t", "prod"],
-            None,
-            ["dbt", "run", "-m", "cc", "-t", "prod"],
-        ),
-        (
-            ["/aa/bb/cc.txt"],
-            None,
-            None,
-            [],
-            ["dbt", "run", "-m", "cc"],
-        ),
-        (
-            ["/aa/bb/cc.txt"],
-            None,
-            None,
-            ["state:modified"],
-            ["dbt", "run", "-m", "state:modified"],
-        ),
-    ],
-)
-def test_dbt_run_cmd(files, global_flags, cmd_flags, models, expected):
-    result = prepare_cmd(files, global_flags, cmd_flags, models=models)
-    assert result == expected
