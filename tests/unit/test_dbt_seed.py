@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from dbt_checkpoint.dbt_compile import main
+from dbt_checkpoint.dbt_seed import main
 
 
 def test_dbt_compile():
