@@ -138,5 +138,5 @@ def test_dbt_compile_cmd(files, global_flags, cmd_flags, models, expected):
     ],
 )
 def test_dbt_test_cmd(files, global_flags, cmd_flags, models, expected):
-    result = prepare_cmd(files, global_flags, cmd_flags, models=models)
+    result = prepare_cmd("test", files, global_flags, cmd_flags, models=models)
     assert result == expected
