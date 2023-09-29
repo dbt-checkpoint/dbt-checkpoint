@@ -1,4 +1,5 @@
-from typing import Optional, Sequence
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.dbt_models_command import parse_and_run
 

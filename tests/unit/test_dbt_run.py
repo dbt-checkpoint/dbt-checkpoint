@@ -23,4 +23,3 @@ def test_dbt_run_error():
         mock_popen.return_value.returncode = 1
         result = main(("test",))
         assert result == 1
-
