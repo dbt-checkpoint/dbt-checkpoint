@@ -17,4 +17,6 @@
 4. Update the relevant dbt-checkpoint file with the necessary alterations
 5. Commit staged changes
 6. Publish Branch to `origin `
-7. Create PR and await review from an Analytics Engineer
+7. Create Pull Request - Make sure to chose `pleo-io/dbt-checkpoint-pleo` as the Base Repository
+![Choose a Base Repository](images/base-repository.png)
+8. Await review from an Analytics Engineer
