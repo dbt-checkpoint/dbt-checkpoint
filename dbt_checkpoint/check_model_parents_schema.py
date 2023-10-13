@@ -7,9 +7,8 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
-    get_missing_file_paths,
     get_models,
     get_parent_childs,
 )
@@ -20,16 +19,12 @@ def check_parents_schema(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
-    schema_location: Optional[str],
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
     blacklist = blacklist or []
     whitelist = whitelist or []
-    schema_location = schema_location or []
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames)
@@ -44,13 +39,7 @@ def check_parents_schema(
             )
         )
         for parent in parents:
-            # Selecting the location of the model schema
-            if schema_location == "config": # pragma: no cover
-                # Chooses the schema inside in the model config (nodes -> model -> config -> schema)
-                db = parent.node.get("config").get("schema")
-            else: # pragma: no cover
-                # Chooses the schema outside the model config (nodes -> model -> schema)
-                db = parent.node.get("schema")
+            db = parent.node.get("schema")
             if (whitelist and db not in whitelist) or db in blacklist:
                 status_code = 1
                 print(
@@ -79,19 +68,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="Blacklisted schemas.",
     )
 
-    parser.add_argument(
-        "--schema_location",
-        type=str,
-        nargs="?",
-        required=False,
-        default="",
-        help="Location of the model schema.",
-    ),
-
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
@@ -106,7 +86,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         blacklist=args.blacklist,
         whitelist=args.whitelist,
-        schema_location=args.schema_location,
     )
     end_time = time.time()
     script_args = vars(args)
