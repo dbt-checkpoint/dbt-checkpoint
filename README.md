@@ -15,4 +15,6 @@
 2. Open repository in your prefered code editor (e.g. VSCode)
 3. Create a branch from `main`
 4. Update the relevant dbt-checkpoint file with the necessary alterations
-5. 
+5. Commit staged changes
+6. Publish Branch to `origin `
+7. Create PR and await review from an Analytics Engineer
