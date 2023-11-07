@@ -28,7 +28,7 @@ Hosted VS Code, dbt-core, SqlFluff, and Airflow, find out more at [Datacoves.com
 <br>
 
 <img style="margin-top: 20px;" src="images/datatonic-blue.png" alt="Datatonic" width="150"/><br>
-[Datatonic](https://datatonic.com/) is a full-stack data and AI consultancy empowering companies to make better business decisions with Modern Data Stack and MLOps. They are a premiere partner to leading cloud technologies and 4x Google Cloud Partner of the year.
+[Datatonic](https://datatonic.com/?utm_source=blog&utm_medium=medium&utm_campaign=dbt-checkpoint) is a full-stack data and AI consultancy empowering companies to make better business decisions with Modern Data Stack and MLOps. They are a premiere partner to leading cloud technologies and 5x Google Cloud Partner of the year.
 
 ## Goal
 
