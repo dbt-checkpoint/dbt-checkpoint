@@ -43,7 +43,7 @@ def check_column_name_contract(
 
             # Check all files of type dtype follow naming pattern
             if dtype.lower() == col_type.lower():
-                if re.match(pattern, col_name) is None:
+                if re.match(pattern, col_name, re.IGNORECASE) is None:
                     status_code = 1
                     print(
                         f"{red(col_name)}: column is of type {yellow(dtype)} and "
