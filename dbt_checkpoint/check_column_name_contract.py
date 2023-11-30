@@ -42,7 +42,7 @@ def check_column_name_contract(
             col_type = col.get("type")
 
             # Check all files of type dtype follow naming pattern
-            if dtype == col_type:
+            if dtype.lower() == col_type.lower():
                 if re.match(pattern, col_name) is None:
                     status_code = 1
                     print(

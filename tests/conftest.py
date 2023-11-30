@@ -383,7 +383,8 @@ CATALOG = {
             "metadata": {},
             "columns": {
                 "COL1": {"type": "boolean", "name": "COL1"},
-                "COL2": {"type": "TEXT", "name": "COL2"},
+                "COL2": {"type": "BOOLEAN", "name": "COL2"},
+                "COL3": {"type": "TEXT", "name": "COL3"},
             },
         },
         "model.test.without_boolean_column_with_prefix": {
