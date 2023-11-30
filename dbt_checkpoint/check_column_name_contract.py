@@ -51,7 +51,7 @@ def check_column_name_contract(
                     )
 
             # Check all files with naming pattern are of type dtype
-            elif re.match(pattern, col_name):
+            elif re.match(pattern, col_name, re.IGNORECASE):
                 status_code = 1
                 print(
                     f"{red(col_name)}: name matches regex pattern {yellow(pattern)} "

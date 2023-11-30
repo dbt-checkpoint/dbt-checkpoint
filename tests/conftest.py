@@ -377,6 +377,7 @@ CATALOG = {
             "columns": {
                 "is_boolean": {"type": "boolean", "name": "is_boolean"},
                 "COL2": {"type": "TEXT", "name": "COL2"},
+                "is_also_boolean": {"type": "BOOLEAN", "name": "is_also_boolean"},
             },
         },
         "model.test.with_boolean_column_without_prefix": {
