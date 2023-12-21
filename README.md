@@ -82,6 +82,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
+- [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
 - [`check-model-has-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-properties-file): Check the model has properties file.
 - [`check-model-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-name): Check the model has a number of tests by test name.
 - [`check-model-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
@@ -107,6 +108,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-source-has-freshness`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-freshness): Check the source has the freshness.
 - [`check-source-has-loader`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-loader): Check the source has loader option.
 - [`check-source-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-meta-keys): Check the source has keys in the meta part.
+- [`check-source-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-labels-keys): Check the source has keys in the labels part.
 - [`check-source-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-group): Check the source has a number of tests from a group of tests.
 - [`check-source-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-name): Check the source has a number of tests by test name.
 - [`check-source-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.

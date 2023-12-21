@@ -66,6 +66,28 @@ MANIFEST = {
             "path": "aa/bb/without_meta.sql",
             "root_path": "/path/to/aa",
         },
+        "model.with_labels": {
+            "config": {
+                "labels": {"foo": "test", "bar": "test"},
+            },
+            "patch_path": "project://bb/with_labels.yml",
+            "path": "aa/bb/with_labels.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_labels_foo": {
+            "config": {
+                "labels": {"foo": "test"},
+            },
+            "patch_path": "project://bb/with_labels_foo.yml",
+            "path": "aa/bb/with_labels_foo.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_labels": {
+            "patch_path": "project://bb/without_labels.yml",
+            "path": "aa/bb/without_labels.sql",
+            "root_path": "/path/to/aa",
+        },
+        
         "model.with_tags": {
             "tags": ["foo", "bar"],
             "patch_path": "project://bb/with_tags.yml",
