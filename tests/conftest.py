@@ -377,13 +377,15 @@ CATALOG = {
             "columns": {
                 "is_boolean": {"type": "boolean", "name": "is_boolean"},
                 "COL2": {"type": "TEXT", "name": "COL2"},
+                "IS_ALSO_BOOLEAN": {"type": "BOOLEAN", "name": "IS_ALSO_BOOLEAN"},
             },
         },
         "model.test.with_boolean_column_without_prefix": {
             "metadata": {},
             "columns": {
                 "COL1": {"type": "boolean", "name": "COL1"},
-                "COL2": {"type": "TEXT", "name": "COL2"},
+                "COL2": {"type": "BOOLEAN", "name": "COL2"},
+                "COL3": {"type": "TEXT", "name": "COL3"},
             },
         },
         "model.test.without_boolean_column_with_prefix": {
