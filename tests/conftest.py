@@ -69,6 +69,28 @@ MANIFEST = {
             "path": "aa/bb/without_meta.sql",
             "root_path": "/path/to/aa",
         },
+        "model.with_labels": {
+            "config": {
+                "labels": {"foo": "test", "bar": "test"},
+            },
+            "patch_path": "project://bb/with_labels.yml",
+            "path": "aa/bb/with_labels.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_labels_foo": {
+            "config": {
+                "labels": {"foo": "test"},
+            },
+            "patch_path": "project://bb/with_labels_foo.yml",
+            "path": "aa/bb/with_labels_foo.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_labels": {
+            "patch_path": "project://bb/without_labels.yml",
+            "path": "aa/bb/without_labels.sql",
+            "root_path": "/path/to/aa",
+        },
+        
         "model.with_tags": {
             "tags": ["foo", "bar"],
             "patch_path": "project://bb/with_tags.yml",
@@ -385,13 +407,15 @@ CATALOG = {
             "columns": {
                 "is_boolean": {"type": "boolean", "name": "is_boolean"},
                 "COL2": {"type": "TEXT", "name": "COL2"},
+                "IS_ALSO_BOOLEAN": {"type": "BOOLEAN", "name": "IS_ALSO_BOOLEAN"},
             },
         },
         "model.test.with_boolean_column_without_prefix": {
             "metadata": {},
             "columns": {
                 "COL1": {"type": "boolean", "name": "COL1"},
-                "COL2": {"type": "TEXT", "name": "COL2"},
+                "COL2": {"type": "BOOLEAN", "name": "COL2"},
+                "COL3": {"type": "TEXT", "name": "COL3"},
             },
         },
         "model.test.without_boolean_column_with_prefix": {

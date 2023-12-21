@@ -12,6 +12,7 @@
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
+- [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
 - [`check-model-has-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-properties-file): Check the model has properties file.
 - [`check-model-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-name): Check the model has a number of tests by test name.
 - [`check-model-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
@@ -38,6 +39,7 @@
 - [`check-source-has-freshness`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-freshness): Check the source has the freshness.
 - [`check-source-has-loader`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-loader): Check the source has loader option.
 - [`check-source-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-meta-keys): Check the source has keys in the meta part.
+- [`check-source-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-labels-keys): Check the source has keys in the labels part.
 - [`check-source-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-name): Check the source has a number of tests by test name.
 - [`check-source-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
 - [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
@@ -372,6 +374,59 @@ If every model needs to have certain meta keys.
 #### Known limitations
 
 If you `run` your model and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
+
+---
+
+### `check-model-has-labels-keys`
+
+Ensures that the model has a list of valid labels keys. (usually `schema.yml`).
+
+By default, it does not allow the model to have any other labels keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--labels-keys`: list of the required keys in the labels part of the model.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-has-labels-keys
+   args: ['--labels-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every model needs to have certain labels keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a model.
+- Modified `yml` files are scanned for a model.
+- If any model (from a manifest or `yml` files) does not have specified labels keys, the hook fails.
+- The labels keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your model and then you delete labels keys from a properties file, the hook success since the labels keys is still present in `manifest.json`.
 
 ---
 
@@ -1197,6 +1252,48 @@ If every source needs to have certain meta keys.
 - Hook takes all changed `yml`.
 - All sources from yml file are parsed.
 - If the source does not have the required meta keys set, the hook fails.
+
+---
+
+### `check-source-has-labels-keys`
+
+Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
+
+#### Arguments
+
+`--labels-keys`: list of the required keys in the labels part of the model.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-source-has-labels-keys
+   args: ['--labels-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every source needs to have certain labels keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml`.
+- All sources from yml file are parsed.
+- If the source does not have the required labels keys set, the hook fails.
 
 ---
 
