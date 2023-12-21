@@ -212,6 +212,13 @@
   entry: check-source-tags
   language: python
   types_or: [yaml]
+- id: dbt-build
+  name: dbt build
+  description: Builds and tests all selected resources (models, seeds, snapshots, tests).
+  entry: dbt-build
+  language: python
+  types_or: [sql]
+  require_serial: true
 - id: dbt-clean
   name: dbt clean
   description: Deletes all folders specified in the clean-targets.
@@ -244,6 +251,20 @@
   language: python
   require_serial: true
   types_or: [sql]
+- id: dbt-seed
+  name: dbt seed
+  description: Loads CSV files into the database.
+  entry: dbt-seed
+  language: python
+  types_or: [csv]
+  require_serial: true
+- id: dbt-snapshot
+  name: dbt snapshot
+  description: Executes "snapshot" jobs defined in a project.
+  entry: dbt-snapshot
+  language: python
+  types_or: [sql]
+  require_serial: true
 - id: dbt-test
   name: dbt test
   description: Runs tests on data in deployed models.

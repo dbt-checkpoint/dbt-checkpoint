@@ -61,10 +61,13 @@
 
 **dbt commands:**
 
+- [`dbt-build`](#dbt-build): Run `dbt build` command.
 - [`dbt-clean`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-clean): Run `dbt clean` command.
 - [`dbt-compile`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-compile): Run `dbt compile` command.
 - [`dbt-deps`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-deps): Run `dbt deps` command.
 - [`dbt-docs-generate`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-docs-generate): Run `dbt docs generate` command.
+- [`dbt-seed`](#dbt-seed): Run `dbt seed` command.
+- [`dbt-snapshot`](#dbt-snapshot): Run `dbt snapshot` command.
 - [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
 - [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
 
@@ -1847,6 +1850,44 @@ You are too lazy or forgetful to delete one character at the end of the script.
 
 ---
 
+### `dbt-build`
+
+Run `dbt build` command. Builds and tests all selected resources (models, seeds, snapshots, tests).
+
+#### Arguments
+
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
+`--model-prefix`: Prefix dbt selector, for selecting parents.</br>
+`--model-postfix`: Postfix dbt selector, for selecting children.</br>
+`--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: dbt-build
+   args: ["--model-prefix", "+", "--"]
+```
+
+or
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: dbt-build
+   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+---
+
 ### `dbt-clean`
 
 Run the` dbt clean` command. Deletes all folders specified in the clean-targets.
@@ -1964,6 +2005,82 @@ repos:
  rev: v1.0.0
  hooks:
  - id: dbt-run
+   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+---
+
+### `dbt-seed`
+
+Run `dbt seed` command. Loads CSV files into the database.
+
+#### Arguments
+
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
+`--model-prefix`: Prefix dbt selector, for selecting parents.</br>
+`--model-postfix`: Postfix dbt selector, for selecting children.</br>
+`--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: dbt-seed
+   args: ["--model-prefix", "+", "--"]
+```
+
+or
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: dbt-seed
+   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+---
+
+### `dbt-snapshot`
+
+Run `dbt snapshot` command. Executes "snapshot" jobs defined in a project.
+
+#### Arguments
+
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
+`--model-prefix`: Prefix dbt selector, for selecting parents.</br>
+`--model-postfix`: Postfix dbt selector, for selecting children.</br>
+`--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: dbt-snapshot
+   args: ["--model-prefix", "+", "--"]
+```
+
+or
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: dbt-snapshot
    args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 

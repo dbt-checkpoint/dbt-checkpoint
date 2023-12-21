@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from dbt_checkpoint.dbt_compile import main
+from dbt_checkpoint.dbt_seed import main
 
 
 def test_dbt_compile():
@@ -23,3 +23,4 @@ def test_dbt_compile_error():
         mock_popen.return_value.returncode = 1
         result = main(("test",))
         assert result == 1
+
