@@ -159,7 +159,7 @@ pip install pre-commit
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-  rev: v1.1.0
+  rev: v1.1.1
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
