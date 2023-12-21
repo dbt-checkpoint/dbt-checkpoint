@@ -288,4 +288,9 @@
   entry: remove-script-semicolon
   language: python
   types_or: [sql]
-  
+- id: check-model-materialization-by-childs
+  name: Check the materialization of the model by childs
+  description: Controls the materialization of the model by its number of childs.
+  entry: check-model-materialization-by-childs
+  language: python
+  types_or: [sql]

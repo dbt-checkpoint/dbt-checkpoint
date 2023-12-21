@@ -19,6 +19,9 @@ MANIFEST = {
             "patch_path": "project://bb/with_schema.yml",
             "path": "aa/bb/with_schema.sql",
             "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table",
+            },
         },
         "model.without_schema": {
             "patch_path": "",
@@ -226,6 +229,7 @@ MANIFEST = {
             "patch_path": "project://bb/with_test1.yml",
             "path": "aa/bb/with_test1.sql",
             "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
         },
         "model.with_test2": {
             "patch_path": "project://bb/with_test2.yml",
@@ -241,6 +245,7 @@ MANIFEST = {
             "patch_path": "project://bb/without_test.yml",
             "path": "aa/bb/without_test.sql",
             "root_path": "/path/to/aa",
+            "config": {"materialized": "incremental"},
         },
         "model.replaced_model": {
             "alias": "replaced_model",
@@ -267,6 +272,9 @@ MANIFEST = {
             "patch_path": "project://bb/parent_child.yml",
             "path": "aa/bb/parent_child.sql",
             "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "view",
+            },
         },
     },
     "sources": {
