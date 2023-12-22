@@ -16,14 +16,14 @@ from dbt_checkpoint.utils import (
 
 
 def has_properties_file(
-    paths: Sequence[str], manifest: Dict[str, Any]
+    paths: Sequence[str], manifest: Dict[str, Any], include_disabled: bool = False
 ) -> Tuple[int, Set[str]]:
     status_code = 0
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     # convert to sets
     in_models = {model.filename for model in models if model.node.get("patch_path")}
     missing = filenames.difference(in_models)
@@ -50,7 +50,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code, _ = has_properties_file(paths=args.filenames, manifest=manifest)
+    status_code, _ = has_properties_file(
+        paths=args.filenames, manifest=manifest, include_disabled=args.include_disabled
+    )
     end_time = time.time()
     script_args = vars(args)
 

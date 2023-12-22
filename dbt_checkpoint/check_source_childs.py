@@ -19,11 +19,12 @@ def check_child_parent_cnt(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     required_cnt: Sequence[Dict[str, Any]],
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         childs = list(
@@ -92,7 +93,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     hook_properties = check_child_parent_cnt(
-        paths=args.filenames, manifest=manifest, required_cnt=required_cnt
+        paths=args.filenames,
+        manifest=manifest,
+        required_cnt=required_cnt,
+        include_disabled=args.include_disabled,
     )
 
     end_time = time.time()

@@ -4,15 +4,7 @@ import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import Text
-from typing import Union
+from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
 
 from yaml import safe_load
 
@@ -144,6 +136,7 @@ def get_models(
     manifest: Dict[str, Any],
     filenames: Set[str],
     include_ephemeral: bool = False,
+    include_disabled: bool = False,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():
@@ -154,6 +147,9 @@ def get_models(
             not include_ephemeral
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
+            continue
+        # Disabled models are skipped by default
+        if not include_disabled and not node.get("config", {}).get("enabled", True):
             continue
         split_key = key.split(".")
         filename = split_key[-1]
@@ -245,11 +241,15 @@ def get_macro_schemas(
 
 
 def get_source_schemas(
-    yml_files: Sequence[Path],
+    yml_files: Sequence[Path], include_disabled: bool = False
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
         schema = safe_load(yml_file.open())
         for source in schema.get("sources", []):
+            if not include_disabled and not source.get("config", {}).get(
+                "enabled", True
+            ):
+                continue
             source_name = source.get("name")
             tables = source.pop("tables", [])
             for table in tables:
@@ -407,12 +407,21 @@ def add_exclude_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_disabled_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--include-disabled",
+        action="store_true",
+        help="Flagto include disabled models",
+    )
+
+
 def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)
     add_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
     add_exclude_args(parser)
+    add_disabled_args(parser)
 
 
 def add_dbt_cmd_args(parser: argparse.ArgumentParser) -> None:

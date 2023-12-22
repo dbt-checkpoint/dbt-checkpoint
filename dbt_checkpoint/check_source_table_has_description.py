@@ -14,12 +14,14 @@ from dbt_checkpoint.utils import (
 )
 
 
-def has_description(paths: Sequence[str]) -> Dict[str, Any]:
+def has_description(
+    paths: Sequence[str], include_disabled: bool = False
+) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         if not schema.table_schema.get("description"):
@@ -44,7 +46,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = has_description(paths=args.filenames)
+    hook_properties = has_description(
+        paths=args.filenames, include_disabled=args.include_disabled
+    )
     end_time = time.time()
     script_args = vars(args)
 

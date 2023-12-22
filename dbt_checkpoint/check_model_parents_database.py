@@ -21,6 +21,7 @@ def check_parents_database(
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
     exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
         paths, manifest, [".sql"], exclude_pattern=exclude_pattern
@@ -33,7 +34,7 @@ def check_parents_database(
     whitelist = whitelist or []
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     for model in models:
         parents = list(
@@ -93,6 +94,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         blacklist=args.blacklist,
         whitelist=args.whitelist,
         exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

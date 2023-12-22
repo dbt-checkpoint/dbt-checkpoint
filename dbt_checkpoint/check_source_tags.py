@@ -13,12 +13,14 @@ from dbt_checkpoint.utils import (
 )
 
 
-def validate_tags(paths: Sequence[str], tags: Sequence[str]) -> Dict[str, Any]:
+def validate_tags(
+    paths: Sequence[str], tags: Sequence[str], include_disabled: bool = False
+) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         schema_tags = set(schema.source_schema.get("tags", []))
@@ -56,7 +58,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = validate_tags(paths=args.filenames, tags=args.tags)
+    hook_properties = validate_tags(
+        paths=args.filenames, tags=args.tags, include_disabled=args.include_disabled
+    )
     end_time = time.time()
     script_args = vars(args)
 

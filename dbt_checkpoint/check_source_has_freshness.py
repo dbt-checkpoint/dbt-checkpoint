@@ -15,12 +15,14 @@ from dbt_checkpoint.utils import (
 )
 
 
-def has_freshness(paths: Sequence[str], required_freshness: Set[str]) -> Dict[str, Any]:
+def has_freshness(
+    paths: Sequence[str], required_freshness: Set[str], include_disabled: bool = False
+) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         source = schema.source_schema
@@ -76,7 +78,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     hook_properties = has_freshness(
-        paths=args.filenames, required_freshness=set(args.freshness)
+        paths=args.filenames,
+        required_freshness=set(args.freshness),
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

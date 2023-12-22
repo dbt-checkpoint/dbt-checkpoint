@@ -1,20 +1,18 @@
 import argparse
 import os
 import time
-from typing import Any
-from typing import Dict
-from typing import Iterable
-from typing import Optional
-from typing import Sequence
+from typing import Any, Dict, Iterable, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import add_default_args
-from dbt_checkpoint.utils import get_dbt_manifest
-from dbt_checkpoint.utils import get_filenames
-from dbt_checkpoint.utils import get_model_schemas
-from dbt_checkpoint.utils import get_model_sqls
-from dbt_checkpoint.utils import get_models
-from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import (
+    JsonOpenError,
+    add_default_args,
+    get_dbt_manifest,
+    get_filenames,
+    get_model_schemas,
+    get_model_sqls,
+    get_models,
+)
 
 
 def validate_keys(
@@ -34,12 +32,13 @@ def has_labels_key(
     manifest: Dict[str, Any],
     labels_keys: Sequence[str],
     allow_extra_keys: bool,
+    include_disabled: bool = False,
 ) -> int:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     schemas = get_model_schemas(list(ymls.values()), filenames)
 
     in_models = set()
@@ -50,17 +49,16 @@ def has_labels_key(
         else:
             model_labels_data = None
         model_labels = set(model_labels_data.keys()) if model_labels_data else set()
-        
+
         if validate_keys(model_labels, labels_keys, allow_extra_keys):
             in_models.add(model.filename)
-
 
     in_schemas = set()
     for schema in schemas:
         schema_config = schema.schema.get("config")
         schema_labels_data = schema_config.get("labels")
         schema_labels = set(schema_labels_data.keys()) if schema_labels_data else set()
-        
+
         if validate_keys(schema_labels, labels_keys, allow_extra_keys):
             in_schemas.add(schema.model_name)
 
@@ -75,7 +73,6 @@ def has_labels_key(
         )
 
     return status_code
-
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -110,6 +107,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         labels_keys=args.labels_keys,
         allow_extra_keys=args.allow_extra_keys,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

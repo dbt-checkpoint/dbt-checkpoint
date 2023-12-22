@@ -13,12 +13,14 @@ from dbt_checkpoint.utils import (
 )
 
 
-def has_meta_key(paths: Sequence[str], meta_keys: Sequence[str]) -> Dict[str, Any]:
+def has_meta_key(
+    paths: Sequence[str], meta_keys: Sequence[str], include_disabled: bool = False
+) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         schema_meta = set(schema.source_schema.get("meta", {}).keys())
@@ -54,7 +56,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = has_meta_key(paths=args.filenames, meta_keys=args.meta_keys)
+    hook_properties = has_meta_key(
+        paths=args.filenames,
+        meta_keys=args.meta_keys,
+        include_disabled=args.include_disabled,
+    )
     end_time = time.time()
     script_args = vars(args)
 

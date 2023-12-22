@@ -83,13 +83,14 @@ def generate_properties_file(
     manifest: Dict[str, Any],
     catalog: Dict[str, Any],
     properties_file: str,
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     catalog_nodes = catalog.get("nodes", {})
 
     for model in models:
@@ -151,6 +152,7 @@ def main(argv: Optional[Sequence[str]] = None) -> Dict[str, Any]:
         manifest=manifest,
         catalog=catalog,
         properties_file=args.properties_file,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

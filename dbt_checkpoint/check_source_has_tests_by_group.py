@@ -21,12 +21,13 @@ def check_test_cnt(
     manifest: Dict[str, Any],
     test_group: Dict[str, int],
     test_cnt: int,
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         childs = list(
@@ -88,6 +89,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         test_group=args.tests,
         test_cnt=args.test_cnt,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
