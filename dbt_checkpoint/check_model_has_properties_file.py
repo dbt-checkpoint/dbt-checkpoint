@@ -19,14 +19,14 @@ def has_properties_file(
     paths: Sequence[str], manifest: Dict[str, Any], include_disabled: bool = False
 ) -> Tuple[int, Set[str]]:
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     # convert to sets
     in_models = {model.filename for model in models if model.node.get("patch_path")}
-    missing = filenames.difference(in_models)
+    missing = filenames.difference(in_models) if in_models else []
 
     for model in missing:
         status_code = 1

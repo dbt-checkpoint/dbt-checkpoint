@@ -28,7 +28,7 @@ def check_model_materialization_by_childs(
     :return: Status code of the check.
     """
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # Prepare the manifest to extract the materialization per model.

@@ -36,7 +36,7 @@ def has_labels_key(
 ) -> int:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     schemas = get_model_schemas(list(ymls.values()), filenames)

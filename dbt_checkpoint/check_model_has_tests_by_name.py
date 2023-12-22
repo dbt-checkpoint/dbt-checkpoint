@@ -29,7 +29,7 @@ def check_test_cnt(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed

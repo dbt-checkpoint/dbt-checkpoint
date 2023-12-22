@@ -148,7 +148,7 @@ def get_models(
             and node.get("config", {}).get("materialized") == "ephemeral"
         ):
             continue
-        # Disabled models are skipped by default
+        # In case a disabled model is still in `nodes`
         if not include_disabled and not node.get("config", {}).get("enabled", True):
             continue
         split_key = key.split(".")
@@ -198,11 +198,32 @@ def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, 
     return {k: v for k, v in sqls.items() if k in macro_sqls and v == macro_sqls[k]}
 
 
-def get_model_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
+def get_disabled(manifest: Dict[str, Any], include_disabled: bool = False) -> List[str]:
+    output = []
+    disabled = manifest.get("disabled", {})
+    for key, node in disabled.items():
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if split_key[0] == "model":
+            if include_disabled:
+                continue
+            output.append(filename)
+
+    return output
+
+
+def get_model_sqls(
+    paths: Sequence[str], manifest: Dict[str, Any], include_disabled: bool = False
+) -> Dict[str, Any]:
     ephemeral = get_ephemeral(manifest)
     sqls = get_filenames(paths, [".sql"])
     macro_sqls = get_macro_sqls(paths, manifest)
-    return {k: v for k, v in sqls.items() if k not in macro_sqls and k not in ephemeral}
+    disabled = get_disabled(manifest, include_disabled)
+    return {
+        k: v
+        for k, v in sqls.items()
+        if k not in macro_sqls and k not in ephemeral and k not in disabled
+    }
 
 
 def get_model_schemas(
