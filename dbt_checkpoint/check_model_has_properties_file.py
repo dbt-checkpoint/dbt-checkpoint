@@ -26,7 +26,7 @@ def has_properties_file(
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     # convert to sets
     in_models = {model.filename for model in models if model.node.get("patch_path")}
-    missing = filenames.difference(in_models) if in_models else []
+    missing = filenames.difference(in_models)
 
     for model in missing:
         status_code = 1
