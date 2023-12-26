@@ -90,7 +90,6 @@ MANIFEST = {
             "path": "aa/bb/without_labels.sql",
             "root_path": "/path/to/aa",
         },
-        
         "model.with_tags": {
             "tags": ["foo", "bar"],
             "patch_path": "project://bb/with_tags.yml",
@@ -274,6 +273,15 @@ MANIFEST = {
             "root_path": "/path/to/aa",
             "config": {
                 "materialized": "view",
+            },
+        },
+        "snapshot.some_snapshot": {
+            "name": "some_snapshot",
+            "patch_path": "project://bb/some_snapshot.yml",
+            "path": "aa/bb/some_snapshot.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "snapshot",
             },
         },
     },
