@@ -86,6 +86,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         required=False,
         default="",
         help="Location of the model schema.",
+        choices=["", "config"],
     ),
 
     args = parser.parse_args(argv)
