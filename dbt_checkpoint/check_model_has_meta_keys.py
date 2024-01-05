@@ -32,13 +32,14 @@ def has_meta_key(
     manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
+    include_disabled: bool = False,
 ) -> int:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     # convert to sets
@@ -98,6 +99,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

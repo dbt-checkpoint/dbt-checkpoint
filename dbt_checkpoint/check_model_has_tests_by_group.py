@@ -23,17 +23,18 @@ def check_test_cnt(
     test_group: Dict[str, int],
     test_cnt: int,
     exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
 
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     for model in models:
         childs = list(
@@ -93,6 +94,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         test_group=args.tests,
         test_cnt=args.test_cnt,
         exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

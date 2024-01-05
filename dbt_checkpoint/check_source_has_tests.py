@@ -17,13 +17,16 @@ from dbt_checkpoint.utils import (
 
 
 def check_test_cnt(
-    paths: Sequence[str], manifest: Dict[str, Any], test_cnt: int
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    test_cnt: int,
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         tests = list(
@@ -65,7 +68,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     hook_properties = check_test_cnt(
-        paths=args.filenames, manifest=manifest, test_cnt=args.test_cnt
+        paths=args.filenames,
+        manifest=manifest,
+        test_cnt=args.test_cnt,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

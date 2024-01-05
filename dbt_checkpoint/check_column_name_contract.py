@@ -26,6 +26,7 @@ def check_column_name_contract(
     catalog: Dict[str, Any],
     manifest: Dict[str, Any],
     exclude_pattern: str,
+    include_disabled: bool,
 ) -> Dict[str, Any]:
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
@@ -34,7 +35,7 @@ def check_column_name_contract(
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
-    models = get_models(catalog, filenames)
+    models = get_models(catalog, filenames, include_disabled=include_disabled)
 
     for model in models:
         for col in model.node.get("columns", []).values():
@@ -101,6 +102,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         catalog=catalog,
         manifest=manifest,
         exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
 
     end_time = time.time()

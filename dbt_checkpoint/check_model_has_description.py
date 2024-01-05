@@ -1,25 +1,27 @@
 import argparse
 import os
 import time
-from typing import Any
-from typing import Dict
-from typing import Optional
-from typing import Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import add_default_args
-from dbt_checkpoint.utils import get_dbt_manifest
-from dbt_checkpoint.utils import get_filenames
-from dbt_checkpoint.utils import get_missing_file_paths
-from dbt_checkpoint.utils import get_model_schemas
-from dbt_checkpoint.utils import get_model_sqls
-from dbt_checkpoint.utils import get_models
-from dbt_checkpoint.utils import JsonOpenError
-from dbt_checkpoint.utils import red
+from dbt_checkpoint.utils import (
+    JsonOpenError,
+    add_default_args,
+    get_dbt_manifest,
+    get_filenames,
+    get_missing_file_paths,
+    get_model_schemas,
+    get_model_sqls,
+    get_models,
+    red,
+)
 
 
 def has_description(
-    paths: Sequence[str], manifest: Dict[str, Any], exclude_pattern: str
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     paths = get_missing_file_paths(  # type: ignore
         paths, manifest, extensions=[".yml", ".yaml"], exclude_pattern=exclude_pattern
@@ -27,11 +29,11 @@ def has_description(
 
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
@@ -65,7 +67,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     hook_properties = has_description(
-        paths=args.filenames, manifest=manifest, exclude_pattern=args.exclude
+        paths=args.filenames,
+        manifest=manifest,
+        exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

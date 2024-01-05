@@ -1,22 +1,23 @@
 """Pre-commit hook that compares the number of childs with a given treshold to
 improve on the chosen materialization of the models."""
 import argparse
-from typing import Any
-from typing import Dict
-from typing import List
+from typing import Any, Dict, List
 
-from dbt_checkpoint.utils import add_default_args
-from dbt_checkpoint.utils import get_dbt_manifest
-from dbt_checkpoint.utils import get_model_sqls
-from dbt_checkpoint.utils import get_models
-from dbt_checkpoint.utils import get_parent_childs
-from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import (
+    JsonOpenError,
+    add_default_args,
+    get_dbt_manifest,
+    get_model_sqls,
+    get_models,
+    get_parent_childs,
+)
 
 
 def check_model_materialization_by_childs(
     paths: List[str],
     manifest: Dict[str, Any],
     threshold_childs: int,
+    include_disabled: bool = False,
 ) -> int:
     """Compares the childs of a model with its materialization.
 
@@ -27,12 +28,12 @@ def check_model_materialization_by_childs(
     :return: Status code of the check.
     """
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # Prepare the manifest to extract the materialization per model.
     nodes = manifest.get("nodes", {})
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     for model in models:
         nr_childs = len(
@@ -95,7 +96,10 @@ def main(argv: List[str] = None) -> int:
         return 1
 
     status_code = check_model_materialization_by_childs(
-        paths=args.filenames, manifest=manifest, threshold_childs=args.threshold_childs
+        paths=args.filenames,
+        manifest=manifest,
+        threshold_childs=args.threshold_childs,
+        include_disabled=args.include_disabled,
     )
 
     return status_code

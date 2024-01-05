@@ -2,24 +2,25 @@ import argparse
 import os
 import time
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import Optional
-from typing import Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import add_default_args
-from dbt_checkpoint.utils import get_dbt_manifest
-from dbt_checkpoint.utils import get_source_schemas
-from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import (
+    JsonOpenError,
+    add_default_args,
+    get_dbt_manifest,
+    get_source_schemas,
+)
 
 
-def has_labels_key(paths: Sequence[str], labels_keys: Sequence[str]) -> Dict[str, Any]:
+def has_labels_key(
+    paths: Sequence[str], labels_keys: Sequence[str], include_disabled: bool = False
+) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         schema_labels = set(schema.source_schema.get("labels", {}).keys())
@@ -57,7 +58,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = has_labels_key(paths=args.filenames, labels_keys=args.labels_keys)
+    hook_properties = has_labels_key(
+        paths=args.filenames,
+        labels_keys=args.labels_keys,
+        include_disabled=args.include_disabled,
+    )
     end_time = time.time()
     script_args = vars(args)
 

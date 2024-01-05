@@ -19,17 +19,18 @@ def validate_tags(
     manifest: Dict[str, Any],
     tags: Sequence[str],
     exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
 
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     for model in models:
         # tags can be specified only from manifest
         model_tags = set(model.node.get("tags", []))
@@ -70,6 +71,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         tags=args.tags,
         exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

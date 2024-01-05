@@ -33,17 +33,18 @@ def check_model_columns(
     manifest: Dict[str, Any],
     catalog: Dict[str, Any],
     exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
 
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     catalog_nodes = catalog.get("nodes", {})
 
@@ -113,6 +114,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         catalog=catalog,
         exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
