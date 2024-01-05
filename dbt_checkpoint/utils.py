@@ -172,6 +172,21 @@ def get_ephemeral(
     return output
 
 
+def get_snapshots(
+    manifest: Dict[str, Any],
+) -> List[str]:
+    output = []
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():  # pragma: no cover
+        if not node.get("config", {}).get("materialized") == "snapshot":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if split_key[0] == "snapshot":
+            output.append(filename)
+    return output
+
+
 def get_macros(
     manifest: Dict[str, Any],
     filenames: Set[str],

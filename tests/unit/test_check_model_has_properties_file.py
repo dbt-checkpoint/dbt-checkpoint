@@ -6,6 +6,7 @@ TESTS = (
     (["aa/bb/with_schema.sql", "--is_test"], True, True, 0),
     (["aa/bb/with_schema.sql", "--is_test"], False, True, 1),
     (["aa/bb/without_schema.sql", "--is_test"], True, False, 1),
+    (["aa/bb/some_snapshot.sql", "--is_test"], True, True, 0),
 )
 
 
