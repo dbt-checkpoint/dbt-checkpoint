@@ -1,3 +1,56 @@
+# 1.2.0 - 2024-01-15
+
+**Fixes:**
+
+- Grammar by @carlthome in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/150
+- chore: update README to reflect change to Datatonic by @alfredodimassimo in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/162
+- update version by @timwinter06 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/168
+- Fix check-model-has-properties-file for snapshots by @ms32035 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/137
+
+**Enhancements:**
+
+- Make check_column_name_contract case insensitive for pattern and datatype by @samkessaram in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/167
+- feature #136 (create a check-model-has-labels-keys for dbt with BigQuery) by @johnerick-py in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/147
+- Feat/check materialization by childs by @LeopoldGabelmann in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/144
+- Ignore disabled models/sources by default, unless --include-disabled is passed by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/171
+
+## New Contributors
+
+- @carlthome made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/150
+- @alfredodimassimo made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/162
+- @samkessaram made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/167
+- @johnerick-py made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/147
+- @LeopoldGabelmann made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/144
+- @timwinter06 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/168
+- @ms32035 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/137
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v1.1.1...v1.2.0
+
+# 1.1.1 - 2023-07-10
+
+**Fixes:**
+
+- Nitpick: Fix `parent` typo by @followingell in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/111
+- fix: typo in track message by @JFrackson in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/122
+- fix: use proper tracking config file and document in README by @JFrackson in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/115
+- Fix/support excluding files at hook level by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/119
+- Add .dbt-checkpoint.yaml to disable hook execution tracking in mixpanel by @mbhoopathy in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/139
+
+**Enhancements:**
+
+- Use None instead of NoReturn by @ian-r-rose in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/113
+- Update sponsorship logos to support dark theme on Github by @noel in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/130
+- Dcv 1682 possibility to change the dbt root for all hooks by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/138
+- Create per-hook excluding README entry by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/140
+
+## New Contributors
+
+- @followingell made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/111
+- @ian-r-rose made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/113
+- @noel made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/130
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v1.1.0...v1.1.1
+
 # 1.1.0 - 2023-03-15
 
 **Fixed bugs:**
