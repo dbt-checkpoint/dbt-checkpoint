@@ -30,7 +30,7 @@ def has_meta_key(
         schema_meta = set(schema.source_schema.get("meta", {}).keys())
         table_meta = set(schema.table_schema.get("meta", {}).keys())
         if allow_extra_keys:
-            diff = not set(meta_keys).issubset(schema_meta, table_meta)
+            diff = not set(meta_keys).issubset(set(schema_meta | table_meta))
         else:
             diff = set(meta_keys).difference(schema_meta, table_meta)
         if diff:
