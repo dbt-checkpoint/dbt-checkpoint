@@ -496,6 +496,21 @@ def add_dbt_cmd_model_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_meta_keys_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--meta-keys",
+        nargs="+",
+        required=True,
+        help="List of required key in meta part of model.",
+    )
+    parser.add_argument(
+        "--allow-extra-keys",
+        action="store_true",
+        required=False,
+        help="Whether extra keys are allowed.",
+    )
+
+
 def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
     if "version" not in yaml_dct:
         raise_invalid_property_yml_version(

@@ -8,13 +8,17 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    add_meta_keys_args,
     get_dbt_manifest,
     get_source_schemas,
 )
 
 
 def has_meta_key(
-    paths: Sequence[str], meta_keys: Sequence[str], include_disabled: bool = False
+    paths: Sequence[str],
+    meta_keys: Sequence[str],
+    allow_extra_keys: bool,
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
@@ -25,7 +29,10 @@ def has_meta_key(
     for schema in schemas:
         schema_meta = set(schema.source_schema.get("meta", {}).keys())
         table_meta = set(schema.table_schema.get("meta", {}).keys())
-        diff = set(meta_keys).difference(schema_meta, table_meta)
+        if allow_extra_keys:
+            diff = not set(meta_keys).issubset(schema_meta, table_meta)
+        else:
+            diff = set(meta_keys).difference(schema_meta, table_meta)
         if diff:
             status_code = 1
             result = "\n- ".join(list(meta_keys))  # pragma: no mutate
@@ -39,14 +46,7 @@ def has_meta_key(
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
-
-    parser.add_argument(
-        "--meta-keys",
-        nargs="+",
-        required=True,
-        help="List of required key in meta part of source.",
-    )
-
+    add_meta_keys_args(parser)
     args = parser.parse_args(argv)
 
     try:
@@ -59,6 +59,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     hook_properties = has_meta_key(
         paths=args.filenames,
         meta_keys=args.meta_keys,
+        allow_extra_keys=args.allow_extra_keys,
         include_disabled=args.include_disabled,
     )
     end_time = time.time()
