@@ -11,6 +11,8 @@ from dbt_checkpoint.utils import (
     add_meta_keys_args,
     get_dbt_manifest,
     get_source_schemas,
+    red,
+    yellow,
 )
 
 
@@ -35,10 +37,10 @@ def has_meta_key(
             diff = not (set(meta_keys) == schema_meta | table_meta)
         if diff:
             status_code = 1
-            result = "\n- ".join(list(meta_keys))  # pragma: no mutate
             print(
-                f"{schema.source_name}.{schema.table_name} meta: "
-                f"does not match the meta keys provided:\n- {result}",
+                f"{schema.source_name}.{schema.table_name} meta keys don't match. \n"
+                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
+                f"Actual: {red(', '.join(list(schema_meta | table_meta)))}\n"
             )
     return {"status_code": status_code}
 

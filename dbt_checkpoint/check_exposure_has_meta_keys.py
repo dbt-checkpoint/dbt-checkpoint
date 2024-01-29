@@ -11,6 +11,8 @@ from dbt_checkpoint.utils import (
     add_meta_keys_args,
     get_dbt_manifest,
     get_exposure_schemas,
+    red,
+    yellow,
 )
 
 
@@ -29,10 +31,10 @@ def has_meta_key(
             diff = not (meta_set == exposure_meta)
         if diff:
             status_code = 1
-            result = "\n- ".join(list(meta_keys))  # pragma: no mutate
             print(
-                f"{exposure.exposure_name}: "
-                f"The exposure meta does not match the provided \n:- {result}"
+                f"{exposure.exposure_name} meta keys don't match. \n"
+                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
+                f"Actual: {red(', '.join(list(exposure_meta)))}\n"
             )
     return {"status_code": status_code}
 
