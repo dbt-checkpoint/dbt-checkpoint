@@ -85,6 +85,14 @@ class SourceSchema:
     prefix: str = "source"
 
 
+@dataclass
+class ExposureSchema:
+    exposure_name: str
+    filename: str
+    exposure_schema: Dict[str, Any]
+    prefix: str = "exposure"
+
+
 def cmd_output(
     *cmd: str,
     expected_code: Optional[int] = 0,
@@ -297,6 +305,20 @@ def get_source_schemas(
                     source_schema=source,
                     table_schema=table,
                 )
+
+
+def get_exposures(
+    yml_files: Sequence[Path],
+) -> Generator[ExposureSchema, None, None]:
+    for yml_file in yml_files:
+        schema = safe_load(yml_file.open())
+        for exposure in schema.get("exposures", []):
+            exposure_name = exposure.get("name")
+            yield ExposureSchema(
+                exposure_name=exposure_name,
+                filename=yml_file.stem,
+                exposure_schema=exposure,
+            )
 
 
 def obj_in_deps(obj: Any, dep_name: str) -> bool:

@@ -10,7 +10,7 @@ from dbt_checkpoint.utils import (
     add_default_args,
     add_meta_keys_args,
     get_dbt_manifest,
-    get_exposure_schemas,
+    get_exposures,
     red,
     yellow,
 )
@@ -22,7 +22,7 @@ def has_meta_key(
     status_code = 0
     ymls = [Path(path) for path in paths]
     meta_set = set(meta_keys)  # pragma: no mutate
-    exposures = get_exposure_schemas(ymls)
+    exposures = get_exposures(ymls)
     for exposure in exposures:
         exposure_meta = set(exposure.exposure_schema.get("meta", {}).keys())
         if allow_extra_keys:
