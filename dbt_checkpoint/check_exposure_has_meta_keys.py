@@ -10,35 +10,29 @@ from dbt_checkpoint.utils import (
     add_default_args,
     add_meta_keys_args,
     get_dbt_manifest,
-    get_source_schemas,
+    get_exposure_schemas,
 )
 
 
 def has_meta_key(
-    paths: Sequence[str],
-    meta_keys: Sequence[str],
-    allow_extra_keys: bool,
-    include_disabled: bool = False,
+    paths: Sequence[str], meta_keys: Sequence[str], allow_extra_keys: bool
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
-
-    # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
-
-    for schema in schemas:
-        schema_meta = set(schema.source_schema.get("meta", {}).keys())
-        table_meta = set(schema.table_schema.get("meta", {}).keys())
+    meta_set = set(meta_keys)  # pragma: no mutate
+    exposures = get_exposure_schemas(ymls)
+    for exposure in exposures:
+        exposure_meta = set(exposure.exposure_schema.get("meta", {}).keys())
         if allow_extra_keys:
-            diff = not set(meta_keys).issubset(set(schema_meta | table_meta))
+            diff = not meta_set.issubset(exposure_meta)
         else:
-            diff = not (set(meta_keys) == schema_meta | table_meta)
+            diff = not (meta_set == exposure_meta)
         if diff:
             status_code = 1
             result = "\n- ".join(list(meta_keys))  # pragma: no mutate
             print(
-                f"{schema.source_name}.{schema.table_name} meta: "
-                f"does not match the meta keys provided:\n- {result}",
+                f"{exposure.exposure_name}: "
+                f"The exposure meta does not match the provided \n:- {result}"
             )
     return {"status_code": status_code}
 
@@ -60,7 +54,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         paths=args.filenames,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
-        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
@@ -71,7 +64,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check the source has keys in the meta part.",
+            "description": "Check the exposure has keys in the meta part.",
             "status": hook_properties.get("status_code"),
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
