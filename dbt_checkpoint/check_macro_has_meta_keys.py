@@ -45,7 +45,7 @@ def has_meta_key(
     return {"status_code": status_code}
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover
     parser = argparse.ArgumentParser()
     add_default_args(parser)
     add_meta_keys_args(parser)
