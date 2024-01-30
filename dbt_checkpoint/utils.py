@@ -41,6 +41,22 @@ class Macro:
 
 
 @dataclass
+class Seed:
+    seed_id: str
+    seed_name: str
+    filename: str
+    seed: Dict[str, Any]
+
+
+@dataclass
+class Snapshot:
+    snapshot_id: str
+    snapshot_name: str
+    filename: str
+    snapshot: Dict[str, Any]
+
+
+@dataclass
 class Test:
     test_id: str
     test_type: str
@@ -180,7 +196,7 @@ def get_ephemeral(
     return output
 
 
-def get_snapshots(
+def get_snapshot_filenames(
     manifest: Dict[str, Any],
 ) -> List[str]:
     output = []
@@ -195,6 +211,32 @@ def get_snapshots(
     return output
 
 
+def get_snapshots(
+    manifest: Dict[str, Any], filenames: Set[str]
+) -> Generator[Snapshot, None, None]:
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():
+        if not node.get("config", {}).get("materialized") == "snapshot":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "snapshot":
+            yield Snapshot(key, node.get("name"), filename, node)  # pragma: no mutate
+
+
+def get_tests(
+    manifest: Dict[str, Any], filenames: Set[str]
+) -> Generator[Test, None, None]:
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():
+        if not node.get("config", {}).get("materialized") == "test":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "test":
+            yield Test(key, node.get("name"), filename, node)  # pragma: no mutate
+
+
 def get_macros(
     manifest: Dict[str, Any],
     filenames: Set[str],
@@ -205,6 +247,18 @@ def get_macros(
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "macro":
             yield Macro(key, macro.get("name"), filename, macro)  # pragma: no mutate
+
+
+def get_seeds(
+    manifest: Dict[str, Any],
+    filenames: Set[str],
+) -> Generator[Seed, None, None]:
+    seeds = manifest.get("nodes", {})
+    for key, seed in seeds.items():
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "seed":
+            yield Seed(key, seed.get("name"), filename, seed)  # pragma: no mutate
 
 
 def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
