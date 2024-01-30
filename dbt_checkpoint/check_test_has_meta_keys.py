@@ -23,7 +23,6 @@ def has_meta_key(
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
 ) -> Dict[str, Any]:
-    breakpoint()
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
