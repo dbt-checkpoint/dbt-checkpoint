@@ -4,7 +4,7 @@ version: 1
 service:
 
   # The name of your repository.
-  name: dbt checkpoint
+  name: DBT Checkpoint
 
   # The state of the code within the repository.
   lifecycle: generally_available
