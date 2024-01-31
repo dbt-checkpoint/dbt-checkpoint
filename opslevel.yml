@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://app.opslevel.com/public/opslevel.schema.yml
+---
+version: 1
+service:
+
+  # The name of your repository.
+  name: DBT Checkpoint
+
+  # The state of the code within the repository.
+  lifecycle: generally_available
+
+  # The lower-case top-level name of your github team name, 
+  # not <team>-backend/frontend. 
+  # If the team name contains spaces, replace these with hyphens/dashes.
+  # This field should be set to the team who stewards the repository.
+  owner: team-analytics-empowerment
+
+  # The programming language of your repository.
+  # Usually Kotlin or TypeScript.
+  language: Python
+
+  # How you describe your repository.
+  # Usually the description of your repository.
+  description: For customizing checks not suitable for dbt-cerebellum repo as is
+
+  # Any aliases you give your repository.
+  aliases: []
+
+  # Repository information to allow OpsLevel to link to your repository.
+  repositories:
+    - name: pleo-io/dbt-checkpoint-pleo
+      path: "/"
+      provider: github
+
+  # Any tags you would like to add to the service definition in OpsLevel.
+  tags:
+      # Which type of service the repository defines. 
+      #
+      # Use:
+      #  - `service` for web services (moons)
+      #  - `application` for downloadable software (such as an iOS/Android app,
+      #     CLI tool, standalone executable). This also includes e.g. web apps.
+      #  - `library` for software used by other components
+      #  - `configuration` for repos that contain pure configuration (such as
+      #    setup of danger or renovate).
+      #  - `hiring-challenge` for our hiring challenge
+      #  - `serverless-function` for lambdas such as space-rocks
+      #  - `documentation` for documentation repositories e.g. .github
+
+    - key: type
+      value: application
