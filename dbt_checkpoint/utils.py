@@ -174,6 +174,7 @@ def get_ephemeral(
 
 def get_snapshots(
     manifest: Dict[str, Any],
+    filenames: Union[Set[str], None] = None,
 ) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():  # pragma: no cover
@@ -182,8 +183,10 @@ def get_snapshots(
         split_key = key.split(".")
         filename = split_key[-1]
         if split_key[0] == "snapshot":
-            #output.append(filename)
+            if filenames is not None and filename not in filenames:
+                continue
             yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
+
 
 def get_macros(
     manifest: Dict[str, Any],

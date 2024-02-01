@@ -9,6 +9,7 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
     get_dbt_manifest,
+    get_filenames,
     get_missing_file_paths,
     get_snapshots,
 )
@@ -24,7 +25,9 @@ def check_snapshot_name_contract(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
     status_code = 0
-    snapshots = get_snapshots(manifest)
+    sqls = get_filenames(paths, [".sql"])
+    filenames = set(sqls.keys())
+    snapshots = get_snapshots(manifest, filenames)
 
     for snapshot in snapshots:
         snapshot_name = snapshot.model_name
