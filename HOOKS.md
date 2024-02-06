@@ -142,7 +142,7 @@ E.g. in two of your models, you have `customer_id` with the description `This is
 
 ### `check-column-name-contract`
 
-Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists on a regex pattern and a series of data types.
+Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists of a regex pattern and a series of data types.
 
 #### Arguments
 
