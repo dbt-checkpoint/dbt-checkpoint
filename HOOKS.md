@@ -142,12 +142,12 @@ E.g. in two of your models, you have `customer_id` with the description `This is
 
 ### `check-column-name-contract`
 
-Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists on a regex pattern and a data type.
+Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists of a regex pattern and a series of data types.
 
 #### Arguments
 
 `--pattern`: Regex pattern to match column names.
-`--dtype`: Data type.
+`--dtypes`: Data types.
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -158,7 +158,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp]
 ```
 
 #### When to use it
@@ -889,6 +889,7 @@ Make sure you did not typo in tags.
 Checks the model materialization by a given threshold of child models. All models with less child models then the treshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
 
 #### Arguments
+
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--threshold-childs`: An integer threshold of the number of child models.
 
