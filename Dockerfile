@@ -17,4 +17,7 @@ RUN apt-get update &&\
 
 WORKDIR /github/workspace
 
-ENTRYPOINT [ "pre-commit" ]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
