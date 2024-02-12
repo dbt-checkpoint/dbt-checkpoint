@@ -221,13 +221,13 @@ jaffle_shop:
       type: snowflake
       threads: 8
       client_session_keep_alive: true
-      account: "{{ env_var('MAIN__ACCOUNT') }}"
-      database: "{{ env_var('MAIN__DATABASE') }}"
-      schema: "{{ env_var('MAIN__SCHEMA') }}"
-      user: "{{ env_var('MAIN__USER') }}"
-      password: "{{ env_var('MAIN__PASSWORD') }}"
-      role: "{{ env_var('MAIN__ROLE') }}"
-      warehouse: "{{ env_var('MAIN__WAREHOUSE') }}"
+      account: "{{ env_var('ACCOUNT') }}"
+      database: "{{ env_var('DATABASE') }}"
+      schema: "{{ env_var('SCHEMA') }}"
+      user: "{{ env_var('USER') }}"
+      password: "{{ env_var('PASSWORD') }}"
+      role: "{{ env_var('ROLE') }}"
+      warehouse: "{{ env_var('WAREHOUSE') }}"
 ```
 
 and store this file in project root `./profiles.yml`.
@@ -251,13 +251,13 @@ jobs:
   dbt-checkpoint:
     runs-on: ubuntu-latest
     env:
-      MAIN__ACCOUNT: ${{ vars.MAIN__ACCOUNT }}
-      MAIN__DATABASE: ${{ vars.MAIN__DATABASE }}
-      MAIN__SCHEMA: ${{ vars.MAIN__SCHEMA }}
-      MAIN__USER: ${{ vars.MAIN__USER }}
-      MAIN__PASSWORD: ${{ secrets.MAIN__PASSWORD }}
-      MAIN__ROLE: ${{ vars.MAIN__ROLE }}
-      MAIN__WAREHOUSE: ${{ vars.MAIN__WAREHOUSE }}
+      ACCOUNT: ${{ vars.ACCOUNT }}
+      DATABASE: ${{ vars.DATABASE }}
+      SCHEMA: ${{ vars.SCHEMA }}
+      USER: ${{ vars.USER }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      ROLE: ${{ vars.ROLE }}
+      WAREHOUSE: ${{ vars.WAREHOUSE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
