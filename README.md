@@ -218,14 +218,16 @@ jaffle_shop:
   target: dev
   outputs:
     dev:
-      type: postgres
-      host: localhost
-      user: alice
-      password: "{{ env_var('DB_PASSWORD') }}"
-      port: 5432
-      dbname: jaffle_shop
-      schema: dbt_alice
-      threads: 4
+      type: snowflake
+      threads: 8
+      client_session_keep_alive: true
+      account: "{{ env_var('MAIN__ACCOUNT') }}"
+      database: "{{ env_var('MAIN__DATABASE') }}"
+      schema: "{{ env_var('MAIN__SCHEMA') }}"
+      user: "{{ env_var('MAIN__USER') }}"
+      password: "{{ env_var('MAIN__PASSWORD') }}"
+      role: "{{ env_var('MAIN__ROLE') }}"
+      warehouse: "{{ env_var('MAIN__WAREHOUSE') }}"
 ```
 
 and store this file in project root `./profiles.yml`.
@@ -249,7 +251,13 @@ jobs:
   dbt-checkpoint:
     runs-on: ubuntu-latest
     env:
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      MAIN__ACCOUNT: ${{ vars.MAIN__ACCOUNT }}
+      MAIN__DATABASE: ${{ vars.MAIN__DATABASE }}
+      MAIN__SCHEMA: ${{ vars.MAIN__SCHEMA }}
+      MAIN__USER: ${{ vars.MAIN__USER }}
+      MAIN__PASSWORD: ${{ secrets.MAIN__PASSWORD }}
+      MAIN__ROLE: ${{ vars.MAIN__ROLE }}
+      MAIN__WAREHOUSE: ${{ vars.MAIN__WAREHOUSE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -257,19 +265,17 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        working-directory: ${{ github.workspace }}
-
       - id: Get file changes
         uses: trilom/file-changes-action@v1.2.4
         with:
           output: " "
 
       - name: Run dbt checkpoint
-        uses: pre-commit/action@v3.0.1
+        uses: dbt-checkpoint/action@v0.1
         with:
           extra_args: --files ${{ steps.get_file_changes.outputs.files}}
+          dbt_version: 1.6.3
+          dbt_adapter: dbt-snowflake
 ```
 
 ### Acknowledgements
