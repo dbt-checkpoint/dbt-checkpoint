@@ -16,10 +16,10 @@ from dbt_checkpoint.utils import (
 
 REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 REGEX_SPLIT = r"[\s]+"
-IGNORE_WORDS = ["", "(", "{{", "{"]  # pragma: no mutate
+IGNORE_WORDS = ["", "(", "{{", "ml.predict"]  # pragma: no mutate
 REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
 REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
-
+DATE_PARTS = ['day', 'month', 'year', 'week', 'dayofyear', 'dayofweek', 'isoweek', 'quarter', 'isoyear']
 
 def prev_cur_next_iter(
     sql: Sequence[str],
@@ -65,8 +65,15 @@ def has_table_name(
     tables = set()
     cte = set()
 
+    is_date_extraction = False
+
     for prev, cur, nxt in prev_cur_next_iter(sql_split):
+        if prev == 'extract' and nxt in DATE_PARTS:
+            is_date_extraction = True
         if prev in ["from", "join"] and cur not in IGNORE_WORDS:
+            if is_date_extraction:
+                is_date_extraction = False
+                continue
             table = cur.lower().strip().replace(",", "") if cur else cur
             if dotless and "." not in table:
                 pass
