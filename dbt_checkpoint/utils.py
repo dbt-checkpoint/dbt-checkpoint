@@ -125,6 +125,10 @@ def get_json(json_filename: str) -> Dict[str, Any]:
 def get_config_file(config_file_path: str) -> Dict[str, Any]:
     try:
         path = Path(config_file_path)
+        if not path.exists():
+            alt_path = path.with_suffix(".yml" if path.suffix == ".yaml" else ".yaml")
+            if alt_path.exists():
+                path = alt_path
         config = safe_load(path.open())
         check_yml_version(config_file_path, config)
     except FileNotFoundError:
