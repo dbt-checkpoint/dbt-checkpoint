@@ -9,6 +9,22 @@ from dbt_checkpoint.check_script_has_no_table_name import replace_comments
 TESTS = (  # type: ignore
     (
         """
+    SELECT EXTRACT(DAYOFYEAR FROM CURRENT_DATE())
+    """,
+        [],
+        0,
+        {}
+    ),
+    (
+        """
+    SELECT * FROM ML.PREDICT(args))
+    """,
+        [],
+        0,
+        {}
+    ),
+    (
+        """
     SELECT * FROM AA
     """,
         [],

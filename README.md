@@ -98,6 +98,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 **Script checks:**
 
 - [`check-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-semicolon): Check the script does not contain a semicolon.
+- [`check-script-pivot`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-script-pivot): Check the script does not contain the PIVOT() function.
 - [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has not table name (is not using `source()` or `ref()` macro for all tables).
 - [`check-script-ref-and-source`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-ref-and-source): Check the script has only existing refs and sources.
 

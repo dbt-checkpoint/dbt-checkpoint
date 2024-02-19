@@ -28,6 +28,7 @@
 **Script checks:**
 
 - [`check-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-semicolon): Check the script does not contain a semicolon.
+- [`check-script-pivot`](https://github.com/offbi/pre-commit-dbt/blob/main/HOOKS.md#check-script-pivot): Check the script does not contain the PIVOT() function.
 - [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has not table name (is not using `source()` or `ref()` macro for all tables).
 - [`check-script-ref-and-source`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-ref-and-source): Check the script has only existing refs and sources.
 
@@ -987,6 +988,46 @@ Make sure you did not provide a semicolon at the end of the file.
 - If the file contains a semicolon at the end of the file, the hook fails.
 
 ---
+
+### `check-script-pivot`
+
+Ensure that the script does not use the PIVOT() function.
+
+#### Example
+```
+repos:
+- repo: https://github.com/offbi/pre-commit-dbt
+ rev: v1.0.0
+ hooks:
+ - id: check-script-pivot
+```
+
+#### When to use it
+
+Make sure you did not use the PIVOT() function in the script.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- It parses `SQL` and finds all sources and refs. If those objects do not exist in `manifest.json`, the hook fails.
+
+-----
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :----: | :----------: |
+| :white_check_mark: Yes| :x: Not needed |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- If the file contains the PIVOT() function, the hook fails.
+
+-----
 
 ### `check-script-has-no-table-name`
 
