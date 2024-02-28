@@ -24,7 +24,7 @@ def validate_tags(
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_snapshots(manifest)
+    models = get_snapshots(manifest, filenames)
 
     for model in models:
         # tags can be specified only from manifest
