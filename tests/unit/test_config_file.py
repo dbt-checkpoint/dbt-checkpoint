@@ -7,7 +7,7 @@ from dbt_checkpoint.utils import CompilationException, get_config_file
 @pytest.fixture
 def temp_yaml_file(tmp_path):
     data = {"disable-tracking": True, "version": 1}  # Sample YAML data with version
-    file_path = tmp_path / "test_config.yaml"
+    file_path = tmp_path / "dbt-checkpoint.yaml"
     with open(file_path, "w") as f:
         f.write(safe_dump(data))
     return file_path
