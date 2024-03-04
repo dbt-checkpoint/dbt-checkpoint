@@ -9,8 +9,10 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_catalog_args,
     add_default_args,
+    get_dbt_catalog,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
+    get_missing_file_paths,
     get_models,
     red,
     yellow,
@@ -18,33 +20,45 @@ from dbt_checkpoint.utils import (
 
 
 def check_column_name_contract(
-    paths: Sequence[str], pattern: str, dtype: str, catalog: Dict[str, Any]
+    paths: Sequence[str],
+    pattern: str,
+    dtypes: Sequence[str],
+    catalog: Dict[str, Any],
+    manifest: Dict[str, Any],
+    exclude_pattern: str,
+    include_disabled: bool,
 ) -> Dict[str, Any]:
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+    )
+
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
-    models = get_models(catalog, filenames)
+    models = get_models(catalog, filenames, include_disabled=include_disabled)
 
     for model in models:
         for col in model.node.get("columns", []).values():
             col_name = col.get("name")
             col_type = col.get("type")
 
-            # Check all files of type dtype follow naming pattern
-            if dtype == col_type:
-                if re.match(pattern, col_name) is None:
+            # Check all files on dtypes follow naming pattern
+            if any(col_type.lower() == dtype.lower() for dtype in dtypes):
+                if re.match(pattern, col_name, re.IGNORECASE) is None:
                     status_code = 1
                     print(
-                        f"{red(col_name)}: column is of type {yellow(dtype)} and "
+                        f"model {red(model.model_id)}, in file {yellow(model.filename + '.sql')} \n"
+                        f"{yellow(col_name)}: column is of type {yellow(col_type)} and "
                         f"does not match regex pattern {yellow(pattern)}."
                     )
 
-            # Check all files with naming pattern are of type dtype
-            elif re.match(pattern, col_name):
+            # Check all files with naming pattern are one of dtypes
+            elif re.match(pattern, col_name, re.IGNORECASE):
                 status_code = 1
                 print(
-                    f"{red(col_name)}: name matches regex pattern {yellow(pattern)} "
-                    f"and is of type {yellow(col_type)} instead of {yellow(dtype)}."
+                    f"model {red(model.model_id)}, in file {yellow(model.filename + '.sql')} \n"
+                    f"{yellow(col_name)}: name matches regex pattern {yellow(pattern)} "
+                    f"and is of type {yellow(col_type)} instead of {yellow(', '.join(dtypes))}."
                 )
 
     return {"status_code": status_code}
@@ -62,22 +76,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="Regex pattern to match column names.",
     )
     parser.add_argument(
-        "--dtype",
-        type=str,
+        "--dtypes",
+        nargs="+",
         required=True,
-        help="Expected data type for the matching columns.",
+        help="Expected data types for the matching columns.",
     )
 
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     try:
-        catalog = get_json(args.catalog)
+        catalog = get_dbt_catalog(args)
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
@@ -86,8 +100,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     hook_properties = check_column_name_contract(
         paths=args.filenames,
         pattern=args.pattern,
-        dtype=args.dtype,
+        dtypes=args.dtypes,
         catalog=catalog,
+        manifest=manifest,
+        exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
 
     end_time = time.time()

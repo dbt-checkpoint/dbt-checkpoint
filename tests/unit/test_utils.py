@@ -1,4 +1,7 @@
+import unittest
+from dataclasses import dataclass
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -11,8 +14,12 @@ from dbt_checkpoint.utils import (
     SourceSchema,
     check_yml_version,
     cmd_output,
+    extend_dbt_project_dir_flag,
+    get_dbt_catalog,
+    get_dbt_manifest,
     get_filenames,
     get_macro_schemas,
+    get_missing_file_paths,
     get_model_schemas,
     obj_in_deps,
     paths_to_dbt_models,
@@ -139,3 +146,119 @@ def test_check_yml_version_with_non_1_version():
     yaml_dct = {"version": 2}
     with pytest.raises(CompilationException):
         check_yml_version("file_path", yaml_dct)
+
+
+# Input files, valid manifest, expected files
+TESTS = (
+    (
+        ["aa/bb/with_description.sql"],
+        "bb/with_description.yml",
+        True,
+        "",
+        ["aa/bb/with_description.sql", "bb/with_description.yml"],
+    ),
+    (
+        ["aa/bb/with_description.sql"],
+        "",
+        False,
+        "",
+        ["aa/bb/with_description.sql"],
+    ),
+    (
+        ["aa/bb/with_description.sql"],
+        "aa/bb/with_description.yml",
+        True,
+        r"^(.+)\/([^\/]+)$",
+        [],
+    ),
+    (
+        ["aa/bb/with_description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["aa/bb/with_description.yml", "bb/with_description.sql"],
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    (
+        "input_files",
+        "discovered_files",
+        "valid_manifest",
+        "exclude_regex",
+        "expected_files",
+    ),
+    TESTS,
+)
+def test_get_missing_file_paths(
+    input_files,
+    discovered_files,
+    valid_manifest,
+    exclude_regex,
+    expected_files,
+    manifest_path_str,
+):
+    manifest = {}
+    if valid_manifest:
+        import json
+
+        manifest = json.load(open(manifest_path_str))
+    with patch("dbt_checkpoint.utils._discover_prop_files") as mock_discover_prop_files:
+        with patch(
+            "dbt_checkpoint.utils._discover_sql_files"
+        ) as mock_discover_sql_files:
+            mock_discover_sql_files.return_value = [Path(discovered_files)]
+            mock_discover_prop_files.return_value = [Path(discovered_files)]
+            resulting_files = get_missing_file_paths(
+                paths=input_files, manifest=manifest, exclude_pattern=exclude_regex
+            )
+    assert set(resulting_files) == set(expected_files)
+
+
+def test_extend_dbt_cmd_flags_with_project_dir():
+    cmd = ["dbt", "run"]
+    cmd_flags = ["--target", "dev"]
+    dbt_project_dir = "/path/to/project"
+
+    expected_result = ["dbt", "run", "--project-dir", "/path/to/project"]
+    result = extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
+
+    assert result == expected_result
+
+
+def test_extend_dbt_cmd_flags_without_project_dir():
+    cmd = ["dbt", "run"]
+    cmd_flags = ["--target", "dev"]
+    dbt_project_dir = ""
+    expected_result = ["dbt", "run"]
+    result = extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
+    assert result == expected_result
+
+
+def test_get_dbt_manifest_with_config_project_dir():
+    class Args:
+        manifest = "target/manifest.json"
+        config = ".dbt_checkpoint.yaml"
+
+    with patch("dbt_checkpoint.utils.get_config_file") as mock_get_config_file:
+        mock_get_config_file.return_value = {"dbt-project-dir": "test_dbt_project"}
+        with patch("dbt_checkpoint.utils.get_json") as mock_get_json:
+            mock_get_json.return_value = {"key": "value"}
+            expected_result = {"key": "value"}
+            result = get_dbt_manifest(Args())
+            assert result == expected_result
+
+
+def test_get_dbt_catalog_with_config_project_dir():
+    class Args:
+        catalog = "target/catalog.json"
+        config = ".dbt_checkpoint.yaml"
+
+    with patch("dbt_checkpoint.utils.get_config_file") as mock_get_config_file:
+        mock_get_config_file.return_value = {"dbt-project-dir": "test_dbt_project"}
+        with patch("dbt_checkpoint.utils.get_json") as mock_get_json:
+            mock_get_json.return_value = {"key": "value"}
+            expected_result = {"key": "value"}
+            result = get_dbt_catalog(Args())
+            assert result == expected_result

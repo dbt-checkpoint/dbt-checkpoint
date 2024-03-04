@@ -7,11 +7,12 @@
 **Model checks:**
 
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
-- [`check-column-name-contract`](): Check column name abides to contract.
+- [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
+- [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
 - [`check-model-has-properties-file`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-properties-file): Check the model has properties file.
 - [`check-model-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-name): Check the model has a number of tests by test name.
 - [`check-model-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-type): Check the model has a number of tests by test type.
@@ -22,6 +23,7 @@
 - [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
 - [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
 - [`check-model-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
+- [`check-model-materialization-by-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-materialization-by-childs): Check the materialization of models given a threshold of child models.
 
 **Script checks:**
 
@@ -37,6 +39,7 @@
 - [`check-source-has-freshness`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-freshness): Check the source has the freshness.
 - [`check-source-has-loader`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-loader): Check the source has loader option.
 - [`check-source-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-meta-keys): Check the source has keys in the meta part.
+- [`check-source-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-labels-keys): Check the source has keys in the labels part.
 - [`check-source-has-tests-by-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-name): Check the source has a number of tests by test name.
 - [`check-source-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
 - [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
@@ -67,6 +70,29 @@
 - [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
 
 ---
+
+:warning: Since v1.1.0, we've implemented a file discovery logic that "fills in" the missing files so that if the yml file is changed we find the corresponding sql file, to make sure we do the proper check.
+With this implementation, certain Hooks now can receive a `--exclude <pattern>` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
+
+Instead of doing this
+
+```
+- id: check-model-has-tests
+  description: "Ensures that the model has a number of tests"
+  args: ["--test-cnt", "1", "--"]
+  exclude: |
+    (?x)(
+      models/demo
+    )
+```
+
+Hooks that use `--exclude` in their args, should receive it this way:
+
+```
+- id: check-model-has-tests
+  description: "Ensures that the model has a number of tests"
+  args: ["--test-cnt", "1", "--exclude models/demo", "--"]
+```
 
 :exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
 
@@ -116,12 +142,13 @@ E.g. in two of your models, you have `customer_id` with the description `This is
 
 ### `check-column-name-contract`
 
-Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists on a regex pattern and a data type.
+Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists of a regex pattern and a series of data types.
 
 #### Arguments
 
 `--pattern`: Regex pattern to match column names.
-`--dtype`: Data type.
+`--dtypes`: Data types.
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -131,7 +158,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp]
 ```
 
 #### When to use it
@@ -210,7 +237,8 @@ Ensures that all columns in the database are also specified in the properties fi
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**
+`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -255,7 +283,8 @@ Ensures that the model has a description in the properties file (usually `schema
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -348,6 +377,59 @@ If you `run` your model and then you delete meta keys from a properties file, th
 
 ---
 
+### `check-model-has-labels-keys`
+
+Ensures that the model has a list of valid labels keys. (usually `schema.yml`).
+
+By default, it does not allow the model to have any other labels keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--labels-keys`: list of the required keys in the labels part of the model.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-has-labels-keys
+   args: ['--labels-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every model needs to have certain labels keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a model.
+- Modified `yml` files are scanned for a model.
+- If any model (from a manifest or `yml` files) does not have specified labels keys, the hook fails.
+- The labels keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your model and then you delete labels keys from a properties file, the hook success since the labels keys is still present in `manifest.json`.
+
+---
+
 ### `check-model-has-properties-file`
 
 Ensures that the model has a properties file (schema file).
@@ -399,7 +481,8 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -443,7 +526,8 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -487,8 +571,9 @@ Ensures that the model has a number of tests from a group of tests.
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: list of test names.
-`--test_cnt`: number of tests required across test group.
+`--tests`: list of test names.<br/>
+`--test_cnt`: number of tests required across test group.<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -532,7 +617,8 @@ Ensures that the model has a number of tests.
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--test-cnt`: Minimum number of tests required.
+`--test-cnt`: Minimum number of tests required.<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -575,7 +661,8 @@ Check that model name abides to a contract (similar to [`check-column-name-contr
 
 #### Arguments
 
-`--pattern`: Regex pattern to match model names.
+`--pattern`: Regex pattern to match model names.<br/>
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -670,6 +757,7 @@ Ensures the parent models or sources are from certain database.
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--whitelist`: list of allowed databases.
 `--blacklist`: list of disabled databases.
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -759,6 +847,7 @@ Ensures that the model has only valid tags from the provided list.
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tags`: A list of tags that models can have.
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 
@@ -794,6 +883,38 @@ Make sure you did not typo in tags.
 - If any model has different tags than specified, the hook fails.
 
 ---
+
+### `check-model-materialization-by-childs`
+
+Checks the model materialization by a given threshold of child models. All models with less child models then the treshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--threshold-childs`: An integer threshold of the number of child models.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-materialization-by-childs
+```
+
+#### When to use it
+
+Make sure to increase the efficiency within your dbt run and make use of good materialization choices.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 ### `check-script-ref-and-source`
 
@@ -1135,6 +1256,48 @@ If every source needs to have certain meta keys.
 
 ---
 
+### `check-source-has-labels-keys`
+
+Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
+
+#### Arguments
+
+`--labels-keys`: list of the required keys in the labels part of the model.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-source-has-labels-keys
+   args: ['--labels-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every source needs to have certain labels keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml`.
+- All sources from yml file are parsed.
+- If the source does not have the required labels keys set, the hook fails.
+
+---
+
 ### `check-source-has-tests-by-name`
 
 Ensures that the source has a number of tests of a certain name (e.g. data, unique).
@@ -1398,6 +1561,7 @@ Ensures that the macro has a description in the properties file (usually `macro.
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--exclude`: Regex pattern to exclude files.
 
 #### Example
 

@@ -12,8 +12,9 @@ from dbt_checkpoint.utils import (
     Model,
     add_catalog_args,
     add_default_args,
+    get_dbt_catalog,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
     get_models,
 )
 
@@ -59,7 +60,7 @@ def write_model_properties(
 
 def get_model_properties(model: Model, catalog_nodes: Dict[str, Any]) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
-    if not model.node.get("patch_path"):  # pragma: no cover
+    if not model.node.get("patch_path"):
         result["name"] = model.model_name
         catalog_node = catalog_nodes.get(model.model_id, {})
         if catalog_node:
@@ -82,13 +83,14 @@ def generate_properties_file(
     manifest: Dict[str, Any],
     catalog: Dict[str, Any],
     properties_file: str,
+    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     catalog_nodes = catalog.get("nodes", {})
 
     for model in models:
@@ -133,13 +135,13 @@ def main(argv: Optional[Sequence[str]] = None) -> Dict[str, Any]:
         return 1
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     try:
-        catalog = get_json(args.catalog)
+        catalog = get_dbt_catalog(args)
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
@@ -150,6 +152,7 @@ def main(argv: Optional[Sequence[str]] = None) -> Dict[str, Any]:
         manifest=manifest,
         catalog=catalog,
         properties_file=args.properties_file,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

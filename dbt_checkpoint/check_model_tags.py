@@ -7,7 +7,7 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
-    get_json,
+    get_dbt_manifest,
     get_missing_file_paths,
     get_model_sqls,
     get_models,
@@ -15,16 +15,22 @@ from dbt_checkpoint.utils import (
 
 
 def validate_tags(
-    paths: Sequence[str], manifest: Dict[str, Any], tags: Sequence[str]
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    tags: Sequence[str],
+    exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+    )
 
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     for model in models:
         # tags can be specified only from manifest
         model_tags = set(model.node.get("tags", []))
@@ -54,13 +60,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     start_time = time.time()
-    status_code = validate_tags(paths=args.filenames, manifest=manifest, tags=args.tags)
+    status_code = validate_tags(
+        paths=args.filenames,
+        manifest=manifest,
+        tags=args.tags,
+        exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
+    )
     end_time = time.time()
     script_args = vars(args)
 

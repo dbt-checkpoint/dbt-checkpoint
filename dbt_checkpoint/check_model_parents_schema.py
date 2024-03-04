@@ -7,9 +7,8 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
-    get_missing_file_paths,
     get_models,
     get_parent_childs,
 )
@@ -21,9 +20,8 @@ def check_parents_schema(
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
     schema_location: Optional[str],
+    include_disabled: bool = False,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
@@ -32,7 +30,7 @@ def check_parents_schema(
     schema_location = schema_location or []
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     for model in models:
         parents = list(
@@ -92,7 +90,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
@@ -108,6 +106,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         blacklist=args.blacklist,
         whitelist=args.whitelist,
         schema_location=args.schema_location,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

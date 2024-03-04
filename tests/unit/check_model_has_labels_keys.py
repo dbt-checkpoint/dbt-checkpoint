@@ -27,43 +27,44 @@ def validate_keys(
         return expected == actual
 
 
-def has_meta_key(
+def has_labels_key(
     paths: Sequence[str],
     manifest: Dict[str, Any],
-    meta_keys: Sequence[str],
+    labels_keys: Sequence[str],
     allow_extra_keys: bool,
-    include_disabled: bool = False,
 ) -> int:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
-    # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames, include_disabled=include_disabled)
-    # if user added schema but did not rerun the model
+    models = get_models(manifest, filenames)
     schemas = get_model_schemas(list(ymls.values()), filenames)
-    # convert to sets
-    in_models = {
-        model.filename
-        for model in models
-        if validate_keys(model.node.get("meta", {}).keys(), meta_keys, allow_extra_keys)
-    }
-    in_schemas = {
-        schema.model_name
-        for schema in schemas
-        if validate_keys(
-            schema.schema.get("meta", {}).keys(), meta_keys, allow_extra_keys
-        )
-    }
+
+    in_models = set()
+    for model in models:
+        model_config = model.node.get("config", {})
+        model_labels = set(model_config.get("labels", {}).keys())
+        if validate_keys(model_labels, labels_keys, allow_extra_keys):
+            in_models.add(model.filename)
+
+    in_schemas = set()
+    for schema in schemas:
+        schema_config = schema.schema.get("config", {})
+        schema_labels = set(schema_config.get("labels", {}).keys())
+
+        if validate_keys(schema_labels, labels_keys, allow_extra_keys):
+            in_schemas.add(schema.model_name)
+
     missing = filenames.difference(in_models, in_schemas)
 
     for model in missing:
         status_code = 1
-        result = "\n- ".join(list(meta_keys))  # pragma: no mutate
+        result = "\n- ".join(list(labels_keys))
         print(
             f"{sqls.get(model)}: "
-            f"does not have some of the meta keys defined:\n- {result}",
+            f"does not have some of the labels keys defined:\n- {result}",
         )
+
     return status_code
 
 
@@ -72,10 +73,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_default_args(parser)
 
     parser.add_argument(
-        "--meta-keys",
+        "--labels-keys",
         nargs="+",
         required=True,
-        help="List of required key in meta part of model.",
+        help="List of required key in labels part of model.",
     )
 
     parser.add_argument(
@@ -94,12 +95,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = has_meta_key(
+    status_code = has_labels_key(
         paths=args.filenames,
         manifest=manifest,
-        meta_keys=args.meta_keys,
+        labels_keys=args.labels_keys,
         allow_extra_keys=args.allow_extra_keys,
-        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
@@ -110,7 +110,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check model has meta keys",
+            "description": "Check model has labels keys",
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

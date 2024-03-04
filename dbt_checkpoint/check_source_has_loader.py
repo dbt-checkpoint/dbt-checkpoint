@@ -8,18 +8,18 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
-    get_json,
+    get_dbt_manifest,
     get_source_schemas,
     red,
 )
 
 
-def has_loader(paths: Sequence[str]) -> Dict[str, Any]:
+def has_loader(paths: Sequence[str], include_disabled: bool = False) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
         if not schema.source_schema.get("loader"):
@@ -38,13 +38,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     start_time = time.time()
-    hook_properties = has_loader(paths=args.filenames)
+    hook_properties = has_loader(
+        paths=args.filenames, include_disabled=args.include_disabled
+    )
     end_time = time.time()
     script_args = vars(args)
 

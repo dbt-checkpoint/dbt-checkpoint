@@ -8,7 +8,7 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     Test,
     add_default_args,
-    get_json,
+    get_dbt_manifest,
     get_missing_file_paths,
     get_model_sqls,
     get_models,
@@ -17,16 +17,22 @@ from dbt_checkpoint.utils import (
 
 
 def check_test_cnt(
-    paths: Sequence[str], manifest: Dict[str, Any], test_cnt: int
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    test_cnt: int,
+    exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
-    paths = get_missing_file_paths(paths, manifest)
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+    )
 
     status_code = 0
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     for model in models:
         childs = list(
@@ -62,14 +68,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     start_time = time.time()
     status_code = check_test_cnt(
-        paths=args.filenames, manifest=manifest, test_cnt=args.test_cnt
+        paths=args.filenames,
+        manifest=manifest,
+        test_cnt=args.test_cnt,
+        exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)

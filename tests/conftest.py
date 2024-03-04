@@ -19,6 +19,9 @@ MANIFEST = {
             "patch_path": "project://bb/with_schema.yml",
             "path": "aa/bb/with_schema.sql",
             "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table",
+            },
         },
         "model.without_schema": {
             "patch_path": "",
@@ -30,6 +33,7 @@ MANIFEST = {
             "patch_path": "project://bb/with_description.yml",
             "path": "aa/bb/with_description.sql",
             "root_path": "/path/to/aa",
+            "original_file_path": "bb/with_description.sql",
         },
         "model.without_description": {
             "description": "",
@@ -63,6 +67,27 @@ MANIFEST = {
         "model.without_meta": {
             "patch_path": "project://bb/without_meta.yml",
             "path": "aa/bb/without_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_labels": {
+            "config": {
+                "labels": {"foo": "test", "bar": "test"},
+            },
+            "patch_path": "project://bb/with_labels.yml",
+            "path": "aa/bb/with_labels.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_labels_foo": {
+            "config": {
+                "labels": {"foo": "test"},
+            },
+            "patch_path": "project://bb/with_labels_foo.yml",
+            "path": "aa/bb/with_labels_foo.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_labels": {
+            "patch_path": "project://bb/without_labels.yml",
+            "path": "aa/bb/without_labels.sql",
             "root_path": "/path/to/aa",
         },
         "model.with_tags": {
@@ -203,6 +228,7 @@ MANIFEST = {
             "patch_path": "project://bb/with_test1.yml",
             "path": "aa/bb/with_test1.sql",
             "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
         },
         "model.with_test2": {
             "patch_path": "project://bb/with_test2.yml",
@@ -218,6 +244,7 @@ MANIFEST = {
             "patch_path": "project://bb/without_test.yml",
             "path": "aa/bb/without_test.sql",
             "root_path": "/path/to/aa",
+            "config": {"materialized": "incremental"},
         },
         "model.replaced_model": {
             "alias": "replaced_model",
@@ -244,6 +271,18 @@ MANIFEST = {
             "patch_path": "project://bb/parent_child.yml",
             "path": "aa/bb/parent_child.sql",
             "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "view",
+            },
+        },
+        "snapshot.some_snapshot": {
+            "name": "some_snapshot",
+            "patch_path": "project://bb/some_snapshot.yml",
+            "path": "aa/bb/some_snapshot.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "snapshot",
+            },
         },
     },
     "sources": {
@@ -376,13 +415,15 @@ CATALOG = {
             "columns": {
                 "is_boolean": {"type": "boolean", "name": "is_boolean"},
                 "COL2": {"type": "TEXT", "name": "COL2"},
+                "IS_ALSO_BOOLEAN": {"type": "BOOLEAN", "name": "IS_ALSO_BOOLEAN"},
             },
         },
         "model.test.with_boolean_column_without_prefix": {
             "metadata": {},
             "columns": {
                 "COL1": {"type": "boolean", "name": "COL1"},
-                "COL2": {"type": "TEXT", "name": "COL2"},
+                "COL2": {"type": "BOOLEAN", "name": "COL2"},
+                "COL3": {"type": "TEXT", "name": "COL3"},
             },
         },
         "model.test.without_boolean_column_with_prefix": {

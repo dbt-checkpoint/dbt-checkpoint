@@ -10,8 +10,8 @@ from dbt_checkpoint.utils import (
     Model,
     ModelSchema,
     add_default_args,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
     get_missing_file_paths,
     get_model_schemas,
     get_model_sqls,
@@ -22,17 +22,15 @@ from dbt_checkpoint.utils import (
 
 
 def check_column_desc(
-    paths: Sequence[str], manifest: Dict[str, Any]
+    paths: Sequence[str], manifest: Dict[str, Any], include_disabled: bool = False
 ) -> Tuple[int, Dict[str, Any]]:
-    paths = get_missing_file_paths(paths, manifest)
-
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
-    sqls = get_model_sqls(paths, manifest)
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
-    models = get_models(manifest, filenames)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     missing: Dict[str, Set[str]] = {}
@@ -55,7 +53,7 @@ def check_column_desc(
                 if (isinstance(value, dict) and not value.get("description"))
             }
         else:
-            continue  # pragma: no cover, no mutate
+            continue
         seen = missing.get(model_name)
         if seen:
             if not missing_cols:
@@ -83,13 +81,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     start_time = time.time()
-    status_code, _ = check_column_desc(paths=args.filenames, manifest=manifest)
+    status_code, _ = check_column_desc(
+        paths=args.filenames, manifest=manifest, include_disabled=args.include_disabled
+    )
     end_time = time.time()
     script_args = vars(args)
 

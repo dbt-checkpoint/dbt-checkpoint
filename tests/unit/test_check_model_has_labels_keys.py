@@ -3,56 +3,56 @@ from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_model_has_meta_keys import main
+from dbt_checkpoint.check_model_has_labels_keys import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
     (
         [
-            "aa/bb/with_meta.sql",
-            "--meta-keys",
+            "aa/bb/with_labels.sql",
+            "--labels-keys",
             "foo",
             "bar",
         ],
-        {"models": [{"name": "with_meta", "meta": {"foo": "bar"}}]},
+        {"models": [{"name": "with_labels", "config": {"labels": {"foo": "bar"}}}]},
         True,
         True,
         0,
     ),
     (
         [
-            "aa/bb/with_meta.sql",
-            "--meta-keys",
+            "aa/bb/with_labels.sql",
+            "--labels-keys",
             "foo",
             "bar",
         ],
-        {"models": [{"name": "with_meta", "meta": {"foo": "bar"}}]},
+        {"models": [{"name": "with_labels", "config": {"labels": {"foo": "bar"}}}]},
         False,
         True,
         1,
     ),
     (
         [
-            "aa/bb/without_meta.sql",
-            "--meta-keys",
+            "aa/bb/without_labels.sql",
+            "--labels-keys",
             "foo",
             "bar",
         ],
-        {"models": [{"name": "without_meta"}]},
+        {"models": [{"name": "without_labels"}]},
         True,
         True,
         1,
     ),
     (
-        ["aa/bb/with_meta.sql", "--meta-keys", "foo", "--allow-extra-keys"],
-        {"models": [{"name": "with_meta", "meta": {"foo": "bar", "baz": "test"}}]},
+        ["aa/bb/with_labels.sql", "--labels-keys", "foo", "--allow-extra-keys"],
+        {"models": [{"name": "with_labels", "config":{"labels": {"foo": "bar", "baz": "test"}}}]},
         True,
         True,
         0,
     ),
     (
-        ["aa/bb/with_meta.sql", "--meta-keys", "baz"],
-        {"models": [{"name": "with_meta", "meta": {"foo": "bar", "baz": "test"}}]},
+        ["aa/bb/with_labels.sql", "--labels-keys", "baz"],
+        {"models": [{"name": "with_labels", "config":{"labels": {"foo": "bar", "baz": "test"}}}]},
         True,
         True,
         1,
@@ -64,7 +64,7 @@ TESTS = (
     ("input_args", "schema", "valid_manifest", "valid_config", "expected_status_code"),
     TESTS,
 )
-def test_check_model_meta_keys(
+def test_check_model_labels_keys(
     input_args,
     schema,
     valid_manifest,
@@ -85,24 +85,25 @@ def test_check_model_meta_keys(
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_model_meta_keys_in_changed(extension, tmpdir, manifest_path_str):
+def test_check_model_labels_keys_in_changed(extension, tmpdir, manifest_path_str):
     schema_yml = """
 version: 2
 
 models:
--   name: in_schema_meta
-    meta:
-        foo: test
-        bar: test
+-   name: in_schema_labels
+    config:
+        labels:
+            foo: test
+            bar: test
 -   name: xxx
     """
     yml_file = tmpdir.join(f"schema.{extension}")
     yml_file.write(schema_yml)
     result = main(
         argv=[
-            "in_schema_meta.sql",
+            "in_schema_labels.sql",
             str(yml_file),
-            "--meta-keys",
+            "--labels-keys",
             "foo",
             "bar",
             "--manifest",

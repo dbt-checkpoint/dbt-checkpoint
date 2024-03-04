@@ -9,6 +9,8 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_catalog_args,
     add_default_args,
+    get_dbt_catalog,
+    get_dbt_manifest,
     get_json,
     get_source_schemas,
 )
@@ -35,13 +37,13 @@ def get_catalog_nodes(catalog: Dict[str, Any]) -> Dict[FrozenSet[str], Any]:
 
 
 def check_source_columns(
-    paths: Sequence[str], catalog: Dict[str, Any]
+    paths: Sequence[str], catalog: Dict[str, Any], include_disabled: bool = False
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
     # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls)
+    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     catalog_nodes = get_catalog_nodes(catalog)
 
@@ -99,19 +101,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        catalog = get_json(args.catalog)
+        catalog = get_dbt_catalog(args)
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     start_time = time.time()
-    hook_properties = check_source_columns(paths=args.filenames, catalog=catalog)
+    hook_properties = check_source_columns(
+        paths=args.filenames, catalog=catalog, include_disabled=args.include_disabled
+    )
     end_time = time.time()
     script_args = vars(args)
 

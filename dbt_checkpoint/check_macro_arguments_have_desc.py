@@ -10,8 +10,8 @@ from dbt_checkpoint.utils import (
     Macro,
     MacroSchema,
     add_default_args,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
     get_macro_schemas,
     get_macro_sqls,
     get_macros,
@@ -52,7 +52,7 @@ def check_argument_desc(
                 if not value.get("description")
             }
         else:
-            continue  # pragma: no cover, no mutate
+            continue
         seen = missing.get(macro_name)
         if seen:
             if not missing_args:
@@ -80,7 +80,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1

@@ -9,19 +9,29 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_catalog_args,
     add_default_args,
+    get_dbt_catalog,
+    get_dbt_manifest,
     get_filenames,
-    get_json,
+    get_missing_file_paths,
     get_models,
 )
 
 
 def check_model_name_contract(
-    paths: Sequence[str], pattern: str, catalog: Dict[str, Any]
+    paths: Sequence[str],
+    pattern: str,
+    catalog: Dict[str, Any],
+    manifest: Dict[str, Any],
+    exclude_pattern: str,
+    include_disabled: bool = False,
 ) -> int:
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+    )
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
-    models = get_models(catalog, filenames)
+    models = get_models(catalog, filenames, include_disabled=include_disabled)
 
     for model in models:
         model_name = model.filename
@@ -47,13 +57,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_json(args.manifest)
+        manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1
 
     try:
-        catalog = get_json(args.catalog)
+        catalog = get_dbt_catalog(args)
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
@@ -63,6 +73,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         paths=args.filenames,
         pattern=args.pattern,
         catalog=catalog,
+        manifest=manifest,
+        exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
