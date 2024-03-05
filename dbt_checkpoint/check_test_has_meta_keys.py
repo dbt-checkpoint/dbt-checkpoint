@@ -13,6 +13,7 @@ from dbt_checkpoint.utils import (
     get_filenames,
     get_tests,
     red,
+    validate_meta_keys,
     yellow,
 )
 
@@ -26,25 +27,14 @@ def has_meta_key(
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
+    meta_set = set(meta_keys)
     # if user added schema but did not rerun
     tests = get_tests(
         manifest,
         filenames,
     )
-
     for test in tests:
-        test_meta = set(test.node.get("meta", {}).keys())
-        if allow_extra_keys:
-            diff = not (set(meta_keys).issubset(test_meta))
-        else:
-            diff = not (set(meta_keys) == test_meta)
-        if diff:
-            status_code = 1
-            print(
-                f"{test.test_name} meta keys don't match. \n"
-                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
-                f"Actual: {red(', '.join(list(test_meta)))}\n"
-            )
+        status_code = validate_meta_keys(test, meta_keys, meta_set, allow_extra_keys)
     return {"status_code": status_code}
 
 

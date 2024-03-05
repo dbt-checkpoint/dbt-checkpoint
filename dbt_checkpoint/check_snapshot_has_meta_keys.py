@@ -13,6 +13,7 @@ from dbt_checkpoint.utils import (
     get_filenames,
     get_snapshots,
     red,
+    validate_meta_keys,
     yellow,
 )
 
@@ -26,27 +27,17 @@ def has_meta_key(
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_filenames(paths, [".sql"])
-
+    meta_set = set(meta_keys)
     filenames = set(ymls.keys()) | set(sqls.keys())
     # if user added schema but did not rerun
     snapshots = get_snapshots(
         manifest,
         filenames,
     )
-
     for snapshot in snapshots:
-        snapshot_meta = set(snapshot.snapshot.get("meta", {}).keys())
-        if allow_extra_keys:
-            diff = not (set(meta_keys).issubset(snapshot_meta))
-        else:
-            diff = not (set(meta_keys) == snapshot_meta)
-        if diff:
-            status_code = 1
-            print(
-                f"{snapshot.snapshot_name} meta keys don't match. \n"
-                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
-                f"Actual: {red(', '.join(list(snapshot_meta)))}\n"
-            )
+        status_code = validate_meta_keys(
+            snapshot, meta_keys, meta_set, allow_extra_keys
+        )
     return {"status_code": status_code}
 
 

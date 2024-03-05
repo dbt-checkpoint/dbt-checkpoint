@@ -8,8 +8,8 @@ from dbt_checkpoint.check_macro_has_meta_keys import has_meta_key, main
 @pytest.fixture
 def mock_macro():
     macro = MagicMock()
-    macro.macro_name = "test_macro"
-    macro.macro = {"meta": {"key1": "value1", "key2": "value2"}}
+    macro.name = "test_macro"
+    macro.schema = {"meta": {"key1": "value1", "key2": "value2"}}
     return macro
 
 

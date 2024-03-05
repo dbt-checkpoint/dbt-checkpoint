@@ -8,8 +8,8 @@ from dbt_checkpoint.check_seed_has_meta_keys import has_meta_key, main
 @pytest.fixture
 def mock_seed():
     seed = MagicMock()
-    seed.seed_name = "test_seed"
-    seed.seed = {"meta": {"key1": "value1", "key2": "value2"}}
+    seed.name = "test_seed"
+    seed.schema = {"meta": {"key1": "value1", "key2": "value2"}}
     return seed
 
 

@@ -13,6 +13,7 @@ from dbt_checkpoint.utils import (
     get_filenames,
     get_seeds,
     red,
+    validate_meta_keys,
     yellow,
 )
 
@@ -25,23 +26,12 @@ def has_meta_key(
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
-
+    meta_set = set(meta_keys)
     # if user added schema but did not rerun
     seeds = get_seeds(manifest, ymls)
 
     for seed in seeds:
-        seed_meta = set(seed.seed.get("meta", {}).keys())
-        if allow_extra_keys:
-            diff = not (set(meta_keys).issubset(seed_meta))
-        else:
-            diff = not (set(meta_keys) == seed_meta)
-        if diff:
-            status_code = 1
-            print(
-                f"{seed.seed_name} meta keys don't match. \n"
-                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
-                f"Actual: {red(', '.join(list(seed_meta)))}\n"
-            )
+        status_code = validate_meta_keys(seed, meta_keys, meta_set, allow_extra_keys)
     return {"status_code": status_code}
 
 

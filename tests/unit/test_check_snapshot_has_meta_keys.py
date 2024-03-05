@@ -8,8 +8,8 @@ from dbt_checkpoint.check_snapshot_has_meta_keys import has_meta_key, main
 @pytest.fixture
 def mock_snapshot():
     snapshot = MagicMock()
-    snapshot.snapshot_name = "test_snapshot"
-    snapshot.snapshot = {"meta": {"key1": "value1", "key2": "value2"}}
+    snapshot.name = "test_snapshot"
+    snapshot.schema = {"meta": {"key1": "value1", "key2": "value2"}}
     return snapshot
 
 

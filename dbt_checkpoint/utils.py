@@ -41,22 +41,6 @@ class Macro:
 
 
 @dataclass
-class Seed:
-    seed_id: str
-    seed_name: str
-    filename: str
-    seed: Dict[str, Any]
-
-
-@dataclass
-class Snapshot:
-    snapshot_id: str
-    snapshot_name: str
-    filename: str
-    snapshot: Dict[str, Any]
-
-
-@dataclass
 class Test:
     test_id: str
     test_type: str
@@ -102,11 +86,10 @@ class SourceSchema:
 
 
 @dataclass
-class ExposureSchema:
-    exposure_name: str
+class GenericDbtObject:
+    name: str
     filename: str
-    exposure_schema: Dict[str, Any]
-    prefix: str = "exposure"
+    schema: Dict[str, Any]
 
 
 def cmd_output(
@@ -213,7 +196,7 @@ def get_snapshot_filenames(
 
 def get_snapshots(
     manifest: Dict[str, Any], filenames: Set[str]
-) -> Generator[Snapshot, None, None]:
+) -> Generator[GenericDbtObject, None, None]:
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():
         if not node.get("config", {}).get("materialized") == "snapshot":
@@ -221,12 +204,14 @@ def get_snapshots(
         split_key = key.split(".")
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "snapshot":
-            yield Snapshot(key, node.get("name"), filename, node)  # pragma: no mutate
+            yield GenericDbtObject(
+                node.get("name"), filename, node
+            )  # pragma: no mutate
 
 
 def get_tests(
     manifest: Dict[str, Any], filenames: Set[str]
-) -> Generator[Test, None, None]:
+) -> Generator[GenericDbtObject, None, None]:
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():
         if not node.get("config", {}).get("materialized") == "test":
@@ -234,7 +219,9 @@ def get_tests(
         split_key = key.split(".")
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "test":
-            yield Test(key, node.get("name"), filename, node)  # pragma: no mutate
+            yield GenericDbtObject(
+                node.get("name"), filename, node
+            )  # pragma: no mutate
 
 
 def get_macros(
@@ -252,13 +239,15 @@ def get_macros(
 def get_seeds(
     manifest: Dict[str, Any],
     filenames: Set[str],
-) -> Generator[Seed, None, None]:
+) -> Generator[GenericDbtObject, None, None]:
     seeds = manifest.get("nodes", {})
     for key, seed in seeds.items():
         split_key = key.split(".")
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "seed":
-            yield Seed(key, seed.get("name"), filename, seed)  # pragma: no mutate
+            yield GenericDbtObject(
+                seed.get("name"), filename, seed
+            )  # pragma: no mutate
 
 
 def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
@@ -363,15 +352,15 @@ def get_source_schemas(
 
 def get_exposures(
     yml_files: Sequence[Path],
-) -> Generator[ExposureSchema, None, None]:
+) -> Generator[GenericDbtObject, None, None]:
     for yml_file in yml_files:
         schema = safe_load(yml_file.open())
         for exposure in schema.get("exposures", []):
             exposure_name = exposure.get("name")
-            yield ExposureSchema(
-                exposure_name=exposure_name,
+            yield GenericDbtObject(
+                name=exposure_name,
                 filename=yml_file.stem,
-                exposure_schema=exposure,
+                schema=exposure,
             )
 
 
@@ -784,3 +773,24 @@ def get_dbt_catalog(args):  # type: ignore
         return get_json(f"{config_project_dir}/target/catalog.json")
     else:
         return get_json(catalog_path)
+
+
+def validate_meta_keys(
+    obj: GenericDbtObject,
+    meta_keys: Sequence[str],
+    meta_set: Set,
+    allow_extra_keys: bool,
+):
+    meta = set(obj.schema.get("meta", {}).keys())
+    if allow_extra_keys:
+        diff = not meta_set.issubset(meta)
+    else:
+        diff = not (meta_set == meta)
+    if diff:
+        print(
+            f"{obj.name} meta keys don't match. \n"
+            f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
+            f"Actual: {red(', '.join(list(meta)))}\n"
+        )
+        return 1
+    return 0

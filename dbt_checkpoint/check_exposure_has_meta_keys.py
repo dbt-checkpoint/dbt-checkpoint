@@ -12,6 +12,7 @@ from dbt_checkpoint.utils import (
     get_dbt_manifest,
     get_exposures,
     red,
+    validate_meta_keys,
     yellow,
 )
 
@@ -24,18 +25,9 @@ def has_meta_key(
     meta_set = set(meta_keys)  # pragma: no mutate
     exposures = get_exposures(ymls)
     for exposure in exposures:
-        exposure_meta = set(exposure.exposure_schema.get("meta", {}).keys())
-        if allow_extra_keys:
-            diff = not meta_set.issubset(exposure_meta)
-        else:
-            diff = not (meta_set == exposure_meta)
-        if diff:
-            status_code = 1
-            print(
-                f"{exposure.exposure_name} meta keys don't match. \n"
-                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
-                f"Actual: {red(', '.join(list(exposure_meta)))}\n"
-            )
+        status_code = validate_meta_keys(
+            exposure, meta_keys, meta_set, allow_extra_keys
+        )
     return {"status_code": status_code}
 
 

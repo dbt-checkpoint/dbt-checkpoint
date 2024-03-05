@@ -8,8 +8,8 @@ from dbt_checkpoint.check_test_has_meta_keys import has_meta_key, main
 @pytest.fixture
 def mock_test():
     test = MagicMock()
-    test.test_name = "test_test"
-    test.node = {"meta": {"key1": "value1", "key2": "value2"}}
+    test.name = "test_test"
+    test.schema = {"meta": {"key1": "value1", "key2": "value2"}}
     return test
 
 
