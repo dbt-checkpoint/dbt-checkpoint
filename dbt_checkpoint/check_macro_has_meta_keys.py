@@ -12,9 +12,7 @@ from dbt_checkpoint.utils import (
     get_dbt_manifest,
     get_filenames,
     get_macros,
-    red,
     validate_meta_keys,
-    yellow,
 )
 
 

@@ -11,9 +11,7 @@ from dbt_checkpoint.utils import (
     add_meta_keys_args,
     get_dbt_manifest,
     get_exposures,
-    red,
     validate_meta_keys,
-    yellow,
 )
 
 
