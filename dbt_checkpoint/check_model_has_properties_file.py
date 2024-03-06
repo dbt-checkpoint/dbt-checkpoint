@@ -11,7 +11,7 @@ from dbt_checkpoint.utils import (
     get_missing_file_paths,
     get_model_sqls,
     get_models,
-    get_snapshots,
+    get_snapshot_filenames,
     red,
 )
 
@@ -21,7 +21,7 @@ def has_properties_file(
 ) -> Tuple[int, Set[str]]:
     status_code = 0
     sqls = get_model_sqls(paths, manifest, include_disabled)
-    filenames = set(sqls.keys()).difference(get_snapshots(manifest))
+    filenames = set(sqls.keys()).difference(get_snapshot_filenames(manifest))
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames, include_disabled=include_disabled)

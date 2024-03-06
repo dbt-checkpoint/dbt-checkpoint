@@ -10,22 +10,24 @@ from dbt_checkpoint.utils import (
     add_default_args,
     add_meta_keys_args,
     get_dbt_manifest,
-    get_exposures,
+    get_filenames,
+    get_macros,
     validate_meta_keys,
 )
 
 
 def has_meta_key(
-    paths: Sequence[str], meta_keys: Sequence[str], allow_extra_keys: bool
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    meta_keys: Sequence[str],
+    allow_extra_keys: bool,
 ) -> Dict[str, Any]:
     status_code = 0
-    ymls = [Path(path) for path in paths]
-    meta_set = set(meta_keys)  # pragma: no mutate
-    exposures = get_exposures(ymls)
-    for exposure in exposures:
-        status_code = validate_meta_keys(
-            exposure, meta_keys, meta_set, allow_extra_keys
-        )
+    ymls = get_filenames(paths, [".yml", ".yaml"])
+    meta_set = set(meta_keys)
+    macros = get_macros(manifest, ymls)
+    for macro in macros:
+        status_code = validate_meta_keys(macro, meta_keys, meta_set, allow_extra_keys)
     return {"status_code": status_code}
 
 
@@ -44,6 +46,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover
     start_time = time.time()
     hook_properties = has_meta_key(
         paths=args.filenames,
+        manifest=manifest,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
     )
@@ -56,7 +59,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check the exposure has keys in the meta part.",
+            "description": "Check the macro has meta keys.",
             "status": hook_properties.get("status_code"),
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

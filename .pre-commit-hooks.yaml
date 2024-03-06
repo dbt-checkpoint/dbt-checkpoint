@@ -294,3 +294,33 @@
   entry: check-model-materialization-by-childs
   language: python
   types_or: [sql]
+- id: check-exposure-has-meta-keys
+  name: Check the exposure has keys in the meta part
+  description: Ensures that the exposure has a list of valid meta keys.
+  entry: check-exposure-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-macro-has-meta-keys
+  name: Check the macro has keys in the meta part
+  description: Ensures that the macro has a list of valid meta keys.
+  entry: check-macro-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-seed-has-meta-keys
+  name: Check the seed has keys in the meta part
+  description: Ensures that the seed has a list of valid meta keys.
+  entry: check-seed-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-snapshot-has-meta-keys
+  name: Check the snapshot has keys in the meta part
+  description: Ensures that the snapshot has a list of valid meta keys.
+  entry: check-snapshot-has-meta-keys
+  language: python
+  types_or: [sql, yaml]
+- id: check-test-has-meta-keys
+  name: Check the test has keys in the meta part
+  description: Ensures that the test has a list of valid meta keys.
+  entry: check-test-has-meta-keys
+  language: python
+  types_or: [sql]

@@ -86,11 +86,10 @@ class SourceSchema:
 
 
 @dataclass
-class ExposureSchema:
-    exposure_name: str
+class GenericDbtObject:
+    name: str
     filename: str
-    exposure_schema: Dict[str, Any]
-    prefix: str = "exposure"
+    schema: Dict[str, Any]
 
 
 def cmd_output(
@@ -133,6 +132,10 @@ def get_json(json_filename: str) -> Dict[str, Any]:
 def get_config_file(config_file_path: str) -> Dict[str, Any]:
     try:
         path = Path(config_file_path)
+        if not path.exists():
+            alt_path = path.with_suffix(".yml" if path.suffix == ".yaml" else ".yaml")
+            if alt_path.exists():
+                path = alt_path
         config = safe_load(path.open())
         check_yml_version(config_file_path, config)
     except FileNotFoundError:
@@ -180,7 +183,7 @@ def get_ephemeral(
     return output
 
 
-def get_snapshots(
+def get_snapshot_filenames(
     manifest: Dict[str, Any],
 ) -> List[str]:
     output = []
@@ -195,6 +198,36 @@ def get_snapshots(
     return output
 
 
+def get_snapshots(
+    manifest: Dict[str, Any], filenames: Set[str]
+) -> Generator[GenericDbtObject, None, None]:
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():
+        if not node.get("config", {}).get("materialized") == "snapshot":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "snapshot":
+            yield GenericDbtObject(
+                node.get("name"), filename, node
+            )  # pragma: no mutate
+
+
+def get_tests(
+    manifest: Dict[str, Any], filenames: Set[str]
+) -> Generator[GenericDbtObject, None, None]:
+    nodes = manifest.get("nodes", {})
+    for key, node in nodes.items():
+        if not node.get("config", {}).get("materialized") == "test":
+            continue
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "test":
+            yield GenericDbtObject(
+                node.get("name"), filename, node
+            )  # pragma: no mutate
+
+
 def get_macros(
     manifest: Dict[str, Any],
     filenames: Set[str],
@@ -205,6 +238,20 @@ def get_macros(
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "macro":
             yield Macro(key, macro.get("name"), filename, macro)  # pragma: no mutate
+
+
+def get_seeds(
+    manifest: Dict[str, Any],
+    filenames: Set[str],
+) -> Generator[GenericDbtObject, None, None]:
+    seeds = manifest.get("nodes", {})
+    for key, seed in seeds.items():
+        split_key = key.split(".")
+        filename = split_key[-1]
+        if filename in filenames and split_key[0] == "seed":
+            yield GenericDbtObject(
+                seed.get("name"), filename, seed
+            )  # pragma: no mutate
 
 
 def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
@@ -309,15 +356,15 @@ def get_source_schemas(
 
 def get_exposures(
     yml_files: Sequence[Path],
-) -> Generator[ExposureSchema, None, None]:
+) -> Generator[GenericDbtObject, None, None]:
     for yml_file in yml_files:
         schema = safe_load(yml_file.open())
         for exposure in schema.get("exposures", []):
             exposure_name = exposure.get("name")
-            yield ExposureSchema(
-                exposure_name=exposure_name,
+            yield GenericDbtObject(
+                name=exposure_name,
                 filename=yml_file.stem,
-                exposure_schema=exposure,
+                schema=exposure,
             )
 
 
@@ -730,3 +777,24 @@ def get_dbt_catalog(args):  # type: ignore
         return get_json(f"{config_project_dir}/target/catalog.json")
     else:
         return get_json(catalog_path)
+
+
+def validate_meta_keys(
+    obj: GenericDbtObject,
+    meta_keys: Sequence[str],
+    meta_set: Set,
+    allow_extra_keys: bool,
+):
+    meta = set(obj.schema.get("meta", {}).keys())
+    if allow_extra_keys:
+        diff = not meta_set.issubset(meta)
+    else:
+        diff = not (meta_set == meta)
+    if diff:
+        print(
+            f"{obj.name} meta keys don't match. \n"
+            f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
+            f"Actual: {red(', '.join(list(meta)))}\n"
+        )
+        return 1
+    return 0
