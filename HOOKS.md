@@ -51,6 +51,23 @@
 
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
+- [`check-macro-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-meta-keys): Check the macro has meta keys
+
+**Exposure checks:**
+
+- [`check-exposure-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-exposure-has-meta-keys): Check the exposure has meta keys
+
+**Seed checks:**
+
+- [`check-seed-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-seed-has-meta-keys): Check the seed has meta keys
+
+**Snapshot checks:**
+
+- [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys
+
+**Tests checks:**
+
+- [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys
 
 **Modifiers:**
 
@@ -142,12 +159,12 @@ E.g. in two of your models, you have `customer_id` with the description `This is
 
 ### `check-column-name-contract`
 
-Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists on a regex pattern and a data type.
+Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists of a regex pattern and a series of data types.
 
 #### Arguments
 
 `--pattern`: Regex pattern to match column names.
-`--dtype`: Data type.
+`--dtypes`: Data types.
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -158,7 +175,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp]
 ```
 
 #### When to use it
@@ -889,6 +906,7 @@ Make sure you did not typo in tags.
 Checks the model materialization by a given threshold of child models. All models with less child models then the treshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
 
 #### Arguments
+
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--threshold-childs`: An integer threshold of the number of child models.
 
@@ -2038,5 +2056,209 @@ repos:
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+---
+
+### `check-macro-has-meta-keys`
+
+Ensures that the macro has a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the macro to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: list of the required keys in the meta part of the macro.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.2.1
+ hooks:
+ - id: check-macro-has-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every macro needs to have certain meta keys.
+
+#### Requirements
+
+| Macro exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Macro exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` files.
+- The manifest is scanned for a macro.
+- If any macro (from a manifest or `yml` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your macro and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
+
+---
+
+### `check-seed-has-meta-keys`
+
+Ensures that the seed has a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the seed to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: list of the required keys in the meta part of the seed.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.2.1
+ hooks:
+ - id: check-seed-has-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every seed needs to have certain meta keys.
+
+#### Requirements
+
+| Seed exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Seed exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :--------------------------------------------------------: | :-------------------------------------------------------: |
+|                   :white_check_mark: Yes                   |                      :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` files.
+- The manifest is scanned for a seed.
+- If any seed (from a manifest or `yml` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your seed and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
+
+---
+
+### `check-snapshot-has-meta-keys`
+
+Ensures that the snapshot has a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the snapshot to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: list of the required keys in the meta part of the snapshot.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.2.1
+ hooks:
+ - id: check-snapshot-has-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every snapshot needs to have certain meta keys.
+
+#### Requirements
+
+| Snapshot exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Snapshot exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :------------------------------------------------------------: | :-----------------------------------------------------------: |
+|                            :x: Not                             |                        :x: Not needed                         |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `sql` files.
+- The manifest is scanned for a snapshot.
+- If any snapshot (from a manifest or `yml` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your snapshot and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
+
+---
+
+### `check-test-has-meta-keys`
+
+Ensures that the test has a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the test to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: list of the required keys in the meta part of the test.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.2.1
+ hooks:
+ - id: check-test-has-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every test needs to have certain meta keys.
+
+#### Requirements
+
+| Test exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Test exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :--------------------------------------------------------: | :-------------------------------------------------------: |
+|                          :x: Not                           |                      :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt run`, `dbt compile` before run this hook.<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `sql` files.
+- The manifest is scanned for a test.
+- If any test (from a manifest or `sql` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your test and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
 
 ---

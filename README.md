@@ -177,7 +177,7 @@ repos:
 
 3. Optionally, run `pre-commit install` to set up the git hook scripts. With this, `pre-commit` will run automatically on `git commit`! You can also manually run `pre-commit run` after you `stage` all files you want to run. Or `pre-commit run --all-files` to run the hooks against all of the files (not only `staged`).
 
-## Run as Github Action
+## Run in CI/CD
 
 Unfortunately, you cannot natively use `dbt-checkpoint` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
 
@@ -195,7 +195,7 @@ repos:
    args: ["--test-cnt", "2", "--"]
 ```
 
-To be able to run this in Github actions you need to modified it to:
+To be able to run this in Github CI you need to modified it to:
 
 ```
 repos:
@@ -218,14 +218,16 @@ jaffle_shop:
   target: dev
   outputs:
     dev:
-      type: postgres
-      host: localhost
-      user: alice
-      password: "{{ env_var('DB_PASSWORD') }}"
-      port: 5432
-      dbname: jaffle_shop
-      schema: dbt_alice
-      threads: 4
+      type: snowflake
+      threads: 8
+      client_session_keep_alive: true
+      account: "{{ env_var('ACCOUNT') }}"
+      database: "{{ env_var('DATABASE') }}"
+      schema: "{{ env_var('SCHEMA') }}"
+      user: "{{ env_var('USER') }}"
+      password: "{{ env_var('PASSWORD') }}"
+      role: "{{ env_var('ROLE') }}"
+      warehouse: "{{ env_var('WAREHOUSE') }}"
 ```
 
 and store this file in project root `./profiles.yml`.
@@ -237,7 +239,7 @@ and store this file in project root `./profiles.yml`.
 - specify your workflow e.g.:
 
 ```
-name: pre-commit
+name: dbt-checkpoint
 
 on:
   push:
@@ -246,20 +248,34 @@ on:
       - main
 
 jobs:
-  pre-commit:
-  runs-on: ubuntu-latest
-  steps:
-  - uses: actions/checkout@v2
-  - uses: actions/setup-python@v2
-  - id: file_changes
-    uses: trilom/file-changes-action@v1.2.4
-    with:
-      output: ' '
-  - uses: dbt-checkpoint/dbt-checkpoint@v1.2.0
+  dbt-checkpoint:
+    runs-on: ubuntu-latest
     env:
-      DB_PASSWORD: ${{ secrets.SuperSecret }}
-    with:
-      args: run --files ${{ steps.file_changes.outputs.files}}
+      ACCOUNT: ${{ vars.ACCOUNT }}
+      DATABASE: ${{ vars.DATABASE }}
+      SCHEMA: ${{ vars.SCHEMA }}
+      USER: ${{ vars.USER }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      ROLE: ${{ vars.ROLE }}
+      WAREHOUSE: ${{ vars.WAREHOUSE }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - id: Get file changes
+        uses: trilom/file-changes-action@v1.2.4
+        with:
+          output: " "
+
+      - name: Run dbt checkpoint
+        uses: dbt-checkpoint/action@v0.1
+        with:
+          extra_args: --files ${{ steps.get_file_changes.outputs.files}}
+          dbt_version: 1.6.3
+          dbt_adapter: dbt-snowflake
 ```
 
 ### Acknowledgements
