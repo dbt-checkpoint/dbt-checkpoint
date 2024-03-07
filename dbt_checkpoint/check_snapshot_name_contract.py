@@ -30,7 +30,7 @@ def check_snapshot_name_contract(
     snapshots = get_snapshots(manifest, filenames)
 
     for snapshot in snapshots:
-        snapshot_name = snapshot.model_name
+        snapshot_name = snapshot.name
         if re.match(pattern, snapshot_name) is None:
             status_code = 1
             print(f"{snapshot_name}: snapshot does not match regex pattern {pattern}.")
