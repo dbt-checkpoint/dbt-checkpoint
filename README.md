@@ -159,7 +159,7 @@ pip install pre-commit
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-  rev: v1.2.0
+  rev: v1.2.1
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
@@ -189,7 +189,7 @@ Say you want to check that a model contains at least two tests, you would use th
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.0
+ rev: v1.2.1
  hooks:
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
@@ -200,7 +200,7 @@ To be able to run this in Github CI you need to modified it to:
 ```
 repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.0
+ rev: v1.2.1
  hooks:
  - id: dbt-compile
    args: ["--cmd-flags", "++profiles-dir", "."]
