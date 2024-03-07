@@ -1,3 +1,16 @@
+# 1.2.1 - 2024-03-07
+
+**Fixes:**
+
+- Fix GitHub action by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/187
+
+**Enhancements:**
+
+- Allow multiple data types, improve error messages by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/180
+- Support yml suffix (without A) in dbt-checkpoint config file by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/190
+- implement 'check has meta keys' for all meta-supported dbt objects by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/181
+- Add --allow-extra-keys to check-source-has-meta-keys by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/176
+
 # 1.2.0 - 2024-01-15
 
 **Fixes:**
