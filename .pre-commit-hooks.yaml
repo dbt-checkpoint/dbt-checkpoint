@@ -116,6 +116,12 @@
   entry: check-model-tags
   language: python
   types_or: [sql, yaml]
+- id: check-snapshot-name-contract
+  name: Check snapshot name contract
+  description: Check snapshot name abides to contract.
+  entry: check-snapshot-name-contract
+  language: python
+  types_or: [sql]
 - id: check-script-has-no-table-name
   name: Check the script has not table name
   description: Ensures that the script is using only source or ref macro to specify the table name.
