@@ -42,7 +42,7 @@ def check_child_parent_cnt(
                 manifest=manifest,
                 obj=model,
                 manifest_node="parent_map",
-                node_types=["model", "source"],
+                node_types=["model", "source", "seed", "snapshot"],
             )
         )
         real_cnt = {"childs": len(childs), "parents": len(parents)}
