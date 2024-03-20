@@ -1,5 +1,6 @@
 import argparse
 import json
+from random import seed
 import re
 import subprocess
 from dataclasses import dataclass
@@ -56,6 +57,19 @@ class Source:
     filename: str
     node: Dict[str, Any]
 
+@dataclass
+class Seed:
+    seed_id: str
+    seed_name: str
+    filename: str
+    node: Dict[str, Any]
+
+@dataclass
+class Snapshot:
+    snapshot_id: str
+    snapshot_name: str
+    filename: str
+    node: Dict[str, Any]
 
 @dataclass
 class ModelSchema:
@@ -408,6 +422,22 @@ def get_parent_childs(
                         yield Model(
                             model_id=node_id,
                             model_name=node.get("name", ""),  # pragma: no mutate
+                            filename=node.get("path", ""),  # pragma: no mutate
+                            node=node,
+                        )
+                    elif node_type == "seed":  # Add this block
+                        node = manifest.get("seeds", {}).get(node_id)
+                        yield Seed(
+                            seed_id=node_id,
+                            seed_name=node.get("name", ""),  # pragma: no mutate
+                            filename=node.get("path", ""),  # pragma: no mutate
+                            node=node,
+                        )
+                    elif node_type == "snapshot":  # Add this block
+                        node = manifest.get("snapshots", {}).get(node_id)
+                        yield Snapshot(
+                            snapshot_id=node_id,
+                            snapshot_name=node.get("name", ""),  # pragma: no mutate
                             filename=node.get("path", ""),  # pragma: no mutate
                             node=node,
                         )

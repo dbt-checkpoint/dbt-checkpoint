@@ -36,7 +36,7 @@ def check_parents_schema(
                 manifest=manifest,
                 obj=model,
                 manifest_node="parent_map",
-                node_types=["model", "source"],
+                node_types=["model", "source", "seed", "snapshot"],
             )
         )
         for parent in parents:
