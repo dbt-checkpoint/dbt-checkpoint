@@ -20,7 +20,7 @@ def compare_source_columns(
     catalog_columns: Dict[str, Any], schema_columns: Sequence[Dict[str, Any]]
 ) -> Tuple[Set[str], Set[str]]:
     catalog_cols = {col.lower() for col in catalog_columns.keys()}
-    schema_cols = {str(col.get("name")) for col in schema_columns if col.get("name")}
+    schema_cols = {str(col.get("name")).lower() for col in schema_columns if col.get("name")}
     schema_only = schema_cols.difference(catalog_cols)
     catalog_only = catalog_cols.difference(schema_cols)
     return schema_only, catalog_only
