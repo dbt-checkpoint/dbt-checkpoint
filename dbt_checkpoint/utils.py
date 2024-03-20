@@ -1,6 +1,5 @@
 import argparse
 import json
-from random import seed
 import re
 import subprocess
 from dataclasses import dataclass
