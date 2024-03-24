@@ -29,13 +29,11 @@ def test_dbt_parse_error():
 
 
 @pytest.mark.parametrize(
-    "files,global_flags,cmd_flags,models,expected",
+    "global_flags,cmd_flags,expected",
     [
-        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "parse"]),
+        (None, None, ["dbt", "parse"]),
         (
-            ["/aa/bb/cc.txt"],
             ["++debug", "++no-write-json"],
-            None,
             None,
             [
                 "dbt",
@@ -45,21 +43,17 @@ def test_dbt_parse_error():
             ],
         ),
         (
-            ["/aa/bb/cc.txt"],
             None,
             ["+t", "prod"],
-            None,
             ["dbt", "parse", "-t", "prod"],
         ),
         (
-            ["/aa/bb/cc.txt"],
             "",
             ["+t", "prod"],
-            None,
             ["dbt", "parse", "-t", "prod"],
         ),
     ],
 )
-def test_dbt_parse_cmd(files, global_flags, cmd_flags, models, expected):
-    result = prepare_cmd(files, global_flags, cmd_flags, models=models)
+def test_dbt_parse_cmd(global_flags, cmd_flags, expected):
+    result = prepare_cmd(global_flags, cmd_flags)
     assert result == expected
