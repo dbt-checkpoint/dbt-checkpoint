@@ -144,7 +144,7 @@ E.g. in two of your models, you have `customer_id` with the description `This is
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -189,7 +189,7 @@ You want to make sure your columns follow a contract, e.g. all your boolean colu
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                   :white_check_mark: Yes                   |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -230,7 +230,7 @@ You want to make sure that all specified columns in the properties files (usuall
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -278,7 +278,7 @@ You want to make sure that you have all the database columns listed in the prope
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                   :white_check_mark: Yes                   |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -324,7 +324,7 @@ You want to make sure that all models have a description.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -377,7 +377,7 @@ If every model needs to have certain meta keys.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -430,7 +430,7 @@ If every model needs to have certain labels keys.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -476,7 +476,7 @@ You want to make sure that every model has a properties file.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -525,7 +525,7 @@ You want to make sure that every model has certain tests.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -570,7 +570,7 @@ You want to make sure that every model has certain tests.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -616,7 +616,7 @@ You want to make sure that every model has one (or more) of a group of eligible 
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -661,7 +661,7 @@ You want to make sure that every model was tested.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -707,7 +707,7 @@ You want to make sure your model names follow a naming convention (e.g., staging
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                   :white_check_mark: Yes                   |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -754,7 +754,7 @@ You want to find orphaned models (empty file, hard-coded reference, etc.). Or yo
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -800,7 +800,7 @@ You want to be sure that certain models are using only models from specified dat
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -845,7 +845,7 @@ You want to be sure that certain models are using only models from specified sch
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -890,7 +890,7 @@ Make sure you did not typo in tags.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -931,7 +931,7 @@ Make sure to increase the efficiency within your dbt run and make use of good ma
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 ### `check-script-ref-and-source`
@@ -962,7 +962,7 @@ Make sure you have only valid ref and sources in your script and you do not want
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 ### `check-script-semicolon`
@@ -996,7 +996,7 @@ Make sure you did not provide a semicolon at the end of the file.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1034,7 +1034,7 @@ To make sure that you have only refs and sources in your `SQL` files.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1068,7 +1068,7 @@ You want to make sure that all specified columns in the properties files (usuall
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                             :x:                             |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1108,7 +1108,7 @@ You want to make sure that you have all the database columns listed in the prope
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                           :x: No                            |                   :white_check_mark: Yes                   |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1148,7 +1148,7 @@ You want to make sure that all sources have a description.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1186,7 +1186,7 @@ You want to make sure that all freshness is correctly set.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1221,7 +1221,7 @@ You want to make sure that the source has loader specified.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1263,7 +1263,7 @@ If every source needs to have certain meta keys.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1305,7 +1305,7 @@ If every source needs to have certain labels keys.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1347,7 +1347,7 @@ You want to make sure that every source has certain tests.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                           :x: Yes                           |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1389,7 +1389,7 @@ You want to make sure that every source has certain tests.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                           :x: Yes                           |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1431,7 +1431,7 @@ You want to make sure that every source was tested.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                           :x: Yes                           |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1474,7 +1474,7 @@ You want to make sure that every source has one (or more) of a group of eligible
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1516,7 +1516,7 @@ Make sure you did not typo in tags.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1560,7 +1560,7 @@ You want to find orphaned sources without any dependencies. Or you want to make 
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1601,7 +1601,7 @@ You want to make sure that all macros have a description.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1647,7 +1647,7 @@ You want to make sure that all specified arguments in the properties files (usua
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1697,7 +1697,7 @@ You are too lazy to define schemas manually :D.
 | :-----------------------------------------------------------------------: | :--------------------------------------------------------: |
 | :x: Not needed since this hook tries to generate even non-existent source |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1754,7 +1754,7 @@ You want the descriptions of the same columns to be the same. E.g. in two of you
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |   :x: Not needed since this hook is using only yaml files   |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1800,7 +1800,7 @@ You are running and debugging your `SQL` in the editor. This editor does not kno
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1847,7 +1847,7 @@ You are running and debugging your `SQL` in the editor. This editor does not kno
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                          :x: Yes                           |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1888,7 +1888,7 @@ You are too lazy or forgetful to delete one character at the end of the script.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                       :x: Not needed                        |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -1986,7 +1986,7 @@ repos:
 
 ### `dbt-parse`
 
-Run the` dbt parse` command. Generates `manifest.json` from source model, test, and analysis files.
+Run the` dbt parse` command. When running dbt >= 1.5, generates `manifest.json` from source model, test, and analysis files.
 
 #### Arguments
 
@@ -2129,7 +2129,7 @@ If every macro needs to have certain meta keys.
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
 |                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -2180,7 +2180,7 @@ If every seed needs to have certain meta keys.
 | :--------------------------------------------------------: | :-------------------------------------------------------: |
 |                   :white_check_mark: Yes                   |                      :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -2231,7 +2231,7 @@ If every snapshot needs to have certain meta keys.
 | :------------------------------------------------------------: | :-----------------------------------------------------------: |
 |                            :x: Not                             |                        :x: Not needed                         |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
@@ -2282,7 +2282,7 @@ If every test needs to have certain meta keys.
 | :--------------------------------------------------------: | :-------------------------------------------------------: |
 |                          :x: Not                           |                      :x: Not needed                       |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook.<br/>
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 #### How it works
