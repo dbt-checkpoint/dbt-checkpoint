@@ -237,6 +237,13 @@
   entry: dbt-docs-generate
   language: python
   pass_filenames: false
+- id: dbt-parse
+  name: dbt parse
+  description: Generates manifest.json from source model, test, and analysis files.
+  entry: dbt-parse
+  language: python
+  types_or: [sql]
+  require_serial: true
 - id: dbt-run
   name: dbt run
   description: Executes compiled sql model files.
