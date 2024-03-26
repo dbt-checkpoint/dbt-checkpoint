@@ -163,7 +163,11 @@ def get_models(
         if not include_disabled and not node.get("config", {}).get("enabled", True):
             continue
         split_key = key.split(".")
-        filename = split_key[-1]
+        # Versions are supported since dbt-core 1.5
+        if node.get("version") and split_key[-1] == "v" + node.get("version"):
+            filename = split_key[-2]
+        else:
+            filename = split_key[-1]
         if filename in filenames and split_key[0] == "model":
             yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
 
