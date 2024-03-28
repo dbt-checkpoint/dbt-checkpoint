@@ -136,6 +136,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`dbt-compile`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-compile): Run `dbt compile` command.
 - [`dbt-deps`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-deps): Run `dbt deps` command.
 - [`dbt-docs-generate`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-docs-generate): Run `dbt docs generate` command.
+- [`dbt-parse`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-parse): Run `dbt parse` command.
 - [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
 - [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
 
@@ -181,8 +182,8 @@ repos:
 
 Unfortunately, you cannot natively use `dbt-checkpoint` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
 
-`dbt-checkpoint` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run `dbt-compile` (or `dbt-run`) command.
-To be able to compile dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example).
+`dbt-checkpoint` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run the `dbt-parse` command.
+To be able to parse dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example).
 
 Say you want to check that a model contains at least two tests, you would use this configuration:
 
@@ -202,8 +203,7 @@ repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
  rev: v1.2.1
  hooks:
- - id: dbt-compile
-   args: ["--cmd-flags", "++profiles-dir", "."]
+ - id: dbt-parse
  - id: check-model-has-tests
    args: ["--test-cnt", "2", "--"]
 ```
