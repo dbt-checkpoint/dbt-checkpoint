@@ -1406,7 +1406,7 @@ Ensures that the source has a number of tests.
 
 #### Arguments
 
-`--tests`: Minimum number of tests required.
+`--test-cnt`: Minimum number of tests required.
 
 #### Example
 
@@ -1416,7 +1416,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-source-has-tests
-   args: ["--tests", "2", "--"]
+   args: ["--test-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
