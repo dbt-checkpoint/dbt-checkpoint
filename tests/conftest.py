@@ -15,6 +15,16 @@ MANIFEST = {
         "adapter_type": "snowflake",
     },
     "nodes": {
+        "model.with_version.v1": {
+            "patch_path": "project://bb/with_version.yml",
+            "path": "aa/bb/with_version.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table",
+            },
+            "version": "1",
+            "latest_version": "1",
+        },
         "model.with_schema": {
             "patch_path": "project://bb/with_schema.yml",
             "path": "aa/bb/with_schema.sql",
