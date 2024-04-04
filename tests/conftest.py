@@ -22,8 +22,8 @@ MANIFEST = {
             "config": {
                 "materialized": "table",
             },
-            "version": "1",
-            "latest_version": "1",
+            "version": 1,
+            "latest_version": 1,
         },
         "model.with_schema": {
             "patch_path": "project://bb/with_schema.yml",
