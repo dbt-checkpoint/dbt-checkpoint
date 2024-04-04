@@ -48,7 +48,7 @@ def check_test_cnt(
         if model_test_cnt < test_cnt:
             status_code = 1
             print(
-                f"{model.model_name}: "
+                f"{model.filename}: "
                 f"has only {model_test_cnt} tests, but {test_cnt} are required.",
             )
     return status_code
