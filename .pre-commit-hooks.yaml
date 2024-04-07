@@ -37,6 +37,18 @@
   entry: check-model-has-all-columns
   language: python
   types_or: [sql, yaml]
+- id: check-model-has-contract
+  name: Check model has contract
+  description: Check model has contract enforced = True
+  entry: check-model-has-contract
+  language: python
+  types_or: [yaml]
+- id: check-model-has-constraints
+  name: Check model has constraints
+  description: Check model has constraints for specific columns
+  entry: check-model-has-constraints
+  language: python
+  types_or: [yaml]
 - id: check-model-has-description
   name: Check the model has description
   description: Ensures that the model has description in properties file.

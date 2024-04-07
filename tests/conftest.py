@@ -275,6 +275,53 @@ MANIFEST = {
                 "materialized": "view",
             },
         },
+        "model.with_contract": {
+            "patch_path": "project://bb/with_contract.yml",
+            "path": "aa/bb/with_contract.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "contract": {
+                    "enforced": True
+                },
+                "materialized": "view",
+            },
+        },
+        "model.with_no_contract": {
+            "patch_path": "project://bb/with_contract.yml",
+            "path": "aa/bb/with_no_contract.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_constraints": {
+            "patch_path": "project://bb/with_constraints.yml",
+            "path": "aa/bb/with_constraints.sql",
+            "root_path": "/path/to/aa",
+            "constraints": [
+                {
+                    "type": "primary_key",
+                    "columns": ["col_a", "col_b"],
+                },
+                {
+                    "type": "foreign_key",
+                    "columns": ["col_a", "col_b"],
+                },
+                {
+                    "type": "check",
+                    "columns": ["col_a", "col_b"],
+                },
+                {
+                    "type": "not_null",
+                    "columns": ["col_a", "col_b"],
+                },
+                {
+                    "type": "unique",
+                    "columns": ["col_a", "col_b"],
+                },
+                {
+                    "type": "custom",
+                    "columns": ["col_a", "col_b"],
+                }
+            ],
+        },
         "snapshot.some_snapshot": {
             "name": "some_snapshot",
             "patch_path": "project://bb/some_snapshot.yml",
