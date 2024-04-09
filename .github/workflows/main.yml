@@ -33,9 +33,9 @@ jobs:
             tox_env: "py39"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
@@ -47,7 +47,7 @@ jobs:
       - name: Test build with coverage
         run: "tox -e cov-report"
       - name: Send coverage report to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
 
@@ -56,8 +56,8 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.8"
 
@@ -81,8 +81,8 @@ jobs:
     runs-on: "${{ matrix.os }}"
 
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.8"
       - name: "Install in dev mode"
