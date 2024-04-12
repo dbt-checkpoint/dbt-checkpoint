@@ -8,7 +8,7 @@ from dbt_checkpoint.utils import cmd_output
 MANIFEST = {
     "metadata": {
         "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v6.json",
-        "dbt_version": "1.2.1",
+        "dbt_version": "1.5.0",
         "generated_at": "2022-10-04T16:19:51.780894Z",
         "user_id": "test_user_id",
         "send_anonymous_usage_stats": True,
