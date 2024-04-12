@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.dbt_docs_generate import docs_generate_cmd
+from dbt_checkpoint.dbt_docs_generate import prepare_cmd
 from dbt_checkpoint.dbt_docs_generate import main
 
 
@@ -70,5 +70,5 @@ def test_dbt_docs_generate_error():
     ],
 )
 def test_dbt_docs_generate_cmd(files, global_flags, cmd_flags, models, expected):
-    result = docs_generate_cmd(files, global_flags, cmd_flags, models=models)
+    result = prepare_cmd(files, global_flags, cmd_flags, models=models)
     assert result == expected

@@ -16,7 +16,7 @@ from dbt_checkpoint.utils import paths_to_dbt_models
 from dbt_checkpoint.utils import run_dbt_cmd
 
 
-def docs_generate_cmd(
+def prepare_cmd(
     paths: Sequence[str],
     global_flags: Optional[Sequence[str]] = None,
     cmd_flags: Optional[Sequence[str]] = None,
@@ -45,7 +45,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
     config = get_config_file(args.config)
-    cmd = docs_generate_cmd(
+    cmd = prepare_cmd(
         args.filenames,
         args.global_flags,
         args.cmd_flags,
