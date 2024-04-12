@@ -514,3 +514,9 @@ def temp_git_dir(tmpdir):
     git_dir = tmpdir.join("gits")
     cmd_output("git", "init", "--", str(git_dir))
     yield git_dir
+
+
+@pytest.fixture(scope="module")
+def pre_commit_hooks_yaml_dict():
+    with open(".pre-commit-hooks.yaml") as f:
+        yield yaml.safe_load(f)
