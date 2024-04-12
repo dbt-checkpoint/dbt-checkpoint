@@ -159,11 +159,11 @@ repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
   rev: v1.2.1
   hooks:
-  - id: check-script-semicolon
-  - id: check-script-has-no-table-name
   - id: dbt-parse
   - id: dbt-docs-generate
     args: ["--cmd-flags", "++no-compile"]
+  - id: check-script-semicolon
+  - id: check-script-has-no-table-name
   - id: check-model-has-all-columns
     name: Check columns - core
     files: ^models/core
