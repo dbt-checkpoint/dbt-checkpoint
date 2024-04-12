@@ -1,22 +1,22 @@
 import argparse
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
+import os
+import time
+from typing import Any, Dict, List, Optional, Sequence
 
-from dbt_checkpoint.utils import add_config_args
-from dbt_checkpoint.utils import add_dbt_cmd_args
-from dbt_checkpoint.utils import add_dbt_cmd_model_args
-from dbt_checkpoint.utils import add_filenames_args
-from dbt_checkpoint.utils import extend_dbt_project_dir_flag
-from dbt_checkpoint.utils import get_config_file
-from dbt_checkpoint.utils import get_flags
-from dbt_checkpoint.utils import paths_to_dbt_models
-from dbt_checkpoint.utils import run_dbt_cmd
+from dbt_checkpoint.utils import (
+    add_config_args,
+    add_dbt_cmd_args,
+    add_dbt_cmd_model_args,
+    add_filenames_args,
+    extend_dbt_project_dir_flag,
+    get_config_file,
+    get_flags,
+    paths_to_dbt_models,
+    run_dbt_cmd,
+)
 
 
-def docs_generate_cmd(
+def prepare_cmd(
     paths: Sequence[str],
     global_flags: Optional[Sequence[str]] = None,
     cmd_flags: Optional[Sequence[str]] = None,
@@ -45,7 +45,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
     config = get_config_file(args.config)
-    cmd = docs_generate_cmd(
+    cmd = prepare_cmd(
         args.filenames,
         args.global_flags,
         args.cmd_flags,
