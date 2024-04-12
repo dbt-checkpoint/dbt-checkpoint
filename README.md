@@ -161,7 +161,6 @@ repos:
   hooks:
   - id: check-script-semicolon
   - id: check-script-has-no-table-name
-  - id: dbt-test
   - id: dbt-parse
   - id: dbt-docs-generate
     args: ["--cmd-flags", "++no-compile"]
