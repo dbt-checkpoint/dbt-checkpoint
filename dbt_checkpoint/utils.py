@@ -555,6 +555,30 @@ class ParseDict(argparse.Action):
         setattr(namespace, self.dest, result)
 
 
+class ParseDictOfLists(argparse.Action):
+    """Parse a KEY=VALUE1,VALUE2 string-list into a dictionary of lists"""
+
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: Union[Text, Sequence[Any], None],
+        option_string: Optional[str] = None,
+    ) -> None:
+        """Perform the parsing"""
+        result = {}
+
+        if values:
+            for item in values:
+                split_items = item.split("=", 1)  # pragma: no mutate
+                key = split_items[0].strip()
+                value = split_items[1].strip()
+
+                result[key] = set(value.split(","))
+
+        setattr(namespace, self.dest, result)
+
+
 def add_related_sqls(
     yml_path: str,
     nodes: Dict[Any, Any],

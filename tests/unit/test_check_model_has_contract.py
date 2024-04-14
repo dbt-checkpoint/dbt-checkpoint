@@ -19,7 +19,7 @@ TESTS = (  # type: ignore
     ),
     TESTS,
 )
-def test_check_model_has_tests(
+def test_check_model_has_contract(
     input_schema,
     input_args,
     valid_manifest,

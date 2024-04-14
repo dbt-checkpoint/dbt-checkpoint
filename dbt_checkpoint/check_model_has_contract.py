@@ -6,17 +6,15 @@ from typing import Any, Dict, Optional, Sequence
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
-    Test,
     add_default_args,
     get_dbt_manifest,
     get_missing_file_paths,
     get_model_sqls,
     get_models,
-    get_parent_childs,
 )
 
 
-def has_contract(
+def check_contract(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     exclude_pattern: str,
@@ -55,7 +53,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = has_contract(
+    status_code = check_contract(
         paths=args.filenames,
         manifest=manifest,
         test_cnt=args.test_cnt,
