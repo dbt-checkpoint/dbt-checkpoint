@@ -8,7 +8,7 @@ from dbt_checkpoint.utils import cmd_output
 MANIFEST = {
     "metadata": {
         "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v6.json",
-        "dbt_version": "1.2.1",
+        "dbt_version": "1.5.0",
         "generated_at": "2022-10-04T16:19:51.780894Z",
         "user_id": "test_user_id",
         "send_anonymous_usage_stats": True,
@@ -514,3 +514,9 @@ def temp_git_dir(tmpdir):
     git_dir = tmpdir.join("gits")
     cmd_output("git", "init", "--", str(git_dir))
     yield git_dir
+
+
+@pytest.fixture(scope="module")
+def pre_commit_hooks_yaml_dict():
+    with open(".pre-commit-hooks.yaml") as f:
+        yield yaml.safe_load(f)
