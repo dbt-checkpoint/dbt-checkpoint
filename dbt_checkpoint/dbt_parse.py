@@ -8,7 +8,6 @@ from typing import Sequence
 from dbt_checkpoint.utils import add_config_args
 from dbt_checkpoint.utils import add_dbt_cmd_args
 from dbt_checkpoint.utils import add_dbt_cmd_model_args
-from dbt_checkpoint.utils import add_filenames_args
 from dbt_checkpoint.utils import extend_dbt_project_dir_flag
 from dbt_checkpoint.utils import get_config_file
 from dbt_checkpoint.utils import get_flags
@@ -29,7 +28,6 @@ def prepare_cmd(
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_filenames_args(parser)
     add_dbt_cmd_args(parser)
     add_dbt_cmd_model_args(parser)
     add_config_args(parser)

@@ -13,7 +13,7 @@ def test_dbt_parse():
             b"stderr",
         )
         mock_popen.return_value.returncode = 0
-        result = main(("test",))
+        result = main(argv=[])
         assert result == 0
 
 
@@ -24,7 +24,7 @@ def test_dbt_parse_error():
             "stderr",
         )
         mock_popen.return_value.returncode = 1
-        result = main(("test",))
+        result = main(argv=[])
         assert result == 1
 
 
