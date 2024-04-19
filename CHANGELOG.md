@@ -1,3 +1,9 @@
+# 2.0.1 - 2024-04-19
+
+**Fixes:**
+
+- Fix/dbt parse config by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/213
+
 # 2.0.0 - 2024-04-12
 
 > :warning: **dbt 1.5**: Starting at 2.0.0, certain hooks (like `dbt-parse`) can fail if using dbt-core < 1.5
