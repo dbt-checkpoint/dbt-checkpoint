@@ -13,7 +13,7 @@ service:
   # not <team>-backend/frontend. 
   # If the team name contains spaces, replace these with hyphens/dashes.
   # This field should be set to the team who stewards the repository.
-  owner: team-analytics-empowerment
+  owner: team-data-platform
 
   # The programming language of your repository.
   # Usually Kotlin or TypeScript.
