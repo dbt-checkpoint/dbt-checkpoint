@@ -1,7 +1,7 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Set, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
@@ -12,28 +12,27 @@ from dbt_checkpoint.utils import (
     get_model_sqls,
     get_models,
     Model,
-    ParseDictOfLists,
+    ParseJson,
 )
 
 
-def has_constraints(constraints:Dict[str, Set[str]], model:Model, nodes) -> bool:
-    model_constraints = nodes.get(model.model_id).get("constraints")
-    for constraint_type, columns in constraints:
-        if (constraint_type not in model_constraints
-                or columns != set(model_constraints.get(constraint_type))):
+def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
+    model_constraints = model.node.get("constraints")
+    for constraint in constraints:
+        if not model_constraints or constraint not in model_constraints:
             return False
     return True
 
 
-def is_incremental_or_table(model:Model, nodes) -> bool:
-    materialization = nodes.get(model.model_id).get("config").get("materialized")
-    return (materialization == "table" or materialization == "incremental")
+def is_incremental_or_table(model:Model) -> bool:
+    materialized = model.node.get("config").get("materialized")
+    return (materialized == "table" or materialized == "incremental")
 
 
 def check_constraints(
     paths: Sequence[str],
     manifest: Dict[str, Any],
-    constraints: Dict[str, Set[str]],
+    constraints: Sequence[Dict[str, Any]],
     exclude_pattern: str,
     include_disabled: bool = False
 ) -> int:
@@ -44,11 +43,10 @@ def check_constraints(
     sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
     models = get_models(manifest, filenames, include_disabled=include_disabled)
-    nodes = manifest.get("nodes", {})
     status_code = 0
 
-    for model in (model for model in models if is_incremental_or_table(model, nodes)):
-        if not has_constraints(constraints, model, nodes):
+    for model in (model for model in models if is_incremental_or_table(model)):
+        if not has_constraints(constraints, model):
             status_code = 1
             print(
                 f"{model.model_name}: "
@@ -58,19 +56,17 @@ def check_constraints(
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+
     parser = argparse.ArgumentParser()
     add_default_args(parser)
 
     parser.add_argument(
         "--constraints",
-        metavar="KEY=VALUE1,VALUE2",
-        nargs="+",
+        metavar='[{"type": "primary_key", "columns": ["column1", "column2"]}]',
         required=True,
-        help="Set a number of key-value pairs. I.e primary_key=column1,column2"
-        " Key is a type of a constraint and values are column names"
-        "(do not put spaces before or after the = sign or commas). "
-        "",
-        action=ParseDictOfLists,
+        type=str,
+        help="Set a constraints config to validate. The same schema as in dbt manifest",
+        action=ParseJson,
     )
 
     args = parser.parse_args(argv)
@@ -85,7 +81,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     status_code = check_constraints(
         paths=args.filenames,
         manifest=manifest,
-        constraints=args.constraints.items(),
+        constraints=args.constraints,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )

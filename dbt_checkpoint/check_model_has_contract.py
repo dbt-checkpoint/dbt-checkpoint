@@ -32,7 +32,8 @@ def check_contract(
     models = get_models(manifest, filenames, include_disabled=include_disabled)
 
     for model in models:
-        if not model.get('contract') or not model.get('contract').get('enforced'):
+        config = model.node.get("config", {})
+        if not config.get('contract') or not config.get('contract').get('enforced'):
             status_code = 1
             print(
                 f"{model.model_name}: "
@@ -56,7 +57,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     status_code = check_contract(
         paths=args.filenames,
         manifest=manifest,
-        test_cnt=args.test_cnt,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )

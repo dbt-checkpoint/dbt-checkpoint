@@ -283,44 +283,90 @@ MANIFEST = {
                 "contract": {
                     "enforced": True
                 },
-                "materialized": "view",
-            },
+                "materialized": "view"
+            }
         },
         "model.with_no_contract": {
-            "patch_path": "project://bb/with_contract.yml",
+            "patch_path": "project://bb/with_no_contract.yml",
             "path": "aa/bb/with_no_contract.sql",
+            "root_path": "/path/to/aa"
+        },
+        "model.with_no_constraints": {
+            "patch_path": "project://bb/with_no_constraints.yml",
+            "path": "aa/bb/with_no_constraints.sql",
             "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table"
+            },
+        },
+        "model.with_empty_constraints": {
+            "patch_path": "project://bb/with_empty_constraints.yml",
+            "path": "aa/bb/with_empty_constraints.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table"
+            },
+            "constraints": []
         },
         "model.with_constraints": {
             "patch_path": "project://bb/with_constraints.yml",
             "path": "aa/bb/with_constraints.sql",
             "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table"
+            },
             "constraints": [
                 {
                     "type": "primary_key",
-                    "columns": ["col_a", "col_b"],
+                    "columns": ["col_a", "col_b"]
                 },
                 {
                     "type": "foreign_key",
-                    "columns": ["col_a", "col_b"],
+                    "columns": ["col_a", "col_b"]
                 },
                 {
                     "type": "check",
-                    "columns": ["col_a", "col_b"],
+                    "columns": ["col_a", "col_b"]
                 },
                 {
                     "type": "not_null",
-                    "columns": ["col_a", "col_b"],
+                    "columns": ["col_a", "col_b"]
                 },
                 {
                     "type": "unique",
-                    "columns": ["col_a", "col_b"],
+                    "columns": ["col_a", "col_b"]
                 },
                 {
-                    "type": "custom",
-                    "columns": ["col_a", "col_b"],
+                    "type": "custom"
                 }
-            ],
+            ]
+        },
+        "model.with_constraints_no_columns": {
+            "patch_path": "project://bb/with_constraints_no_columns.yml",
+            "path": "aa/bb/with_constraints_no_columns.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table"
+            },
+            "constraints": [
+                {
+                    "type": "primary_key"
+                }
+            ]
+        },
+        "model.with_constraints_no_match": {
+            "patch_path": "project://bb/with_constraints_no_match.yml",
+            "path": "aa/bb/with_constraints_no_match.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table"
+            },
+            "constraints": [
+                {
+                    "type": "foreign_key",
+                    "columns": ["col_a", "col_b"]
+                }
+            ]
         },
         "snapshot.some_snapshot": {
             "name": "some_snapshot",
