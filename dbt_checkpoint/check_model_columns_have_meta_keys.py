@@ -58,7 +58,7 @@ def check_column_has_meta_keys(
         if isinstance(item, ModelSchema):
             model_name = item.model_name
             missing_cols = {
-                key.get("name"):[meta_key for meta_key in list(meta_set) if meta_key not in key.get("meta", {}).keys()]
+                key.get("name"):sorted([meta_key for meta_key in meta_set if meta_key not in key.get("meta", {}).keys()])
                 for key in item.schema.get("columns", [])
                 if not validate_meta_keys(key.get("meta", {}).keys(), meta_set, allow_extra_keys)
             }
@@ -67,7 +67,7 @@ def check_column_has_meta_keys(
             model_name = item.filename
             
             missing_cols = {
-                key: [meta_key for meta_key in list(meta_set) if meta_key not in value.get("meta", {}).keys()]
+                key: sorted([meta_key for meta_key in meta_set if meta_key not in value.get("meta", {}).keys()])
                 for key, value in item.node.get("columns", {}).items()
                 if (
                     not value.get("meta") or 

@@ -165,7 +165,7 @@ models:
         ["in_schema_some_column_meta.sql", str(yml_file)], manifest, ["foo","bar"], False
     )
     assert res_stat == 1
-    assert missing == {"in_schema_some_column_meta":  {'test1': ["bar"], 'test2': ["foo","bar"]}}
+    assert missing == {"in_schema_some_column_meta":  {'test1': ["bar"], 'test2': ["bar","foo"]}}
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
