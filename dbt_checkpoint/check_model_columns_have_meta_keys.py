@@ -2,7 +2,7 @@ import argparse
 import itertools
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Set, Tuple, Iterable
+from typing import Any, Dict, Optional, Sequence, Set, Tuple
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
@@ -23,9 +23,9 @@ from dbt_checkpoint.utils import (
 
 def validate_meta_keys(
     meta: Sequence[str],
-    meta_set: Set,
+    meta_set: Set[str],
     allow_extra_keys: bool,
-):
+) -> int:
     if allow_extra_keys:
         diff = not meta_set.issubset(meta)
     else:
@@ -54,7 +54,7 @@ def check_column_has_meta_keys(
     meta_set = set(meta_keys)
 
     for item in itertools.chain(models, schemas):
-        missing_cols = set()  # pragma: no mutate
+        missing_cols = {}  # pragma: no mutate
         if isinstance(item, ModelSchema):
             model_name = item.model_name
             missing_cols = {
@@ -79,7 +79,7 @@ def check_column_has_meta_keys(
         seen = missing.get(model_name)
         if seen:
             if not missing_cols:
-                missing[model_name] = set()  # pragma: no mutate
+                missing[model_name] = {}  # pragma: no mutate
             else:
                 missing[model_name] = seen.union(missing_cols)
         elif missing_cols:
@@ -113,7 +113,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code, missing = check_column_has_meta_keys(
+    status_code, _ = check_column_has_meta_keys(
         paths=args.filenames,
         manifest=manifest,
         meta_keys=args.meta_keys,
