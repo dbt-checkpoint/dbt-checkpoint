@@ -199,10 +199,37 @@ MANIFEST = {
             "columns": {
                 "test1": {"name": "test1"},
                 "test2": {"name": "test2"},
-                "patch_path": "project://bb/without_columns_description.yml",
-                "path": "aa/bb/without_columns_description.sql",
-                "root_path": "/path/to/aa",
-            }
+            },
+            "patch_path": "project://bb/without_columns_description.yml",
+            "path": "aa/bb/without_columns_description.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_column_meta": {
+            "columns": {
+                "test1": {"name": "test1", "meta": {"foo":"foo", "bar":"bar"}},
+                "test2": {"name": "test2", "meta": {"foo":"foo", "bar":"bar"}},
+            },
+            "patch_path": "project://bb/with_column_meta.yml",
+            "path": "aa/bb/with_column_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_some_column_meta": {
+            "columns": {
+                "test1": {"name": "test1", "meta": {"foo":"foo", "bar":"bar"}},
+                "test2": {"name": "test2"},
+            },
+            "patch_path": "project://bb/with_some_column_meta.yml",
+            "path": "aa/bb/with_some_column_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_columns_meta": {
+            "columns": {
+                "test1": {"name": "test1"},
+                "test2": {"name": "test2"},
+            },
+            "patch_path": "project://bb/without_columns_meta.yml",
+            "path": "aa/bb/without_columns_meta.sql",
+            "root_path": "/path/to/aa",
         },
         "model.same_col_desc_1": {
             "columns": {
