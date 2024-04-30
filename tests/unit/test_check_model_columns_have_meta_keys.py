@@ -118,7 +118,7 @@ def test_check_column_meta_keys(
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_model_columns_have_desc_in_schema(extension, tmpdir, manifest_path_str):
+def test_check_model_columns_meta_keys_in_schema(extension, tmpdir, manifest_path_str):
     schema_yml = """
 version: 2
 
@@ -129,9 +129,6 @@ models:
         meta: 
             foo: foo
             bar: bar
-        tests:
-          - unique
-          - not_null
     """
     yml_file = tmpdir.join(f"schema.{extension}")
     yml_file.write(schema_yml)
@@ -150,7 +147,7 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_column_desc(extension, tmpdir, manifest):
+def test_check_column_meta_keys(extension, tmpdir, manifest):
     schema_yml = """
 version: 2
 
@@ -160,9 +157,6 @@ models:
     -   name: test1
         meta: 
             foo: foo
-        tests:
-          - unique
-          - not_null
     -   name: test2
     """
     yml_file = tmpdir.join(f"schema.{extension}")
@@ -175,7 +169,7 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_model_columns_have_desc_both(extension, tmpdir, manifest_path_str):
+def test_check_model_columns_have_meta_keys_both(extension, tmpdir, manifest_path_str):
     schema_yml = """
 version: 2
 
@@ -208,7 +202,7 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_model_columns_have_desc_without(extension, tmpdir, manifest_path_str):
+def test_check_model_columns_have_meta_keys_without(extension, tmpdir, manifest_path_str):
     schema_yml = """
 version: 2
 

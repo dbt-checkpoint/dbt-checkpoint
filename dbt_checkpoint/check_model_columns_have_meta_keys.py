@@ -31,8 +31,8 @@ def validate_meta_keys(
     else:
         diff = not (meta_set == meta)
     if diff:
-        return 1
-    return 0
+        return 0
+    return 1
 
 def check_column_has_meta_keys(
     paths: Sequence[str],
@@ -58,20 +58,21 @@ def check_column_has_meta_keys(
         if isinstance(item, ModelSchema):
             model_name = item.model_name
             missing_cols = {
-                key.get("name"):list(set(meta_set) - set(key.get("meta", {}).keys()))
+                key.get("name"):[meta_key for meta_key in list(meta_set) if meta_key not in key.get("meta", {}).keys()]
                 for key in item.schema.get("columns", [])
-                if validate_meta_keys(key.get("meta", {}).keys(), meta_set, allow_extra_keys)
+                if not validate_meta_keys(key.get("meta", {}).keys(), meta_set, allow_extra_keys)
             }
         # Model
         elif isinstance(item, Model):
             model_name = item.filename
             
             missing_cols = {
-                key: list(set(meta_set) - set(value.get("meta", {}).keys()))
+                key: [meta_key for meta_key in list(meta_set) if meta_key not in value.get("meta", {}).keys()]
                 for key, value in item.node.get("columns", {}).items()
-                if
-                    (isinstance(value, dict) and not value.get("meta")) or 
-                    (isinstance(value, dict) and validate_meta_keys(value.get("meta", {}).keys(), meta_set, allow_extra_keys) if value.get("meta") else False)
+                if (
+                    not value.get("meta") or 
+                    not validate_meta_keys(value.get("meta", {}).keys(), meta_set, allow_extra_keys) if value.get("meta") else False
+                )
             }
         else:
             continue
@@ -83,13 +84,18 @@ def check_column_has_meta_keys(
                 missing[model_name] = seen.union(missing_cols)
         elif missing_cols:
             missing[model_name] = missing_cols
-    print(missing)
     for model, columns in missing.items():
         if columns:
             status_code = 1
+            result = ""  # pragma: no mutate
+            for column, missing_meta_keys in columns.items():
+                result += f"\n- {column}"  # pragma: no mutate
+                for meta_key in missing_meta_keys:
+                    result += f"\n  - {meta_key}"  # pragma: no mutate
+
             print(
                 f"{red(sqls.get(model))}: "
-                f"following columns do not have some of the meta keys defined:\n- {yellow(columns)}",
+                f"following columns do not have all of the meta keys defined:\n {yellow(result)}",
             )
     return status_code, missing
 
