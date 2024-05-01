@@ -31,7 +31,7 @@ Hosted VS Code, dbt-core, SqlFluff, and Airflow, find out more at [Datacoves.com
 
 dbt-checkpoint provides [pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects.
 
-`dbt` is awesome, but when the number of models, sources, and macros in a project grows, it becomes challenging to maintain the same level of quality across developers.. Users forget to update columns in property(yml) files or add table and column add descriptions. Without automation the reviewer workload increases and unintentional errors may be missed. dbt-checkpoint allows organizations to add automated validations improving your code review and release process.
+`dbt` is awesome, but when the number of models, sources, and macros in a project grows, it becomes challenging to maintain the same level of quality across developers. Users forget to update columns in property (yml) files or add table and column descriptions. Without automation the reviewer workload increases and unintentional errors may be missed. dbt-checkpoint allows organizations to add automated validations improving your code review and release process.
 
 ## Telemetry
 
