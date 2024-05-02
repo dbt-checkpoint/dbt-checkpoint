@@ -63,20 +63,20 @@ def check_column_has_meta_keys(
             model_name = item.model_name
             missing_cols = {
                 key.get("name"): {
-                    "missing_meta_keys":sorted(
-                    [
-                        meta_key
-                        for meta_key in meta_set
-                        if meta_key not in key.get("meta", {}).keys()
-                    ]
-                )
-                ,"extra_meta_keys":sorted(
-                    [
-                        extra_meta_key
-                        for extra_meta_key in key.get("meta", {}).keys()
-                        if extra_meta_key not in meta_set
-                    ]
-                )
+                    "missing_meta_keys": sorted(
+                        [
+                            meta_key
+                            for meta_key in meta_set
+                            if meta_key not in key.get("meta", {}).keys()
+                        ]
+                    ),
+                    "extra_meta_keys": sorted(
+                        [
+                            extra_meta_key
+                            for extra_meta_key in key.get("meta", {}).keys()
+                            if extra_meta_key not in meta_set
+                        ]
+                    ),
                 }
                 for key in item.schema.get("columns", [])
                 if not validate_meta_keys(
@@ -86,21 +86,22 @@ def check_column_has_meta_keys(
         # Model
         elif isinstance(item, Model):
             model_name = item.filename
-
             missing_cols = {
                 key: {
-                    "missing_meta_keys":sorted(
-                    [
-                        meta_key
-                        for meta_key in meta_set
-                        if meta_key not in value.get("meta", {}).keys()
-                    ])
-                    ,"extra_meta_keys":sorted(
-                    [
-                        extra_meta_key
-                        for extra_meta_key in value.get("meta", {}).keys()
-                        if extra_meta_key not in meta_set
-                    ])
+                    "missing_meta_keys": sorted(
+                        [
+                            meta_key
+                            for meta_key in meta_set
+                            if meta_key not in value.get("meta", {}).keys()
+                        ]
+                    ),
+                    "extra_meta_keys": sorted(
+                        [
+                            extra_meta_key
+                            for extra_meta_key in value.get("meta", {}).keys()
+                            if extra_meta_key not in meta_set
+                        ]
+                    ),
                 }
                 for key, value in item.node.get("columns", {}).items()
                 if (
@@ -132,14 +133,18 @@ def check_column_has_meta_keys(
                     result += "\n  missing keys:"
                     for meta_key in missing_or_extra_meta_keys["missing_meta_keys"]:
                         result += f"\n  - {yellow(meta_key)}"  # pragma: no mutate
-                if not allow_extra_keys and len(missing_or_extra_meta_keys["extra_meta_keys"]) > 0:
+                if (
+                    not allow_extra_keys
+                    and len(missing_or_extra_meta_keys["extra_meta_keys"]) > 0
+                ):
                     result += "\n  unknown extra keys:"
                     for meta_key in missing_or_extra_meta_keys["extra_meta_keys"]:
                         result += f"\n  - {yellow(meta_key)}"  # pragma: no mutate
 
             print(
                 f"{red(sqls.get(model))}: "
-                "following columns do not have all of the meta keys defined and/or unknown keys:"
+                "following columns do not have all of the meta keys "
+                "defined and/or unknown keys:"
                 f"\n {result}",
             )
     return status_code, missing
