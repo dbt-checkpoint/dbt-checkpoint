@@ -93,7 +93,7 @@ def check_column_has_meta_keys(
                         value.get("meta", {}).keys(), meta_set, allow_extra_keys
                     )
                     if value.get("meta")
-                    else False
+                    else True
                 )
             }
         else:

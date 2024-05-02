@@ -213,6 +213,15 @@ MANIFEST = {
             "path": "aa/bb/with_column_meta.sql",
             "root_path": "/path/to/aa",
         },
+        "model.with_column_meta_and_extra": {
+            "columns": {
+                "test1": {"name": "test1", "meta": {"foo":"foo", "bar":"bar", "baz":"baz"}},
+                "test2": {"name": "test2", "meta": {"foo":"foo", "bar":"bar"}},
+            },
+            "patch_path": "project://bb/with_column_meta_and_extra.yml",
+            "path": "aa/bb/with_column_meta_and_extra.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.with_some_column_meta": {
             "columns": {
                 "test1": {"name": "test1", "meta": {"foo":"foo", "bar":"bar"}},

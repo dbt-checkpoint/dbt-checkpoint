@@ -28,6 +28,61 @@ TESTS = (
         0,
     ),
     (
+        ["aa/bb/with_column_meta_and_extra.sql",
+            "--meta-keys",
+            "foo",
+            "bar",],
+        {
+            "models": [
+                {
+                    "name": "with_meta",
+                    "description": "test meta",
+                    "columns": [
+                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar", "baz":"baz"}},
+                        {"name": "column_2", "description": "description_2", "meta": {"foo":"foo", "bar":"bar"}},
+                    ],
+                }
+            ]
+        },
+        True,
+        True,
+        1,
+    ),
+    (
+        ["aa/bb/with_column_meta_and_extra.sql",
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--allow-extra-keys"],
+        {
+            "models": [
+                {
+                    "name": "with_meta",
+                    "description": "test meta",
+                    "columns": [
+                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar", "baz":"baz"}},
+                        {"name": "column_2", "description": "description_2", "meta": {"foo":"foo", "bar":"bar"}},
+                    ],
+                }
+            ]
+        },
+        True,
+        True,
+        0,
+    ),
+    (
+        [
+            "aa/bb/with_column_meta_and_extra_.sql",
+            "--meta-keys",
+            "foo",
+            "bar",
+        ],
+        {"models": [{"name": "with_meta", "meta": {"foo": "bar"}}]},
+        True,
+        True,
+        0,
+    ),
+    (
         ["aa/bb/with_column_meta.sql",
             "--meta-keys",
             "foo",
@@ -97,7 +152,7 @@ TESTS = (
     ("input_args", "schema", "valid_manifest", "valid_config", "expected_status_code"),
     TESTS,
 )
-def test_check_column_meta_keys(
+def test_check_columns_have_meta_keys(
     input_args,
     schema,
     valid_manifest,
