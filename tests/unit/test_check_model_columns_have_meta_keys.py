@@ -202,6 +202,35 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_model_columns_meta_keys_and_extra_keys_in_schema(extension, tmpdir, manifest_path_str):
+    schema_yml = """
+version: 2
+
+models:
+-   name: in_schema_column_meta
+    columns:
+    -   name: test
+        meta: 
+            foo: foo
+            bar: bar
+            baz: baz
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_column_meta.sql",
+            str(yml_file),
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 1
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
 def test_check_column_meta_keys(extension, tmpdir, manifest):
     schema_yml = """
 version: 2
@@ -220,7 +249,18 @@ models:
         ["in_schema_some_column_meta.sql", str(yml_file)], manifest, ["foo","bar"], False
     )
     assert res_stat == 1
-    assert missing == {"in_schema_some_column_meta":  {'test1': ["bar"], 'test2': ["bar","foo"]}}
+    assert missing == {
+        'in_schema_some_column_meta': {
+            'test1': {
+                'extra_meta_keys': [],
+                'missing_meta_keys': ['bar']
+            }, 
+            'test2': {
+                'extra_meta_keys': [],
+                'missing_meta_keys': ['bar', 'foo']
+            }
+        }
+    }
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
