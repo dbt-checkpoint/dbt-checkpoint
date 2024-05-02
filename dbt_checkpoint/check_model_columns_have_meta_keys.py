@@ -2,24 +2,27 @@ import argparse
 import itertools
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Set, Tuple
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Tuple
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    Model,
-    ModelSchema,
-    add_default_args,
-    get_dbt_manifest,
-    get_filenames,
-    get_model_schemas,
-    get_model_sqls,
-    get_models,
-    validate_meta_keys,
-    add_meta_keys_args,
-    red,
-    yellow,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import add_meta_keys_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_model_schemas
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import Model
+from dbt_checkpoint.utils import ModelSchema
+from dbt_checkpoint.utils import red
+from dbt_checkpoint.utils import yellow
+
 
 def validate_meta_keys(
     meta: Sequence[str],
@@ -34,12 +37,13 @@ def validate_meta_keys(
         return 0
     return 1
 
+
 def check_column_has_meta_keys(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
-    include_disabled: bool = False
+    include_disabled: bool = False,
 ) -> Tuple[int, Dict[str, Any]]:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
@@ -50,7 +54,7 @@ def check_column_has_meta_keys(
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
-    missing: Dict[str, Set[str]] = {}
+    missing: Dict[str, Any] = {}
     meta_set = set(meta_keys)
 
     for item in itertools.chain(models, schemas):
@@ -58,20 +62,38 @@ def check_column_has_meta_keys(
         if isinstance(item, ModelSchema):
             model_name = item.model_name
             missing_cols = {
-                key.get("name"):sorted([meta_key for meta_key in meta_set if meta_key not in key.get("meta", {}).keys()])
+                key.get("name"): sorted(
+                    [
+                        meta_key
+                        for meta_key in meta_set
+                        if meta_key not in key.get("meta", {}).keys()
+                    ]
+                )
                 for key in item.schema.get("columns", [])
-                if not validate_meta_keys(key.get("meta", {}).keys(), meta_set, allow_extra_keys)
+                if not validate_meta_keys(
+                    key.get("meta", {}).keys(), meta_set, allow_extra_keys
+                )
             }
         # Model
         elif isinstance(item, Model):
             model_name = item.filename
-            
+
             missing_cols = {
-                key: sorted([meta_key for meta_key in meta_set if meta_key not in value.get("meta", {}).keys()])
+                key: sorted(
+                    [
+                        meta_key
+                        for meta_key in meta_set
+                        if meta_key not in value.get("meta", {}).keys()
+                    ]
+                )
                 for key, value in item.node.get("columns", {}).items()
                 if (
-                    not value.get("meta") or 
-                    not validate_meta_keys(value.get("meta", {}).keys(), meta_set, allow_extra_keys) if value.get("meta") else False
+                    not value.get("meta")
+                    or not validate_meta_keys(
+                        value.get("meta", {}).keys(), meta_set, allow_extra_keys
+                    )
+                    if value.get("meta")
+                    else False
                 )
             }
         else:
@@ -95,7 +117,8 @@ def check_column_has_meta_keys(
 
             print(
                 f"{red(sqls.get(model))}: "
-                f"following columns do not have all of the meta keys defined:\n {yellow(result)}",
+                "following columns do not have all of the meta keys defined:"
+                f"\n {yellow(result)}",
             )
     return status_code, missing
 

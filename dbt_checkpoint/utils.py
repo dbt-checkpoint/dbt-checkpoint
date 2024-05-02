@@ -4,7 +4,15 @@ import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Text
+from typing import Union
 
 from yaml import safe_load
 
@@ -786,9 +794,9 @@ def get_dbt_catalog(args):  # type: ignore
 def validate_meta_keys(
     obj: GenericDbtObject,
     meta_keys: Sequence[str],
-    meta_set: Set,
+    meta_set: Set[str],
     allow_extra_keys: bool,
-):
+) -> int:
     meta = set(obj.schema.get("meta", {}).keys())
     if allow_extra_keys:
         diff = not meta_set.issubset(meta)
