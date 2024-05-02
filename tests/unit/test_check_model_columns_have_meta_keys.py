@@ -7,6 +7,18 @@ from dbt_checkpoint.check_model_columns_have_meta_keys import check_column_has_m
 # Input args, valid manifest, expected return value
 TESTS = (
     (
+        [
+            "aa/bb/with_no_columns.sql",
+            "--meta-keys",
+            "foo",
+            "bar",
+        ],
+        {"models": [{"name": "with_no_columns"}]},
+        True,
+        True,
+        0,
+    ),
+    (
         ["aa/bb/with_column_meta.sql",
             "--meta-keys",
             "foo",

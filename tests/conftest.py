@@ -204,6 +204,11 @@ MANIFEST = {
             "path": "aa/bb/without_columns_description.sql",
             "root_path": "/path/to/aa",
         },
+        "model.with_no_columns": {
+            "patch_path": "project://bb/with_no_columns.yml",
+            "path": "aa/bb/with_no_columns.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.with_column_meta": {
             "columns": {
                 "test1": {"name": "test1", "meta": {"foo":"foo", "bar":"bar"}},
