@@ -18,6 +18,8 @@ from dbt_checkpoint.utils import (
 
 def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
     model_constraints = model.node.get("constraints")
+    print(model.model_name)
+    print(model_constraints)
     for constraint in constraints:
         if not model_constraints or constraint not in model_constraints:
             return False
