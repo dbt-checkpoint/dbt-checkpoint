@@ -33,7 +33,7 @@ def check_contract(
 
     for model in models:
         config = model.node.get("config", {})
-        if not config.get('contract') or not config.get('contract').get('enforced'):
+        if not config.get('contract', {}).get('enforced'):
             status_code = 1
             print(
                 f"{model.model_name}: "

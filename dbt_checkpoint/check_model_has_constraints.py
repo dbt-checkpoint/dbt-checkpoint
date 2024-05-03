@@ -27,8 +27,8 @@ def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
     model_constraints = model.node.get("constraints", [])
     for constraint in constraints:
         found = False
-        for model_consraint in model_constraints:
-            found = found or is_equal(constraint, model_consraint)
+        for model_constraint in model_constraints:
+            found = found or is_equal(constraint, model_constraint)
         if not found:
             return False
     return True
