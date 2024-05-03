@@ -316,6 +316,7 @@ It checks the generated manifest for the contract configuration
 
 Checks that model's yaml has specific constraints defined, eg:
 
+```
   - name: products
     config:
       contract:
@@ -324,6 +325,7 @@ Checks that model's yaml has specific constraints defined, eg:
       - type: foreign_key
         columns: 
           - "product_id"
+```
 
 #### Arguments
 
