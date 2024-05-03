@@ -16,10 +16,20 @@ from dbt_checkpoint.utils import (
 )
 
 
+def is_equal(constraint:Dict[str, Any], model_constraint:Dict[str, Any]) -> bool:
+    for key, value in constraint.items():
+        if key not in model_constraint or model_constraint[key] != value:
+            return False
+    return True
+
+
 def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
-    model_constraints = model.node.get("constraints")
+    model_constraints = model.node.get("constraints", [])
     for constraint in constraints:
-        if not model_constraints or constraint not in model_constraints:
+        found = False
+        for model_consraint in model_constraints:
+            found = found or is_equal(constraint, model_consraint)
+        if not found:
             return False
     return True
 
