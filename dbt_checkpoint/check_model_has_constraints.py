@@ -61,7 +61,7 @@ def check_constraints(
             print(
                 f"{model.model_id}: "
                 "Doesn't have necessary constraints defined. Model constraints:",
-                f"{model.node.get("constraints")}"
+                f"{model.node.get('constraints')}"
             )
     return status_code
 
