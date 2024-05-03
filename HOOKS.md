@@ -109,7 +109,7 @@ Hooks that use `--exclude` in their args, should receive it this way:
 ```
 - id: check-model-has-tests
   description: "Ensures that the model has a number of tests"
-  args: ["--test-cnt", "1", "--exclude models/demo", "--"]
+  args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
 ```
 
 :exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:

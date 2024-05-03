@@ -3,6 +3,7 @@ import os
 import time
 from itertools import groupby
 from typing import Any, Dict, Optional, Sequence
+import re
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
@@ -25,6 +26,13 @@ def check_test_cnt(
     exclude_pattern: str,
     include_disabled: bool = False,
 ) -> int:
+    exclude_re = re.compile(exclude_pattern)
+    paths = [
+        filename
+        for filename in paths
+        if not exclude_re.search(filename)
+    ]
+
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
