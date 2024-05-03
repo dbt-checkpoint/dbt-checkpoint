@@ -1,22 +1,23 @@
 import argparse
 import os
+import re
 import time
 from itertools import groupby
-from typing import Any, Dict, Optional, Sequence
-import re
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    ParseDict,
-    Test,
-    add_default_args,
-    get_dbt_manifest,
-    get_missing_file_paths,
-    get_model_sqls,
-    get_models,
-    get_parent_childs,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import get_parent_childs
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import ParseDict
+from dbt_checkpoint.utils import Test
 
 
 def check_test_cnt(
@@ -27,11 +28,7 @@ def check_test_cnt(
     include_disabled: bool = False,
 ) -> int:
     exclude_re = re.compile(exclude_pattern)
-    paths = [
-        filename
-        for filename in paths
-        if not exclude_re.search(filename)
-    ]
+    paths = [filename for filename in paths if not exclude_re.search(filename)]
 
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
