@@ -18,8 +18,6 @@ from dbt_checkpoint.utils import (
 
 def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
     model_constraints = model.node.get("constraints")
-    print(model.model_name)
-    print(model_constraints)
     for constraint in constraints:
         if not model_constraints or constraint not in model_constraints:
             return False
@@ -51,8 +49,9 @@ def check_constraints(
         if not has_constraints(constraints, model):
             status_code = 1
             print(
-                f"{model.model_name}: "
-                "doesn't have necessary constraints defined.",
+                f"{model.model_id}: "
+                "Doesn't have necessary constraints defined. Model constraints:",
+                f"{model.node.get("constraints")}"
             )
     return status_code
 

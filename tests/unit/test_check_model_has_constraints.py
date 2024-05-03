@@ -28,7 +28,7 @@ TESTS = (  # type: ignore
     ),
     TESTS,
 )
-def test_check_model_has_tests(
+def test_check_model_has_constraints(
     input_args,
     valid_manifest,
     expected_status_code,
