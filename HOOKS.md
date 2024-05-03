@@ -10,6 +10,8 @@
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
+- [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
+- [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
 - [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
@@ -292,6 +294,82 @@ You want to make sure that you have all the database columns listed in the prope
 #### Known limitations
 
 If you did not update the catalog and manifest results can be wrong.
+
+---
+
+### `check-model-has-contract`
+
+Checks that model's yaml has:
+
+    config:
+      contract: 
+        enforced: true
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-has-contract
+```
+
+#### When to use it
+
+When you want to force developers to define model contracts.
+
+#### How it works
+
+It checks the generated manifest for the contract configuration
+
+---
+
+### `check-model-has-constraints`
+
+Checks that model's yaml has specific constraints defined, eg:
+
+```
+  - name: products
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: foreign_key
+        columns: 
+          - "product_id"
+```
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--constraints`: JSON string escaped by single quotes 
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/xasm83/dbt-checkpoint
+  rev: v1.0.0
+  hooks:
+  - id: check-model-has-contract
+  - id: check-model-has-constraints
+    args: ["--constraints", '[{"type": "primary_key", "columns": ["product_id"]}]', "--"]
+```
+
+#### When to use it
+
+When you want to force developers to define model constraints.
+
+#### How it works
+
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
 
 ---
 

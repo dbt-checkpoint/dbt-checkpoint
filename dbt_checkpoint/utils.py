@@ -643,6 +643,25 @@ class ParseDict(argparse.Action):
         setattr(namespace, self.dest, result)
 
 
+class ParseJson(argparse.Action):
+    """Parse a JSON string into a dictionary"""
+
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: Text,
+        option_string: Optional[str] = None,
+    ) -> None:
+        """Perform the parsing"""
+        result = {}
+
+        if values:
+            result = json.loads(values)
+
+        setattr(namespace, self.dest, result)
+
+
 def add_related_sqls(
     yml_path: str,
     nodes: Dict[Any, Any],
