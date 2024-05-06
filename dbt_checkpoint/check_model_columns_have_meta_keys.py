@@ -38,13 +38,30 @@ def validate_meta_keys(
     return 1
 
 
+def missing_or_extra_meta_keys_dict(
+    meta: Sequence[str], meta_set: Set[str]
+) -> Dict[str, Sequence[str]]:
+    return {
+        "missing_meta_keys": sorted(
+            [meta_key for meta_key in meta_set if meta_key not in meta]
+        ),
+        "extra_meta_keys": sorted(
+            [
+                extra_meta_key
+                for extra_meta_key in meta
+                if extra_meta_key not in meta_set
+            ]
+        ),
+    }
+
+
 def check_column_has_meta_keys(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
     include_disabled: bool = False,
-) -> Tuple[int, Dict[str, Any]]:
+) -> Tuple[int, Dict[Optional[str], Any]]:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest, include_disabled)
@@ -54,92 +71,61 @@ def check_column_has_meta_keys(
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
-    missing: Dict[str, Any] = {}
+    missing: Dict[Optional[str], Any] = {}
     meta_set = set(meta_keys)
 
     for item in itertools.chain(models, schemas):
-        missing_cols = {}  # pragma: no mutate
+        missing_cols = {}
+        model_name = None
         if isinstance(item, ModelSchema):
             model_name = item.model_name
             missing_cols = {
-                key.get("name"): {
-                    "missing_meta_keys": sorted(
-                        [
-                            meta_key
-                            for meta_key in meta_set
-                            if meta_key not in key.get("meta", {}).keys()
-                        ]
-                    ),
-                    "extra_meta_keys": sorted(
-                        [
-                            extra_meta_key
-                            for extra_meta_key in key.get("meta", {}).keys()
-                            if extra_meta_key not in meta_set
-                        ]
-                    ),
-                }
-                for key in item.schema.get("columns", [])
+                columns.get("name"): missing_or_extra_meta_keys_dict(
+                    columns.get("meta", {}).keys(), meta_set
+                )
+                for columns in item.schema.get("columns", [])
                 if not validate_meta_keys(
-                    key.get("meta", {}).keys(), meta_set, allow_extra_keys
+                    columns.get("meta", {}).keys(), meta_set, allow_extra_keys
                 )
             }
         # Model
         elif isinstance(item, Model):
             model_name = item.filename
             missing_cols = {
-                key: {
-                    "missing_meta_keys": sorted(
-                        [
-                            meta_key
-                            for meta_key in meta_set
-                            if meta_key not in value.get("meta", {}).keys()
-                        ]
-                    ),
-                    "extra_meta_keys": sorted(
-                        [
-                            extra_meta_key
-                            for extra_meta_key in value.get("meta", {}).keys()
-                            if extra_meta_key not in meta_set
-                        ]
-                    ),
-                }
-                for key, value in item.node.get("columns", {}).items()
-                if (
-                    not value.get("meta")
-                    or not validate_meta_keys(
-                        value.get("meta", {}).keys(), meta_set, allow_extra_keys
-                    )
-                    if value.get("meta")
-                    else True
+                column_name: missing_or_extra_meta_keys_dict(
+                    config.get("meta", {}).keys(), meta_set
+                )
+                for column_name, config in item.node.get("columns", {}).items()
+                if not validate_meta_keys(
+                    config.get("meta", {}).keys(), meta_set, allow_extra_keys
                 )
             }
-        else:
-            continue
-        seen = missing.get(model_name)
-        if seen:
-            if not missing_cols:
-                missing[model_name] = {}  # pragma: no mutate
-            else:
-                missing[model_name] = seen.union(missing_cols)
-        elif missing_cols:
-            missing[model_name] = missing_cols
+
+        for key, value in missing_cols.items():
+            missing[model_name] = missing.get(model_name, {})
+            missing[model_name][key] = value
+
     for model, columns in missing.items():
         if columns:
             status_code = 1
-            result = ""  # pragma: no mutate
+            result = ""
             for column, missing_or_extra_meta_keys in columns.items():
-                result += f"\n- name: {yellow(column)}"  # pragma: no mutate
-                if len(missing_or_extra_meta_keys["missing_meta_keys"]) > 0:
+                result += f"\n- name: {yellow(column)}"
+                if len(missing_or_extra_meta_keys.get("missing_meta_keys", [])) > 0:
                     result += "\n  missing keys:"
-                    for meta_key in missing_or_extra_meta_keys["missing_meta_keys"]:
-                        result += f"\n  - {yellow(meta_key)}"  # pragma: no mutate
+                    for meta_key in missing_or_extra_meta_keys.get(
+                        "missing_meta_keys", []
+                    ):
+                        result += f"\n  - {yellow(meta_key)}"
                 if (
                     not allow_extra_keys
-                    and len(missing_or_extra_meta_keys["extra_meta_keys"]) > 0
+                    and len(missing_or_extra_meta_keys.get("extra_meta_keys", [])) > 0
                 ):
                     result += "\n  unknown extra keys:"
-                    for meta_key in missing_or_extra_meta_keys["extra_meta_keys"]:
-                        result += f"\n  - {yellow(meta_key)}"  # pragma: no mutate
+                    for meta_key in missing_or_extra_meta_keys.get(
+                        "extra_meta_keys", []
+                    ):
+                        result += f"\n  - {yellow(meta_key)}"
 
             print(
                 f"{red(sqls.get(model))}: "
