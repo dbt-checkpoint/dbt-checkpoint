@@ -235,7 +235,8 @@ MANIFEST = {
                 "test1": {"name": "test1", "meta": {"foo": "foo", "bar": "bar"}},
                 "test2": {"name": "test2", "meta": {"foo": "foo", "bar": "bar"}},
             },
-            "patch_path": "project://bb/in_schema_without_and_manifest_with_columns_meta.yml",
+            "patch_path": "project://bb/in_schema_without"
+            "_and_manifest_with_columns_meta.yml",
             "path": "aa/bb/in_schema_without_and_manifest_with_columns_meta.sql",
             "root_path": "/path/to/aa",
         },
@@ -244,8 +245,22 @@ MANIFEST = {
                 "test1": {"name": "test1"},
                 "test2": {"name": "test2"},
             },
-            "patch_path": "project://bb/in_schema_without_and_manifest_with_columns_meta.yml",
-            "path": "aa/bb/in_schema_without_and_manifest_with_columns_meta.sql",
+            "patch_path": "project://bb/in_schema_with_and_"
+            "manifest_without_columns_meta.yml",
+            "path": "aa/bb/in_schema_with_and_manifest_without_columns_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.in_schema_with_and_manifest_without"
+        "_columns_meta_extra_column_in_manifest": {
+            "columns": {
+                "test1": {"name": "test1"},
+                "test2": {"name": "test2"},
+                "test3": {"name": "test3"},
+            },
+            "patch_path": "project://bb/in_schema_with_and_manifest_without"
+            "_columns_meta_extra_column_in_manifest.yml",
+            "path": "aa/bb/in_schema_with_and_manifest_without"
+            "_columns_meta_extra_column_in_manifest.sql",
             "root_path": "/path/to/aa",
         },
         "model.with_some_column_meta": {

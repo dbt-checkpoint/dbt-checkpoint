@@ -409,7 +409,11 @@ version: 2
 models:
 -   name: in_schema_with_and_manifest_without_columns_meta
     columns:
-    -   name: test
+    -   name: test1
+        meta:
+            foo: foo
+            bar: bar
+    -   name: test2
         meta:
             foo: foo
             bar: bar
@@ -428,3 +432,39 @@ models:
         ],
     )
     assert result == 0
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_model_columns_have_meta_keys_in_schema_without_in_manifest_extra_column(
+    extension, tmpdir, manifest_path_str
+):
+    schema_yml = """
+version: 2
+
+models:
+-   name: in_schema_with_and_manifest_without_columns_meta_extra_column_in_manifest
+    columns:
+    -   name: test1
+        meta:
+            foo: foo
+            bar: bar
+    -   name: test2`
+        meta:
+            foo: foo
+            bar: bar
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_with_and_manifest_without_columns"
+            "_meta_extra_column_in_manifest.sql",
+            str(yml_file),
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 1

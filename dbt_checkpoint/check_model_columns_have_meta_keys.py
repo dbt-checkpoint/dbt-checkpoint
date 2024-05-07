@@ -1,5 +1,4 @@
 import argparse
-import itertools
 import os
 import time
 from typing import Any
@@ -19,8 +18,6 @@ from dbt_checkpoint.utils import get_model_schemas
 from dbt_checkpoint.utils import get_model_sqls
 from dbt_checkpoint.utils import get_models
 from dbt_checkpoint.utils import JsonOpenError
-from dbt_checkpoint.utils import Model
-from dbt_checkpoint.utils import ModelSchema
 from dbt_checkpoint.utils import red
 from dbt_checkpoint.utils import yellow
 
@@ -72,43 +69,48 @@ def check_column_has_meta_keys(
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     meta_set = set(meta_keys)
-    seen = []
+    seen = {}
     missing = {}
 
-    for item in itertools.chain(schemas, models):
+    # Check schemas before manifest (Models)
+    for schema in schemas:
         missing_cols = []
-        model_name = None
-        if isinstance(item, ModelSchema) and item.model_name not in seen:
-            model_name = item.model_name
-            missing_cols = [
-                columns.get("name")
-                for columns in item.schema.get("columns", [])
-                if not validate_meta_keys(
-                    columns.get("meta", {}).keys(),
-                    meta_set,
-                    allow_extra_keys,
-                    model_name,
-                    columns.get("name"),
-                )
-            ]
-            missing[model_name] = missing_cols
-        # Model
-        elif isinstance(item, Model) and item.filename not in seen:
-            model_name = item.filename
-            missing_cols = [
-                column_name
-                for column_name, column_config in item.node.get("columns", {}).items()
-                if not validate_meta_keys(
+        model_name = schema.model_name
+        columns = schema.schema.get("columns", [])
+        missing_cols = [
+            column.get("name")
+            for column in columns
+            if not validate_meta_keys(
+                column.get("meta", {}).keys(),
+                meta_set,
+                allow_extra_keys,
+                model_name,
+                column.get("name"),
+            )
+        ]
+        missing[model_name] = missing_cols
+        seen[model_name] = [column.get("name") for column in columns]
+
+    # Model
+    for model in models:
+        model_name = model.filename
+        missing_cols = [
+            column_name
+            for column_name, column_config in model.node.get("columns", {}).items()
+            if (
+                not validate_meta_keys(
                     column_config.get("meta", {}).keys(),
                     meta_set,
                     allow_extra_keys,
                     model_name,
                     column_name,
                 )
-            ]
-            missing[model_name] = missing_cols
-
-        seen.append(model_name)
+                if column_name not in seen.get(model_name, [])
+                else False
+            )
+        ]
+        missing_cols += missing.get(model_name, [])
+        missing[model_name] = missing_cols
 
     if any(columns for columns in iter(missing.values())):
         status_code = 1
