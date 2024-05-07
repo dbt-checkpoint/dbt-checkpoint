@@ -4,6 +4,7 @@ import os
 import time
 from typing import Any
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Sequence
 from typing import Set
@@ -28,31 +29,30 @@ def validate_meta_keys(
     meta: Sequence[str],
     meta_set: Set[str],
     allow_extra_keys: bool,
+    model_name: str,
+    column_name: str,
 ) -> int:
     if allow_extra_keys:
         diff = not meta_set.issubset(meta)
     else:
         diff = not (meta_set == meta)
     if diff:
+        missing_keys = [meta_key for meta_key in meta_set if meta_key not in meta]
+        extra_keys = [
+            extra_meta_key for extra_meta_key in meta if extra_meta_key not in meta_set
+        ]
+        print(
+            f"{red(model_name)}: "
+            "following column(s) do not have all of the meta keys "
+            "defined and/or unknown keys:\n"
+            f"- Column name: {yellow(column_name)}"
+        )
+        if len(missing_keys) > 0:
+            print(f"  Missing keys: {yellow(', '.join(missing_keys))}")
+        if not allow_extra_keys and len(extra_keys) > 0:
+            print(f"  Unknown extra keys: {yellow(', '.join(extra_keys))}")
         return 0
     return 1
-
-
-def missing_or_extra_meta_keys_dict(
-    meta: Sequence[str], meta_set: Set[str]
-) -> Dict[str, Sequence[str]]:
-    return {
-        "missing_meta_keys": sorted(
-            [meta_key for meta_key in meta_set if meta_key not in meta]
-        ),
-        "extra_meta_keys": sorted(
-            [
-                extra_meta_key
-                for extra_meta_key in meta
-                if extra_meta_key not in meta_set
-            ]
-        ),
-    }
 
 
 def check_column_has_meta_keys(
@@ -61,7 +61,7 @@ def check_column_has_meta_keys(
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
     include_disabled: bool = False,
-) -> Tuple[int, Dict[Optional[str], Any]]:
+) -> Tuple[int, Dict[str, List[Any]]]:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest, include_disabled)
@@ -71,68 +71,47 @@ def check_column_has_meta_keys(
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
-    missing: Dict[Optional[str], Any] = {}
     meta_set = set(meta_keys)
+    seen = []
+    missing = {}
 
     for item in itertools.chain(models, schemas):
-        missing_cols = {}
+        missing_cols = []
         model_name = None
-        if isinstance(item, ModelSchema):
+        if isinstance(item, ModelSchema) and item.model_name not in seen:
             model_name = item.model_name
-            missing_cols = {
-                columns.get("name"): missing_or_extra_meta_keys_dict(
-                    columns.get("meta", {}).keys(), meta_set
-                )
+            missing_cols = [
+                columns.get("name")
                 for columns in item.schema.get("columns", [])
                 if not validate_meta_keys(
-                    columns.get("meta", {}).keys(), meta_set, allow_extra_keys
+                    columns.get("meta", {}).keys(),
+                    meta_set,
+                    allow_extra_keys,
+                    model_name,
+                    columns.get("name"),
                 )
-            }
+            ]
+            missing[model_name] = missing_cols
         # Model
-        elif isinstance(item, Model):
+        elif isinstance(item, Model) and item.filename not in seen:
             model_name = item.filename
-            missing_cols = {
-                column_name: missing_or_extra_meta_keys_dict(
-                    config.get("meta", {}).keys(), meta_set
-                )
-                for column_name, config in item.node.get("columns", {}).items()
+            missing_cols = [
+                column_name
+                for column_name, column_config in item.node.get("columns", {}).items()
                 if not validate_meta_keys(
-                    config.get("meta", {}).keys(), meta_set, allow_extra_keys
+                    column_config.get("meta", {}).keys(),
+                    meta_set,
+                    allow_extra_keys,
+                    model_name,
+                    column_name,
                 )
-            }
+            ]
+            missing[model_name] = missing_cols
 
-        for key, value in missing_cols.items():
-            missing[model_name] = missing.get(model_name, {})
-            missing[model_name][key] = value
+        seen.append(model_name)
 
-    for model, columns in missing.items():
-        if columns:
-            status_code = 1
-            result = ""
-            for column, missing_or_extra_meta_keys in columns.items():
-                result += f"\n- name: {yellow(column)}"
-                if len(missing_or_extra_meta_keys.get("missing_meta_keys", [])) > 0:
-                    result += "\n  missing keys:"
-                    for meta_key in missing_or_extra_meta_keys.get(
-                        "missing_meta_keys", []
-                    ):
-                        result += f"\n  - {yellow(meta_key)}"
-                if (
-                    not allow_extra_keys
-                    and len(missing_or_extra_meta_keys.get("extra_meta_keys", [])) > 0
-                ):
-                    result += "\n  unknown extra keys:"
-                    for meta_key in missing_or_extra_meta_keys.get(
-                        "extra_meta_keys", []
-                    ):
-                        result += f"\n  - {yellow(meta_key)}"
-
-            print(
-                f"{red(sqls.get(model))}: "
-                "following columns do not have all of the meta keys "
-                "defined and/or unknown keys:"
-                f"\n {result}",
-            )
+    if any(columns for columns in iter(missing.values())):
+        status_code = 1
     return status_code, missing
 
 
@@ -165,7 +144,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check model has meta keys",
+            "description": "Check model columns have meta keys",
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

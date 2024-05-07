@@ -1,8 +1,10 @@
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_model_columns_have_meta_keys import check_column_has_meta_keys, main
+from dbt_checkpoint.check_model_columns_have_meta_keys import check_column_has_meta_keys
+from dbt_checkpoint.check_model_columns_have_meta_keys import main
 
 # Input args, valid manifest, expected return value
 TESTS = (
@@ -19,61 +21,28 @@ TESTS = (
         0,
     ),
     (
-        ["aa/bb/with_column_meta.sql",
-            "--meta-keys",
-            "foo",
-            "bar",],
-        {
-            "models": [
-                {
-                    "name": "with_meta",
-                    "description": "test meta",
-                    "columns": [
-                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar"}},
-                        {"name": "column_2", "description": "description_2", "meta": {"foo":"foo", "bar":"bar"}},
-                    ],
-                }
-            ]
-        },
-        True,
-        True,
-        0,
-    ),
-    (
-        ["aa/bb/with_column_meta_and_extra.sql",
-            "--meta-keys",
-            "foo",
-            "bar",],
-        {
-            "models": [
-                {
-                    "name": "with_meta",
-                    "description": "test meta",
-                    "columns": [
-                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar", "baz":"baz"}},
-                        {"name": "column_2", "description": "description_2", "meta": {"foo":"foo", "bar":"bar"}},
-                    ],
-                }
-            ]
-        },
-        True,
-        True,
-        1,
-    ),
-    (
-        ["aa/bb/with_column_meta_and_extra.sql",
+        [
+            "aa/bb/with_column_meta.sql",
             "--meta-keys",
             "foo",
             "bar",
-            "--allow-extra-keys"],
+        ],
         {
             "models": [
                 {
                     "name": "with_meta",
                     "description": "test meta",
                     "columns": [
-                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar", "baz":"baz"}},
-                        {"name": "column_2", "description": "description_2", "meta": {"foo":"foo", "bar":"bar"}},
+                        {
+                            "name": "column_1",
+                            "description": "description_1",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
+                        {
+                            "name": "column_2",
+                            "description": "description_2",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
                     ],
                 }
             ]
@@ -84,29 +53,90 @@ TESTS = (
     ),
     (
         [
-            "aa/bb/with_column_meta_and_extra_.sql",
+            "aa/bb/with_column_meta_and_extra.sql",
             "--meta-keys",
             "foo",
             "bar",
         ],
-        {"models": [{"name": "with_meta", "meta": {"foo": "bar"}}]},
-        True,
-        True,
-        0,
-    ),
-    (
-        ["aa/bb/with_column_meta.sql",
-            "--meta-keys",
-            "foo",
-            "bar",],
         {
             "models": [
                 {
                     "name": "with_meta",
                     "description": "test meta",
                     "columns": [
-                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar"}},
-                        {"name": "column_2", "description": "description_2", "meta": {"foo":"foo", "bar":"bar"}},
+                        {
+                            "name": "column_1",
+                            "description": "description_1",
+                            "meta": {"foo": "foo", "bar": "bar", "baz": "baz"},
+                        },
+                        {
+                            "name": "column_2",
+                            "description": "description_2",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
+                    ],
+                }
+            ]
+        },
+        True,
+        True,
+        1,
+    ),
+    (
+        [
+            "aa/bb/with_column_meta_and_extra.sql",
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--allow-extra-keys",
+        ],
+        {
+            "models": [
+                {
+                    "name": "with_meta",
+                    "description": "test meta",
+                    "columns": [
+                        {
+                            "name": "column_1",
+                            "description": "description_1",
+                            "meta": {"foo": "foo", "bar": "bar", "baz": "baz"},
+                        },
+                        {
+                            "name": "column_2",
+                            "description": "description_2",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
+                    ],
+                }
+            ]
+        },
+        True,
+        True,
+        0,
+    ),
+    (
+        [
+            "aa/bb/with_column_meta.sql",
+            "--meta-keys",
+            "foo",
+            "bar",
+        ],
+        {
+            "models": [
+                {
+                    "name": "with_meta",
+                    "description": "test meta",
+                    "columns": [
+                        {
+                            "name": "column_1",
+                            "description": "description_1",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
+                        {
+                            "name": "column_2",
+                            "description": "description_2",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
                     ],
                 }
             ]
@@ -116,10 +146,12 @@ TESTS = (
         1,
     ),
     (
-        ["aa/bb/without_columns_meta.sql",
+        [
+            "aa/bb/without_columns_meta.sql",
             "--meta-keys",
             "foo",
-            "bar",],
+            "bar",
+        ],
         {
             "models": [
                 {
@@ -137,17 +169,23 @@ TESTS = (
         1,
     ),
     (
-        ["aa/bb/with_some_column_meta.sql",
+        [
+            "aa/bb/with_some_column_meta.sql",
             "--meta-keys",
             "foo",
-            "bar",],
+            "bar",
+        ],
         {
             "models": [
                 {
                     "name": "with_some_meta",
                     "description": "test meta",
                     "columns": [
-                        {"name": "column_1", "description": "description_1", "meta": {"foo":"foo", "bar":"bar"}},
+                        {
+                            "name": "column_1",
+                            "description": "description_1",
+                            "meta": {"foo": "foo", "bar": "bar"},
+                        },
                         {"name": "column_2"},
                     ],
                 }
@@ -193,7 +231,7 @@ models:
 -   name: in_schema_column_meta
     columns:
     -   name: test
-        meta: 
+        meta:
             foo: foo
             bar: bar
     """
@@ -214,7 +252,9 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_model_columns_meta_keys_and_extra_keys_in_schema(extension, tmpdir, manifest_path_str):
+def test_check_model_columns_meta_keys_and_extra_keys_in_schema(
+    extension, tmpdir, manifest_path_str
+):
     schema_yml = """
 version: 2
 
@@ -222,7 +262,7 @@ models:
 -   name: in_schema_column_meta
     columns:
     -   name: test
-        meta: 
+        meta:
             foo: foo
             bar: bar
             baz: baz
@@ -242,6 +282,7 @@ models:
     )
     assert result == 1
 
+
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
 def test_check_column_meta_keys(extension, tmpdir, manifest):
     schema_yml = """
@@ -251,28 +292,20 @@ models:
 -   name: in_schema_some_column_meta
     columns:
     -   name: test1
-        meta: 
+        meta:
             foo: foo
     -   name: test2
     """
     yml_file = tmpdir.join(f"schema.{extension}")
     yml_file.write(schema_yml)
     res_stat, missing = check_column_has_meta_keys(
-        ["in_schema_some_column_meta.sql", str(yml_file)], manifest, ["foo","bar"], False
+        ["in_schema_some_column_meta.sql", str(yml_file)],
+        manifest,
+        ["foo", "bar"],
+        False,
     )
     assert res_stat == 1
-    assert missing == {
-        'in_schema_some_column_meta': {
-            'test1': {
-                'extra_meta_keys': [],
-                'missing_meta_keys': ['bar']
-            }, 
-            'test2': {
-                'extra_meta_keys': [],
-                'missing_meta_keys': ['bar', 'foo']
-            }
-        }
-    }
+    assert missing == {"in_schema_some_column_meta": ["test1", "test2"]}
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
@@ -284,7 +317,7 @@ models:
 -   name: in_schema_some_column_meta
     columns:
     -   name: test4
-        meta: 
+        meta:
             foo: foo
             bar: bar
 -   name: in_schema_without_columns_meta
@@ -309,7 +342,9 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
-def test_check_model_columns_have_meta_keys_without(extension, tmpdir, manifest_path_str):
+def test_check_model_columns_have_meta_keys_without(
+    extension, tmpdir, manifest_path_str
+):
     schema_yml = """
 version: 2
 
