@@ -75,7 +75,7 @@ def check_column_has_meta_keys(
     seen = []
     missing = {}
 
-    for item in itertools.chain(models, schemas):
+    for item in itertools.chain(schemas, models):
         missing_cols = []
         model_name = None
         if isinstance(item, ModelSchema) and item.model_name not in seen:
