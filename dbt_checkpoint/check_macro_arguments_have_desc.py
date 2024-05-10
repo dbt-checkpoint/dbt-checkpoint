@@ -46,11 +46,20 @@ def check_argument_desc(
         # Macro
         elif isinstance(item, Macro):
             macro_name = item.filename
-            missing_args = {
-                key
-                for key, value in item.macro.get("arguments", {}).items()
-                if not value.get("description")
-            }
+            if isinstance(item.macro, list):  # Check if item.macro is a list
+                # Handle case where item.macro is a list
+                missing_args = {
+                    arg.get("name")
+                    for arg in item.macro
+                    if not arg.get("description")
+                }
+            else:
+                # Assume item.macro is a dictionary
+                missing_args = {
+                    key
+                    for key, value in item.macro.get("arguments", {}).items()
+                    if not value.get("description")
+                }
         else:
             continue
         seen = missing.get(macro_name)
