@@ -19,6 +19,7 @@ def check_parents_schema(
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
+    schema_location: Optional[str],
     include_disabled: bool = False,
 ) -> int:
     status_code = 0
@@ -26,6 +27,7 @@ def check_parents_schema(
     filenames = set(sqls.keys())
     blacklist = blacklist or []
     whitelist = whitelist or []
+    schema_location = schema_location or []
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames, include_disabled=include_disabled)
@@ -40,7 +42,13 @@ def check_parents_schema(
             )
         )
         for parent in parents:
-            db = parent.node.get("schema")
+            # Selecting the location of the model schema
+            if schema_location == "config": # pragma: no cover
+                # Chooses the schema inside in the model config (nodes -> model -> config -> schema)
+                db = parent.node.get("config").get("schema")
+            else: # pragma: no cover
+                # Chooses the schema outside the model config (nodes -> model -> schema)
+                db = parent.node.get("schema")
             if (whitelist and db not in whitelist) or db in blacklist:
                 status_code = 1
                 print(
@@ -69,6 +77,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="Blacklisted schemas.",
     )
 
+    parser.add_argument(
+        "--schema_location",
+        type=str,
+        nargs="?",
+        required=False,
+        default="",
+        help="Location of the model schema.",
+        choices=["", "config"],
+    ),
+
     args = parser.parse_args(argv)
 
     try:
@@ -87,6 +105,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         blacklist=args.blacklist,
         whitelist=args.whitelist,
+        schema_location=args.schema_location,
         include_disabled=args.include_disabled,
     )
     end_time = time.time()
