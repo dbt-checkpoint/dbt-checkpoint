@@ -16,12 +16,14 @@
  </a>
 </p>
 
-## Sponsors
+## Brough to you by your friends at Datacoves
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="images/datacoves-dark.png">
   <img alt="Datacoves" src="images/datacoves-light.png" width="150">
 </picture>
+
+The Datacoves platform helps enterprises overcome their data delivery challenges quickly using dbt and Airflow, implementing best practices from the start without the need for multiple vendors or costly consultants.
 
 Hosted VS Code, dbt-core, SqlFluff, and Airflow, find out more at [Datacoves.com](https://datacoves.com/product).
 
