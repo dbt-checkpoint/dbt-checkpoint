@@ -123,6 +123,10 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
 
+**Selectors checks:**
+
+- [`check-selectors-duplicate-names`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-selectors-duplicate-names): Check for duplicate names in selectors.
+
 **Modifiers:**
 
 - [`generate-missing-sources`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.

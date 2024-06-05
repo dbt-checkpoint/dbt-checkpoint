@@ -343,3 +343,10 @@
   entry: check-test-has-meta-keys
   language: python
   types_or: [sql]
+- id: check-selectors-duplicate-names
+  name: Check selectors for duplicate names
+  description: Ensures that there are no duplicate selector names in `selectors.yml`
+  entry: check-selectors-duplicate-names
+  language: python
+  types_or: [yaml]
+  files: 'selectors.yml'

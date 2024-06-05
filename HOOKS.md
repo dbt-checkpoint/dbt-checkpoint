@@ -71,6 +71,10 @@
 
 - [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys
 
+**Selectors checks:**
+
+- [`check-selectors-duplicate-names`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-selectors-duplicate-names): Check for duplicate selector names in `selectors.yml`.
+
 **Modifiers:**
 
 - [`generate-missing-sources`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
@@ -2375,3 +2379,35 @@ If every test needs to have certain meta keys.
 If you `run` your test and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
 
 ---
+
+### `check-selectors-duplicate-names`
+
+Ensures that there are no duplicate selector names in your `selectors.yml` file.
+
+#### Arguments
+
+`--filenames`: List of YAML files to check for duplicate selector names.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.2.1
+ hooks:
+ - id: check-selectors-duplicate-names
+```
+
+#### When to use it
+
+You want to ensure that each selector name is unique within your `selectors.yml` file.
+
+#### How it works
+
+- Hook takes all specified YAML files.
+- Each file is parsed to check for duplicate selector names.
+- If any duplicate names are found, the hook fails and reports the duplicates.
+
+#### Known limitations
+
+This hook only checks for duplicate names within the provided files and does not validate the overall structure of `selectors.yml`.
