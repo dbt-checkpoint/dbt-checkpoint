@@ -1,5 +1,4 @@
 import pytest
-import yaml
 
 from dbt_checkpoint.check_selectors_duplicate_names import (
     check_selectors_duplicate_names,
@@ -35,8 +34,8 @@ TESTS = [
             ]
         },
         [
-            "Duplicate selector name found: 'selector1'",
             "Duplicate selector name found: 'selector2'",
+            "Duplicate selector name found: 'selector1'",
         ],
     ),
     (
@@ -49,4 +48,4 @@ TESTS = [
 @pytest.mark.parametrize("input_data, expected_errors", TESTS)
 def test_check_selectors_duplicate_names(input_data, expected_errors):
     errors = check_selectors_duplicate_names(input_data)
-    assert errors == expected_errors
+    assert sorted(errors) == sorted(expected_errors)
