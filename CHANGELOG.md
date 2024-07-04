@@ -1,3 +1,21 @@
+# 2.0.2 - 2024-07-04
+
+**Fixes:**
+
+- Fix some typos in README.md by @Lapkonium in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/217
+- Fix Macro arguments schema compliance by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/223
+
+**Enhancements:**
+
+- model has contract and model has constraints by @xasm83 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/218
+
+**New Contributors**
+
+- @Lapkonium made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/217
+- @xasm83 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/218
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.1...v2.0.2
+
 # 2.0.1 - 2024-04-19
 
 **Fixes:**
@@ -14,8 +32,6 @@
 - Documentation Update: Changed Hooks to reflect correct usage of args for source-has-tests by @Thomas-George-T in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/200
 
 **Enhancements:**
-
-## What's Changed
 
 - Adding dbt parse hook by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/195
 - Fix support model versions by @gbrunois in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/199
