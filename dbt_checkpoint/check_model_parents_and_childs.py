@@ -56,7 +56,7 @@ def check_child_parent_cnt(
                 status_code = 1
                 print(
                     f"{model.model_name}: "
-                    f"has {real_value} {req_type}, but {req_type} {req_cnt}"
+                    f"has {real_value} {req_dep} {req_type}, but {req_type} {req_cnt} "
                     f"is/are required.",
                 )
 
@@ -77,7 +77,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "--max-parent-cnt",
         type=int,
-        help="Miximal number of parent relations.",
+        help="Maximal number of parent relations.",
     )
 
     parser.add_argument(
@@ -90,7 +90,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "--max-child-cnt",
         type=int,
-        help="Miximal number of child relations.",
+        help="Maximal number of child relations.",
     )
 
     args = parser.parse_args(argv)

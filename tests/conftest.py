@@ -8,13 +8,23 @@ from dbt_checkpoint.utils import cmd_output
 MANIFEST = {
     "metadata": {
         "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v6.json",
-        "dbt_version": "1.2.1",
+        "dbt_version": "1.5.0",
         "generated_at": "2022-10-04T16:19:51.780894Z",
         "user_id": "test_user_id",
         "send_anonymous_usage_stats": True,
         "adapter_type": "snowflake",
     },
     "nodes": {
+        "model.with_version.v1": {
+            "patch_path": "project://bb/with_version.yml",
+            "path": "aa/bb/with_version.sql",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "table",
+            },
+            "version": 1,
+            "latest_version": 1,
+        },
         "model.with_schema": {
             "patch_path": "project://bb/with_schema.yml",
             "path": "aa/bb/with_schema.sql",
@@ -275,6 +285,58 @@ MANIFEST = {
                 "materialized": "view",
             },
         },
+        "model.with_contract": {
+            "patch_path": "project://bb/with_contract.yml",
+            "path": "aa/bb/with_contract.sql",
+            "root_path": "/path/to/aa",
+            "config": {"contract": {"enforced": True}, "materialized": "view"},
+        },
+        "model.with_no_contract": {
+            "patch_path": "project://bb/with_no_contract.yml",
+            "path": "aa/bb/with_no_contract.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_no_constraints": {
+            "patch_path": "project://bb/with_no_constraints.yml",
+            "path": "aa/bb/with_no_constraints.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
+        },
+        "model.with_empty_constraints": {
+            "patch_path": "project://bb/with_empty_constraints.yml",
+            "path": "aa/bb/with_empty_constraints.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
+            "constraints": [],
+        },
+        "model.with_constraints": {
+            "patch_path": "project://bb/with_constraints.yml",
+            "path": "aa/bb/with_constraints.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
+            "constraints": [
+                {"type": "primary_key", "columns": ["col_a", "col_b"]},
+                {"type": "foreign_key", "columns": ["col_a", "col_b"]},
+                {"type": "check", "columns": ["col_a", "col_b"]},
+                {"type": "not_null", "columns": ["col_a", "col_b"]},
+                {"type": "unique", "columns": ["col_a", "col_b"]},
+                {"type": "custom"},
+            ],
+        },
+        "model.with_constraints_no_columns": {
+            "patch_path": "project://bb/with_constraints_no_columns.yml",
+            "path": "aa/bb/with_constraints_no_columns.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
+            "constraints": [{"type": "primary_key"}],
+        },
+        "model.with_constraints_no_match": {
+            "patch_path": "project://bb/with_constraints_no_match.yml",
+            "path": "aa/bb/with_constraints_no_match.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "table"},
+            "constraints": [{"type": "foreign_key", "columns": ["col_a", "col_b"]}],
+        },
         "snapshot.some_snapshot": {
             "name": "some_snapshot",
             "patch_path": "project://bb/some_snapshot.yml",
@@ -340,21 +402,21 @@ MANIFEST = {
         },
         "macro.with_argument_description": {
             "path": "macros/aa/with_argument_description.sql",
-            "arguments": {
-                "test1": {"name": "test1", "description": "test"},
-                "test2": {"name": "test2", "description": "test"},
-            },
+            "arguments": [
+                {"name": "test1", "description": "test"},
+                {"name": "test2", "description": "test"},
+            ],
         },
         "macro.with_some_argument_description": {
             "path": "macros/aa/with_some_argument_description.sql",
-            "arguments": {
-                "test1": {"name": "test1", "description": "test"},
-                "test2": {"name": "test2"},
-            },
+            "arguments": [
+                {"name": "test1", "description": "test"},
+                {"name": "test2"},
+            ],
         },
         "macro.without_arguments_description": {
             "path": "macros/aa/without_arguments_description.sql",
-            "arguments": {"test1": {"name": "test1"}, "test2": {"name": "test2"}},
+            "arguments": [{"name": "test1"}, {"name": "test2"}],
         },
     },
     "child_map": {
@@ -504,3 +566,9 @@ def temp_git_dir(tmpdir):
     git_dir = tmpdir.join("gits")
     cmd_output("git", "init", "--", str(git_dir))
     yield git_dir
+
+
+@pytest.fixture(scope="module")
+def pre_commit_hooks_yaml_dict():
+    with open(".pre-commit-hooks.yaml") as f:
+        yield yaml.safe_load(f)
