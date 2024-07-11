@@ -37,6 +37,18 @@
   entry: check-model-has-all-columns
   language: python
   types_or: [sql, yaml]
+- id: check-model-has-contract
+  name: Check model has contract
+  description: Check model has contract enforced = True
+  entry: check-model-has-contract
+  language: python
+  types_or: [yaml]
+- id: check-model-has-constraints
+  name: Check model has constraints
+  description: Check model has constraints for specific columns
+  entry: check-model-has-constraints
+  language: python
+  types_or: [yaml]
 - id: check-model-has-description
   name: Check the model has description
   description: Ensures that the model has description in properties file.
@@ -65,7 +77,7 @@
   language: python
   types_or: [sql, yaml]
 - id: check-model-has-tests-by-group
-  name: Check the model has a number of tests from a group of tests.
+  name: Check model; number of tests from group of tests.
   description: Ensures that the model has a number of tests from a group of tests.
   entry: check-model-has-tests-by-group
   language: python
@@ -95,12 +107,12 @@
   language: python
   types_or: [sql]
 - id: check-model-parents-schema
-  name: Check parent models or sources are from certain schema
+  name: Check parent models/sources from certain schema
   entry: check-model-parents-schema
   language: python
   types_or: [yaml, sql]
 - id: check-model-parents-database
-  name: Check parent models or sources are from certain database
+  name: Check parent models/sources from certain database
   entry: check-model-parents-database
   language: python
   types_or: [sql, yaml]
@@ -141,7 +153,7 @@
   language: python
   types_or: [sql]
 - id: check-source-childs
-  name: Check the source has a specific number (max/min) of childs.
+  name: Check the source has max/min number of childs.
   description: Ensures the source has a specific number (max/min) of childs.
   entry: check-source-childs
   language: python
@@ -153,7 +165,7 @@
   language: python
   types_or: [yaml]
 - id: check-source-has-all-columns
-  name: Check the source has all columns in the properties file
+  name: Check source has all columns in properties file
   description: Ensures that all columns in the database are specified in the properties file.
   entry: check-source-has-all-columns
   language: python
@@ -243,6 +255,13 @@
   entry: dbt-docs-generate
   language: python
   pass_filenames: false
+- id: dbt-parse
+  name: dbt parse
+  description: Generates manifest.json from source model, test, and analysis files.
+  entry: dbt-parse
+  language: python
+  types_or: [yaml, sql]
+  pass_filenames: false
 - id: dbt-run
   name: dbt run
   description: Executes compiled sql model files.
@@ -316,5 +335,35 @@
   name: Check the materialization of the model by childs
   description: Controls the materialization of the model by its number of childs.
   entry: check-model-materialization-by-childs
+  language: python
+  types_or: [sql]
+- id: check-exposure-has-meta-keys
+  name: Check the exposure has keys in the meta part
+  description: Ensures that the exposure has a list of valid meta keys.
+  entry: check-exposure-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-macro-has-meta-keys
+  name: Check the macro has keys in the meta part
+  description: Ensures that the macro has a list of valid meta keys.
+  entry: check-macro-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-seed-has-meta-keys
+  name: Check the seed has keys in the meta part
+  description: Ensures that the seed has a list of valid meta keys.
+  entry: check-seed-has-meta-keys
+  language: python
+  types_or: [yaml]
+- id: check-snapshot-has-meta-keys
+  name: Check the snapshot has keys in the meta part
+  description: Ensures that the snapshot has a list of valid meta keys.
+  entry: check-snapshot-has-meta-keys
+  language: python
+  types_or: [sql, yaml]
+- id: check-test-has-meta-keys
+  name: Check the test has keys in the meta part
+  description: Ensures that the test has a list of valid meta keys.
+  entry: check-test-has-meta-keys
   language: python
   types_or: [sql]

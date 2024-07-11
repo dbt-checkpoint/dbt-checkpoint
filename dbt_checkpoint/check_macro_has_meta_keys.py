@@ -10,42 +10,28 @@ from dbt_checkpoint.utils import (
     add_default_args,
     add_meta_keys_args,
     get_dbt_manifest,
-    get_source_schemas,
-    red,
-    yellow,
+    get_filenames,
+    get_macros,
+    validate_meta_keys,
 )
 
 
 def has_meta_key(
     paths: Sequence[str],
+    manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
-    include_disabled: bool = False,
 ) -> Dict[str, Any]:
     status_code = 0
-    ymls = [Path(path) for path in paths]
-
-    # if user added schema but did not rerun
-    schemas = get_source_schemas(ymls, include_disabled=include_disabled)
-
-    for schema in schemas:
-        schema_meta = set(schema.source_schema.get("meta", {}).keys())
-        table_meta = set(schema.table_schema.get("meta", {}).keys())
-        if allow_extra_keys:
-            diff = not set(meta_keys).issubset(set(schema_meta | table_meta))
-        else:
-            diff = not (set(meta_keys) == schema_meta | table_meta)
-        if diff:
-            status_code = 1
-            print(
-                f"{schema.source_name}.{schema.table_name} meta keys don't match. \n"
-                f"Provided: {yellow(', '.join(list(meta_keys)))}\n"
-                f"Actual: {red(', '.join(list(schema_meta | table_meta)))}\n"
-            )
+    ymls = get_filenames(paths, [".yml", ".yaml"])
+    meta_set = set(meta_keys)
+    macros = get_macros(manifest, ymls)
+    for macro in macros:
+        status_code = validate_meta_keys(macro, meta_keys, meta_set, allow_extra_keys)
     return {"status_code": status_code}
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover
     parser = argparse.ArgumentParser()
     add_default_args(parser)
     add_meta_keys_args(parser)
@@ -60,9 +46,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     start_time = time.time()
     hook_properties = has_meta_key(
         paths=args.filenames,
+        manifest=manifest,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
-        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
@@ -73,7 +59,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check the source has keys in the meta part.",
+            "description": "Check the macro has meta keys.",
             "status": hook_properties.get("status_code"),
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

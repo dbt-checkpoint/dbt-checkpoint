@@ -1,3 +1,67 @@
+# 2.0.2 - 2024-07-04
+
+**Fixes:**
+
+- Fix some typos in README.md by @Lapkonium in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/217
+- Fix Macro arguments schema compliance by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/223
+
+**Enhancements:**
+
+- model has contract and model has constraints by @xasm83 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/218
+
+**New Contributors**
+
+- @Lapkonium made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/217
+- @xasm83 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/218
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.1...v2.0.2
+
+# 2.0.1 - 2024-04-19
+
+**Fixes:**
+
+- Fix/dbt parse config by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/213
+
+# 2.0.0 - 2024-04-12
+
+> :warning: **dbt 1.5**: Starting at 2.0.0, certain hooks (like `dbt-parse`) can fail if using dbt-core < 1.5
+
+**Fixes:**
+
+- Bugfix-192: Applied lower() to schema_cols by @ronak-datatonic in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/197
+- Documentation Update: Changed Hooks to reflect correct usage of args for source-has-tests by @Thomas-George-T in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/200
+
+**Enhancements:**
+
+- Adding dbt parse hook by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/195
+- Fix support model versions by @gbrunois in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/199
+- All hook names <= 50 characters by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/209
+- Expand testing to python 3.10 - 3.12 by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/207
+- Update user visible messages in check_model_parents_and_childs.py by @awal11 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/204
+- Bump action versions by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/208
+- Describe a faster build configuration in the example by @awal11 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/211
+
+## New Contributors
+
+- @pgoslatara made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/195
+- @ronak-datatonic made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/197
+- @Thomas-George-T made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/200
+- @gbrunois made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/199
+- @awal11 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/204
+
+# 1.2.1 - 2024-03-07
+
+**Fixes:**
+
+- Fix GitHub action by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/187
+
+**Enhancements:**
+
+- Allow multiple data types, improve error messages by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/180
+- Support yml suffix (without A) in dbt-checkpoint config file by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/190
+- implement 'check has meta keys' for all meta-supported dbt objects by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/181
+- Add --allow-extra-keys to check-source-has-meta-keys by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/176
+
 # 1.2.0 - 2024-01-15
 
 **Fixes:**
