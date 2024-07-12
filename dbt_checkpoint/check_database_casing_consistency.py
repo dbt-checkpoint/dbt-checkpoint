@@ -1,9 +1,6 @@
 import argparse
-import os
-import time
 from typing import Any, Dict, Optional, Sequence
 
-from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_catalog_args,
@@ -44,7 +41,7 @@ def _find_inconsistent_objects(
 
 
 def check_database_casing_consistency(
-    manifest: Dict[str, Any], catalog: Dict[str, Any], adapter: str = None
+    manifest: Dict[str, Any], catalog: Dict[str, Any]
 ):
     return_code = 0
     results = set()
@@ -91,27 +88,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     except JsonOpenError as e:
         print(f"Unable to load catalog file ({e})")
         return 1
-    dbt_adapter = manifest.get("metadata", {}).get("dbt_adapter")
-    start_time = time.time()
-    status_code = check_database_casing_consistency(
-        manifest=manifest, catalog=catalog, adapter=dbt_adapter
-    )
-    end_time = time.time()
-    script_args = vars(args)
-
-    tracker = dbtCheckpointTracking(script_args=script_args)
-    tracker.track_hook_event(
-        event_name="Hook Executed",
-        manifest=manifest,
-        event_properties={
-            "hook_name": os.path.basename(__file__),
-            "description": "Check the model has description",
-            "status": status_code,
-            "execution_time": end_time - start_time,
-            "is_pytest": script_args.get("is_test"),
-        },
-    )
-
+    status_code = check_database_casing_consistency(manifest, catalog)
     return status_code  # type: ignore
 
 
