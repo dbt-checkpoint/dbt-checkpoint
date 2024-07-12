@@ -23,7 +23,7 @@ def manifest():
         "sources": {
             "source.balboa.credits_total": {
                 "database": "test",
-                "schema": "BRUNO",
+                "schema": "test",
                 "name": "credits_total",
                 "alias": "credits_total",
             },
@@ -48,7 +48,7 @@ def catalog():
             "source.balboa.credits_total": {
                 "metadata": {
                     "database": "test",
-                    "schema": "BRUNO",
+                    "schema": "test",
                     "name": "credits_total",
                     "alias": "credits_total",
                 }
@@ -109,7 +109,7 @@ def test_main(
         "sources": {
             "source.balboa.credits_total": {
                 "database": "test",
-                "schema": "BRUNO",
+                "schema": "test",
                 "name": "credits_total",
                 "alias": "credits_total",
             },
@@ -130,7 +130,7 @@ def test_main(
             "source.balboa.credits_total": {
                 "metadata": {
                     "database": "test",
-                    "schema": "BRUNO",
+                    "schema": "test",
                     "name": "credits_total",
                     "alias": "credits_total",
                 }
