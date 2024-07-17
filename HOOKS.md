@@ -23,6 +23,7 @@
 - [`check-model-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
 - [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
 - [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
+- [`check-model-parents-name-prefix`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-name-prefix): Check the parent model names have a specific prefix.
 - [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
 - [`check-model-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-tags): Check the model has valid tags.
 - [`check-model-materialization-by-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-materialization-by-childs): Check the materialization of models given a threshold of child models.
@@ -871,6 +872,53 @@ repos:
 #### When to use it
 
 You want to be sure that certain models are using only models from specified database(s).
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a parent models/sources.
+- If any parent model does not have allowed or has disabled databases, the hook fails.
+
+---
+
+### `check-model-parents-name-prefix`
+
+Ensures the parent model names have a certain prefix.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: list of allowed prefixes.
+`--blacklist`: list of non-allowed prefixes.
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-parents-filename-prefix
+   exlude: ^models/stage/
+   args: ["--whitelist", "stage_", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+You want to be sure that certain models are using only parent models with a specified prefix
 
 #### Requirements
 
