@@ -343,3 +343,8 @@
   entry: check-test-has-meta-keys
   language: python
   types_or: [sql]
+- id: check-database-casing-consistency
+  name: Check databases and schemas casing are consistent comparing Manifest and Catalog
+  description: Check databases and schemas casing are consistent comparing Manifest and Catalog
+  entry: check-database-casing-consistency
+  language: python
