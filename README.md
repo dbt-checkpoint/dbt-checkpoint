@@ -141,6 +141,10 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
 - [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
 
+**dbt checks:**
+
+- [`check-database-casing-consistency`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-database-casing-consistency): compare Manifest and Catalog to ensure DB and Schemas have the same casing.
+
 ---
 
 :exclamation:**If you have a suggestion for a new hook or you find a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:

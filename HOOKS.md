@@ -302,7 +302,7 @@ If you did not update the catalog and manifest results can be wrong.
 Checks that model's yaml has:
 
     config:
-      contract: 
+      contract:
         enforced: true
 
 #### Arguments
@@ -341,14 +341,14 @@ Checks that model's yaml has specific constraints defined, eg:
         enforced: true
     constraints:
       - type: foreign_key
-        columns: 
+        columns:
           - "product_id"
 ```
 
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--constraints`: JSON string escaped by single quotes 
+`--constraints`: JSON string escaped by single quotes
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -2375,3 +2375,30 @@ If every test needs to have certain meta keys.
 If you `run` your test and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
 
 ---
+
+### `check-database-casing-consistency`
+
+compare Manifest and Catalog to ensure DB and Schemas have the same casing.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.2.1
+ hooks:
+ - id: check-database-casing-consistency
+```
+
+#### When to use it
+
+If you want to make sure your dbt project (Manifest) and database (Catalog) are db.schema consistent
+
+#### How it works
+
+It compares models and sources databases and schemas in `manifest vs catalog`. If a db/schema in one of them presents a different casing, the hook fails.
