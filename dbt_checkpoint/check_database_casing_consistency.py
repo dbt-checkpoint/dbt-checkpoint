@@ -5,6 +5,7 @@ from dbt_checkpoint.utils import (
     JsonOpenError,
     add_catalog_args,
     add_config_args,
+    add_default_args,
     add_manifest_args,
     add_tracking_args,
     get_dbt_catalog,
@@ -71,10 +72,7 @@ def check_database_casing_consistency(
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    add_manifest_args(parser)
-    add_tracking_args(parser)
-    add_config_args(parser)
-    add_catalog_args(parser)
+    add_default_args(parser)
 
     args = parser.parse_args(argv)
 
