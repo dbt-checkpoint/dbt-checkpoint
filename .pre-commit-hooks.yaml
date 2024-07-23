@@ -344,7 +344,8 @@
   language: python
   types_or: [sql]
 - id: check-database-casing-consistency
-  name: Check databases and schemas casing are consistent comparing Manifest and Catalog
-  description: Check databases and schemas casing are consistent comparing Manifest and Catalog
+  name: Check databases and schemas casing are consistent
+  description: Check databases and schemas casing are consistent
   entry: check-database-casing-consistency
   language: python
+  always_run: true

@@ -121,6 +121,11 @@ def paths_to_dbt_models(
     return [prefix + Path(path).stem + postfix for path in paths]
 
 
+def checkpoint_safe_load(stream):
+    # FIXME: temporary fix for YAML incompatibility of safe_load with empty files
+    return safe_load(stream) or {}
+
+
 def get_json(json_filename: str) -> Dict[str, Any]:
     try:
         file_content = Path(json_filename).read_text(encoding="utf-8")
@@ -136,7 +141,7 @@ def get_config_file(config_file_path: str) -> Dict[str, Any]:
             alt_path = path.with_suffix(".yml" if path.suffix == ".yaml" else ".yaml")
             if alt_path.exists():
                 path = alt_path
-        config = safe_load(path.open())
+        config = checkpoint_safe_load(path.open())
         check_yml_version(config_file_path, config)
     except FileNotFoundError:
         config = {}
@@ -305,7 +310,7 @@ def get_model_schemas(
 ) -> Generator[ModelSchema, None, None]:
     for yml_file in yml_files:
         with open(yml_file, "r") as file:
-            schema = safe_load(file)
+            schema = checkpoint_safe_load(file)
             for model in schema.get("models", []):
                 if isinstance(model, dict) and model.get("name"):
                     model_name = model.get("name", "")  # pragma: no mutate
@@ -322,7 +327,7 @@ def get_macro_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[MacroSchema, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = checkpoint_safe_load(yml_file.open())
         for macro in schema.get("macros", []):
             if isinstance(macro, dict) and macro.get("name"):
                 macro_name = macro.get("name", "")  # pragma: no mutate
@@ -339,7 +344,7 @@ def get_source_schemas(
     yml_files: Sequence[Path], include_disabled: bool = False
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = checkpoint_safe_load(yml_file.open())
         for source in schema.get("sources", []):
             if not include_disabled and not source.get("config", {}).get(
                 "enabled", True
@@ -362,7 +367,7 @@ def get_exposures(
     yml_files: Sequence[Path],
 ) -> Generator[GenericDbtObject, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = checkpoint_safe_load(yml_file.open())
         for exposure in schema.get("exposures", []):
             exposure_name = exposure.get("name")
             yield GenericDbtObject(
