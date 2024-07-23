@@ -311,17 +311,16 @@ def get_model_schemas(
     for yml_file in yml_files:
         with open(yml_file, "r") as file:
             schema = checkpoint_safe_load(file)
-            if schema and type(schema) is dict:
-                for model in schema.get("models", []):
-                    if isinstance(model, dict) and model.get("name"):
-                        model_name = model.get("name", "")  # pragma: no mutate
-                        if model_name in filenames or all_schemas:
-                            yield ModelSchema(
-                                model_name=model_name,
-                                file=yml_file,
-                                filename=yml_file.stem,
-                                schema=model,
-                            )
+            for model in schema.get("models", []):
+                if isinstance(model, dict) and model.get("name"):
+                    model_name = model.get("name", "")  # pragma: no mutate
+                    if model_name in filenames or all_schemas:
+                        yield ModelSchema(
+                            model_name=model_name,
+                            file=yml_file,
+                            filename=yml_file.stem,
+                            schema=model,
+                        )
 
 
 def get_macro_schemas(
@@ -346,23 +345,22 @@ def get_source_schemas(
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
         schema = checkpoint_safe_load(yml_file.open())
-        if schema and type(schema) is dict:
-            for source in schema.get("sources", []):
-                if not include_disabled and not source.get("config", {}).get(
-                    "enabled", True
-                ):
-                    continue
-                source_name = source.get("name")
-                tables = source.pop("tables", [])
-                for table in tables:
-                    table_name = table.get("name")
-                    yield SourceSchema(
-                        source_name=source_name,
-                        table_name=table_name,
-                        filename=yml_file.stem,
-                        source_schema=source,
-                        table_schema=table,
-                    )
+        for source in schema.get("sources", []):
+            if not include_disabled and not source.get("config", {}).get(
+                "enabled", True
+            ):
+                continue
+            source_name = source.get("name")
+            tables = source.pop("tables", [])
+            for table in tables:
+                table_name = table.get("name")
+                yield SourceSchema(
+                    source_name=source_name,
+                    table_name=table_name,
+                    filename=yml_file.stem,
+                    source_schema=source,
+                    table_schema=table,
+                )
 
 
 def get_exposures(
