@@ -1,3 +1,15 @@
+# 2.0.3 - 2024-07-23
+
+**Fixes:**
+
+- yaml safe_loader bug on empty YML files by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/240
+
+**Enhancements:**
+
+- Create hook that checks for database and schema casing consistency by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/235
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.2...v2.0.3
+
 # 2.0.2 - 2024-07-04
 
 **Fixes:**
