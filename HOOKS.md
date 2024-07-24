@@ -179,8 +179,10 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp]
+   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp, "--"]
 ```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
 
 #### When to use it
 
