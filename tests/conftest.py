@@ -121,6 +121,7 @@ MANIFEST = {
         "model.without_tags": {
             "database": "prod",
             "schema": "test",
+            "name": "without_tags",
             "patch_path": "project://bb/without_tags.yml",
             "path": "aa/bb/without_tags.sql",
             "root_path": "/path/to/aa",

@@ -116,6 +116,11 @@
   entry: check-model-parents-database
   language: python
   types_or: [sql, yaml]
+- id: check-model-parents-name-prefix
+  name: Check parent model names have certain prefix
+  entry: check-model-parents-name-prefix
+  language: python
+  types_or: [sql, yaml]
 - id: check-model-parents-and-childs
   name: Check the model has a parents/childs
   description: Ensures the model has a specific number (max/min) of parents or/and childs.
