@@ -9,8 +9,12 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    add_space_to_braces,
+    add_space_to_parenthesis,
+    add_space_to_source_ref,
     get_dbt_manifest,
     red,
+    replace_comments,
     yellow,
 )
 
@@ -35,22 +39,6 @@ def prev_cur_next_iter(
             cur = nxt
     except StopIteration:
         yield prev, cur, None
-
-
-def replace_comments(sql: str) -> str:
-    return re.sub(REGEX_COMMENTS, "", sql)
-
-
-def add_space_to_parenthesis(sql: str) -> str:
-    return re.sub(REGEX_PARENTHESIS, r" \1 ", sql)
-
-
-def add_space_to_braces(sql: str) -> str:
-    return re.sub(REGEX_BRACES, r" \1 ", sql)
-
-
-def add_space_to_source_ref(sql: str) -> str:
-    return sql.replace("{{", "{{ ").replace("}}", " }}")
 
 
 def has_table_name(

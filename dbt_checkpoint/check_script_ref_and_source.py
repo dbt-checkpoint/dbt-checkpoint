@@ -11,6 +11,7 @@ from dbt_checkpoint.utils import (
     get_dbt_manifest,
     get_filenames,
     red,
+    replace_comments,
 )
 
 
@@ -24,7 +25,8 @@ def check_refs_sources(
     sources = {}
     for _, file in sqls.items():
         full_script = file.read_text(encoding="utf-8")
-        src_refs = re.findall(r"\{\{\s*(source|ref)\s*\((.*)\)\s*\}\}", full_script)
+        sql_clean = replace_comments(full_script)
+        src_refs = re.findall(r"\{\{\s*(source|ref)\s*\((.*)\)\s*\}\}", sql_clean)
         for src_ref in src_refs:
             src_ref_value = src_ref[1].replace("'", "").replace('"', "").strip()
             if src_ref[0] == "ref":
@@ -38,7 +40,6 @@ def check_refs_sources(
                     "source_name": source_name,
                     "table_name": table_name,
                 }
-
     if models:
         nodes = manifest.get("nodes", {})
         for _, value in nodes.items():

@@ -774,6 +774,33 @@ def extend_dbt_project_dir_flag(
     return cmd
 
 
+def _belongs_to_project(dbt_item_set, project_name):
+    """
+    Leave only nodes/sources/etc that belong to project_name or dbt itself
+    """
+    return {
+        item: config
+        for item, config in dbt_item_set.items()
+        if isinstance(config, dict)
+        and config.get("package_name", project_name) in (project_name, "dbt")
+    }
+
+
+def _manifest_clean_cross_project_dependencies(manifest: Dict[Any, Any]) -> Dict[Any, Any]:  # type: ignore
+    """
+    Get dbt project name from metadata
+    Clean all objects (nodes/sources/tests/etc) that don't belong to the project
+    """
+    project_name = manifest.get("metadata", {}).get("project_name")
+    if not project_name:
+        return manifest
+    for dbt_category, item_set in manifest.items():
+        if dbt_category == "metadata":
+            continue
+        manifest[dbt_category] = _belongs_to_project(item_set, project_name)
+    return manifest
+
+
 def get_dbt_manifest(args):  # type: ignore
     """
     Get dbt manifest following the new config file approach. Precedence:
@@ -785,11 +812,12 @@ def get_dbt_manifest(args):  # type: ignore
     dbt_checkpoint_config = get_config_file(args.config)
     config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
     if manifest_path != DEFAULT_MANIFEST_PATH:
-        return get_json(manifest_path)
+        manifest = get_json(manifest_path)
     elif config_project_dir:
-        return get_json(f"{config_project_dir}/target/manifest.json")
+        manifest = get_json(f"{config_project_dir}/target/manifest.json")
     else:
-        return get_json(manifest_path)
+        manifest = get_json(manifest_path)
+    return _manifest_clean_cross_project_dependencies(manifest)
 
 
 def get_dbt_catalog(args):  # type: ignore
@@ -826,3 +854,28 @@ def validate_meta_keys(
         )
         return 1
     return 0
+
+
+import re
+
+REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
+REGEX_SPLIT = r"[\s]+"
+IGNORE_WORDS = ["", "(", "{{", "{"]  # pragma: no mutate
+REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
+REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
+
+
+def replace_comments(sql: str) -> str:
+    return re.sub(REGEX_COMMENTS, "", sql)
+
+
+def add_space_to_parenthesis(sql: str) -> str:
+    return re.sub(REGEX_PARENTHESIS, r" \1 ", sql)
+
+
+def add_space_to_braces(sql: str) -> str:
+    return re.sub(REGEX_BRACES, r" \1 ", sql)
+
+
+def add_space_to_source_ref(sql: str) -> str:
+    return sql.replace("{{", "{{ ").replace("}}", " }}")
