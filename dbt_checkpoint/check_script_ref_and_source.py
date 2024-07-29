@@ -102,7 +102,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        manifest = get_dbt_manifest(args)
+        manifest = get_dbt_manifest(args, clean=False)
     except JsonOpenError as e:
         print(f"Unable to load manifest file ({e})")
         return 1

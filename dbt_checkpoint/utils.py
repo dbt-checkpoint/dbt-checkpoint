@@ -801,7 +801,7 @@ def _manifest_clean_cross_project_dependencies(manifest: Dict[Any, Any]) -> Dict
     return manifest
 
 
-def get_dbt_manifest(args):  # type: ignore
+def get_dbt_manifest(args, clean=True):  # type: ignore
     """
     Get dbt manifest following the new config file approach. Precedence:
         - custom `--manifest` flag
@@ -817,7 +817,10 @@ def get_dbt_manifest(args):  # type: ignore
         manifest = get_json(f"{config_project_dir}/target/manifest.json")
     else:
         manifest = get_json(manifest_path)
-    return _manifest_clean_cross_project_dependencies(manifest)
+    if clean:
+        return _manifest_clean_cross_project_dependencies(manifest)
+    else:
+        return manifest
 
 
 def get_dbt_catalog(args):  # type: ignore
