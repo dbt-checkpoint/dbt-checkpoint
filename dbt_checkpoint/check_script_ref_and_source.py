@@ -20,9 +20,10 @@ def check_refs_sources(
 ) -> Dict[str, Any]:
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
-
-    models = set()
+    models = {}
     sources = {}
+    version_pattern = r"version=(\d+)"
+    project_name = manifest.get("metadata", {}).get("project_name")
     for _, file in sqls.items():
         full_script = file.read_text(encoding="utf-8")
         sql_clean = replace_comments(full_script)
@@ -30,7 +31,22 @@ def check_refs_sources(
         for src_ref in src_refs:
             src_ref_value = src_ref[1].replace("'", "").replace('"', "").strip()
             if src_ref[0] == "ref":
-                models.add(src_ref_value)
+                model_split = src_ref_value.split(",")
+                version = re.search(version_pattern, src_ref_value)
+                if version:
+                    version = version.group(1)
+                    model_split.pop()
+                if len(model_split) < 2:
+                    model_split.insert(0, project_name)
+                package_name = model_split[0].strip()
+                model_name = model_split[1].strip()
+                model_version = version
+                ref_key = frozenset([model_split[0].strip(), model_split[1].strip()])
+                models[ref_key] = {
+                    "package_name": package_name,
+                    "model_name": model_name,
+                    "model_version": model_version,
+                }
             if src_ref[0] == "source":
                 src_split = src_ref_value.split(",")
                 source_name = src_split[0].strip()
@@ -43,9 +59,13 @@ def check_refs_sources(
     if models:
         nodes = manifest.get("nodes", {})
         for _, value in nodes.items():
-            model_name = value.get("name")
-            if model_name in models:
-                models.remove(model_name)
+            model_set = frozenset([value.get("package_name"), value.get("name")])
+            if model_set in models.keys():
+                model_version = models[model_set].get("model_version")
+                if not model_version or (
+                    model_version and not model_version != str(value.get("version"))
+                ):
+                    models.pop(model_set)
 
     if sources:
         srcs = manifest.get("sources", {})
@@ -60,9 +80,15 @@ def check_refs_sources(
         table_name = src.get("table_name")  # pragma: no mutate
         print(f"Missing source `{red(f'{source_name}.{table_name}')}`")
 
-    for missing_ref in models:
+    for _, ref in models.items():
         status_code = 1
-        print(f"Missing model (ref) {red(missing_ref)}")
+        package_name = ref.get("package_name")  # pragma: no mutate
+        model_name = ref.get("model_name")  # pragma: no mutate
+        version = ref.get("model_version")  # pragma: no mutate
+        msg = f"Missing model (ref) {red(f'{package_name}.{model_name}')}"
+        if version:
+            msg += f" with version {red(version)}"
+        print(msg)
 
     hook_properties = {"status_code": status_code, "models": models, "sources": sources}
 
