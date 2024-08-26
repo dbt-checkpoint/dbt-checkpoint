@@ -11,6 +11,10 @@ from dbt_checkpoint.utils import (
 )
 
 
+def _strings_match_case_insensitive(str1: str, str2: str) -> bool:
+    return (str1.lower() == str2.lower()) and (str1 != str2)
+
+
 def _find_inconsistent_objects(
     manifest_objects: Dict[str, Any],
     catalog_objects: Dict[str, Any],
@@ -19,14 +23,16 @@ def _find_inconsistent_objects(
 ):
     for object in objects:
         result = {}
-        if manifest_objects[object].get("database") != catalog_objects[object].get(
-            "metadata", {}
-        ).get("database"):
+        if _strings_match_case_insensitive(
+            manifest_objects[object].get("database", ""),
+            catalog_objects[object].get("metadata", {}).get("database", ""),
+        ):
             result["manifest"] = manifest_objects[object].get("database")
             result["catalog"] = catalog_objects[object].get("metadata").get("database")
-        if manifest_objects[object].get("schema") != catalog_objects[object].get(
-            "metadata", {}
-        ).get("schema"):
+        if _strings_match_case_insensitive(
+            manifest_objects[object].get("schema", ""),
+            catalog_objects[object].get("metadata", {}).get("schema", ""),
+        ):
             result["manifest"] = (
                 f"{manifest_objects[object].get('database')}.{manifest_objects[object].get('schema')}"
             )

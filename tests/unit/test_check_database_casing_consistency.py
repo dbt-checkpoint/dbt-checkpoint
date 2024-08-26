@@ -64,7 +64,7 @@ def test_find_inconsistent_objects(manifest, catalog):
     )
     assert len(results) == 0
 
-    catalog["nodes"]["model.test_model"]["metadata"]["database"] = "DBT"
+    catalog["nodes"]["model.test_model"]["metadata"]["database"] = "test"
     _find_inconsistent_objects(
         manifest["nodes"], catalog["nodes"], ["model.test_model"], results
     )
@@ -75,7 +75,7 @@ def test_check_database_casing_consistency(manifest, catalog):
     result = check_database_casing_consistency(manifest, catalog)
     assert result == 0
 
-    catalog["nodes"]["model.test_model"]["metadata"]["database"] = "DBT"
+    catalog["nodes"]["model.test_model"]["metadata"]["database"] = "test"
     result = check_database_casing_consistency(manifest, catalog)
     assert result == 1
 
