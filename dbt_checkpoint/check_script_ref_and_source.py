@@ -30,7 +30,7 @@ def check_refs_sources(
             src_ref_value = src_ref[1].replace("'", "").replace('"', "").strip()
             if src_ref[0] == "ref":
                 ref_node = get_manifest_node_from_file_path(manifest, str(file))
-                for ref in ref_node.get("refs"):
+                for ref in ref_node.get("refs", []):
                     ref_id = f"model.{ref.get('package') or ref_node['package_name']}.{ref.get('name')}"
                     if ref.get("version"):
                         ref_id += f".v{ref.get('version')}"
