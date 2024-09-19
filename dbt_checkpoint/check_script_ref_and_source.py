@@ -4,6 +4,7 @@ import re
 import time
 from typing import Any, Dict, Optional, Sequence
 
+from dbt_checkpoint.check_script_has_no_table_name import replace_comments
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
@@ -25,6 +26,7 @@ def check_refs_sources(
     sources = {}
     for _, file in sqls.items():
         full_script = file.read_text(encoding="utf-8")
+        full_script = replace_comments(full_script)
         src_refs = re.findall(r"\{\{\s*(source|ref)\s*\((.*)\)\s*\}\}", full_script)
         for src_ref in src_refs:
             src_ref_value = src_ref[1].replace("'", "").replace('"', "").strip()
