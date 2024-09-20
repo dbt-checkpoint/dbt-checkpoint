@@ -1,3 +1,12 @@
+# 2.0.4 - 2024-09-20
+
+**Enhancements:**
+
+- check-script-ref-and-source support for versioned models by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/250
+
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.3...v2.0.4
+
 # 2.0.3 - 2024-07-23
 
 **Fixes:**
