@@ -465,7 +465,7 @@ def get_manifest_node_from_file_path(
     manifest: Dict[str, Any], file_path: str
 ) -> Dict[str, Any]:
     for node in manifest.get("nodes", {}).values():
-        if node.get("original_file_path") in file_path:
+        if node.get("original_file_path", "") in file_path:
             return node
     return {}
 
