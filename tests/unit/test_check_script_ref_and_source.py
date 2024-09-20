@@ -164,3 +164,63 @@ def test_check_script_ref_and_source_integration(
     ret = main(input_args)
 
     assert ret == expected_status_code
+
+
+TESTS_MANIFEST_REFS = (
+    (
+        """
+    SELECT * FROM {{ ref("ref1") }} bb
+    JOIN {{ ref("ref2") }} r ON bb.id = r.id
+    """,
+        0,
+        set(),
+        {
+            "nodes": {
+                "test_model": {
+                    "original_file_path": "model/test_model.sql",
+                    "refs": [
+                        {"name": "ref1", "package": "package1"},
+                        {"name": "ref2", "package": "package2"},
+                        {"name": "ref3", "package": "package3", "version": 1},
+                    ],
+                },
+                "model.package1.ref1": {
+                    "name": "ref1",
+                    "unique_id": "model.package1.ref1",
+                },
+                "model.package2.ref2": {
+                    "name": "ref2",
+                    "unique_id": "model.package2.ref2",
+                    "original_file_path": "model/ref2.sql",
+                },
+                "model.package3.ref3.v1": {
+                    "name": "ref3",
+                    "unique_id": "model.package3.ref3.v1",
+                },
+            }
+        },
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("input_s", "expected_status_code", "missing_models", "manifest"),
+    TESTS_MANIFEST_REFS,
+)
+def test_check_script_ref_and_source_manifest_refs(
+    input_s,
+    expected_status_code,
+    missing_models,
+    manifest,
+    tmpdir,
+):
+    path = tmpdir.join("file.sql")
+    manifest["nodes"]["test_model"]["original_file_path"] = str(path)
+    path.write_text(input_s, "utf-8")
+    hook_properties = check_refs_sources(paths=[path], manifest=manifest)
+
+    ret = hook_properties.get("status_code")
+    models = hook_properties.get("models")
+
+    assert ret == expected_status_code
+    assert models == missing_models

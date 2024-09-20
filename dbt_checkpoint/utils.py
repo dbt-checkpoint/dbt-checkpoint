@@ -461,6 +461,15 @@ def run_dbt_cmd(cmd: Sequence[Any]) -> int:
     return status_code
 
 
+def get_manifest_node_from_file_path(
+    manifest: Dict[str, Any], file_path: str
+) -> Dict[str, Any]:
+    for node in manifest.get("nodes", {}).values():
+        if node.get("original_file_path") == file_path:
+            return node
+    return {}
+
+
 def add_filenames_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "filenames",

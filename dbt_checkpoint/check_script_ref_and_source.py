@@ -4,12 +4,14 @@ import re
 import time
 from typing import Any, Dict, Optional, Sequence
 
+from dbt_checkpoint.check_script_has_no_table_name import replace_comments
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
     get_dbt_manifest,
     get_filenames,
+    get_manifest_node_from_file_path,
     red,
 )
 
@@ -24,11 +26,20 @@ def check_refs_sources(
     sources = {}
     for _, file in sqls.items():
         full_script = file.read_text(encoding="utf-8")
+        full_script = replace_comments(full_script)
         src_refs = re.findall(r"\{\{\s*(source|ref)\s*\((.*)\)\s*\}\}", full_script)
         for src_ref in src_refs:
             src_ref_value = src_ref[1].replace("'", "").replace('"', "").strip()
             if src_ref[0] == "ref":
-                models.add(src_ref_value)
+                ref_node = get_manifest_node_from_file_path(manifest, str(file))
+                refs = ref_node.get("refs", [])
+                if not refs:
+                    models.add(src_ref_value)
+                for ref in refs:
+                    ref_id = f"model.{ref.get('package') or ref_node['package_name']}.{ref.get('name')}"
+                    if ref.get("version"):
+                        ref_id += f".v{ref.get('version')}"
+                    models.add(ref_id)
             if src_ref[0] == "source":
                 src_split = src_ref_value.split(",")
                 source_name = src_split[0].strip()
@@ -43,7 +54,10 @@ def check_refs_sources(
         nodes = manifest.get("nodes", {})
         for _, value in nodes.items():
             model_name = value.get("name")
-            if model_name in models:
+            model_id = value.get("unique_id")
+            if model_id in models:
+                models.remove(model_id)
+            elif model_name in models:
                 models.remove(model_name)
 
     if sources:
