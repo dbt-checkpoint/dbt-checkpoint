@@ -8,6 +8,7 @@ from dbt_checkpoint.utils import (
     get_dbt_catalog,
     get_dbt_manifest,
     red,
+    strings_differ_in_case,
 )
 
 
@@ -19,14 +20,17 @@ def _find_inconsistent_objects(
 ):
     for object in objects:
         result = {}
-        if manifest_objects[object].get("database") != catalog_objects[object].get(
-            "metadata", {}
-        ).get("database"):
+        if strings_differ_in_case(
+            manifest_objects[object].get("database", ""),
+            catalog_objects[object].get("metadata", {}).get("database", ""),
+        ):
             result["manifest"] = manifest_objects[object].get("database")
             result["catalog"] = catalog_objects[object].get("metadata").get("database")
-        if manifest_objects[object].get("schema") != catalog_objects[object].get(
-            "metadata", {}
-        ).get("schema"):
+
+        if strings_differ_in_case(
+            manifest_objects[object].get("schema", ""),
+            catalog_objects[object].get("metadata", {}).get("schema", ""),
+        ):
             result["manifest"] = (
                 f"{manifest_objects[object].get('database')}.{manifest_objects[object].get('schema')}"
             )
