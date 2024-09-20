@@ -53,9 +53,12 @@ def check_refs_sources(
     if models:
         nodes = manifest.get("nodes", {})
         for _, value in nodes.items():
+            model_name = value.get("name")
             model_id = value.get("unique_id")
             if model_id in models:
                 models.remove(model_id)
+            elif model_name in models:
+                models.remove(model_name)
 
     if sources:
         srcs = manifest.get("sources", {})
