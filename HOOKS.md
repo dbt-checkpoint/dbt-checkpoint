@@ -93,7 +93,7 @@
 ---
 
 :warning: Since v1.1.0, we've implemented a file discovery logic that "fills in" the missing files so that if the yml file is changed we find the corresponding sql file, to make sure we do the proper check.
-With this implementation, certain Hooks now can receive a `--exclude <pattern>` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
+With this implementation, certain Hooks now can receive `"--exclude", "pattern"` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
 
 Instead of doing this
 
@@ -112,7 +112,7 @@ Hooks that use `--exclude` in their args, should receive it this way:
 ```
 - id: check-model-has-tests
   description: "Ensures that the model has a number of tests"
-  args: ["--test-cnt", "1", "--exclude models/demo", "--"]
+  args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
 ```
 
 :exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
