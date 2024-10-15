@@ -170,11 +170,17 @@ def get_models(
         split_key = key.split(".")
         # Versions are supported since dbt-core 1.5
         if node.get("version") and split_key[-1] == f"v{node.get('version')}":
-            filename = f"{split_key[-2]}_v{node.get('version')}"
+            # dbt versioned filenames can be either `model_name` or `model_name_v{version}`
+            filename_candidates = [
+                f"{split_key[-2]}",
+                f"{split_key[-2]}_v{node.get('version')}",
+            ]
         else:
-            filename = split_key[-1]
-        if filename in filenames and split_key[0] == "model":
-            yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
+            filename_candidates = [split_key[-1]]
+        if split_key[0] == "model":
+            for fn in filename_candidates:
+                if fn in filenames:
+                    yield Model(key, node.get("name"), fn, node)  # pragma: no mutate
 
 
 def get_ephemeral(
