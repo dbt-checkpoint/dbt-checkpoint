@@ -911,8 +911,8 @@ repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
  rev: v1.0.0
  hooks:
- - id: check-model-parents-filename-prefix
-   exlude: ^models/stage/
+ - id: check-model-parents-name-prefix
+   exclude: ^models/stage/
    args: ["--whitelist", "stage_", "--"]
 ```
 
