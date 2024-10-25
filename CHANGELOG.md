@@ -5,6 +5,7 @@
 
 **Fixes:**
 * Fix #185: --exclude usage docs by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/257
+* Fix #260: Add check-model-parents-name-prefix to setup.cfg and fix docs by @lucaslortiz in  https://github.com/dbt-checkpoint/dbt-checkpoint/pull/261
 
 **Enhancements:**
 * check-model-name-contract can use manifest.json by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/265
