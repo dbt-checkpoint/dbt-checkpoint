@@ -1,3 +1,17 @@
+# 2.0.5 - 2024-10-25
+
+**Breaking Changes:**
+* Deprecate Python 3.7 by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/263
+
+**Fixes:**
+* Fix #185: --exclude usage docs by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/257
+
+**Enhancements:**
+* check-model-name-contract can use manifest.json by @pgoslatara in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/265
+* Feat-2974: ref-and-source support for Seeds and Snapshots by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/266
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.4...v2.0.5
+
 # 2.0.4 - 2024-09-20
 
 **Enhancements:**
