@@ -1,3 +1,11 @@
+# 2.0.6 - 2024-11-13
+
+**Fixes:**
+* Fix #259: error discovering property file by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/262
+* Fix check_model_has_description missing-filepath sql detection by @BAntonellini in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/269
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.5...v2.0.6
+
 # 2.0.5 - 2024-10-25
 
 **Breaking Changes:**
