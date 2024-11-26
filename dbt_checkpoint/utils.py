@@ -200,18 +200,15 @@ def get_snapshot_filenames(
 
 
 def get_snapshots(
-    manifest: Dict[str, Any], filenames: Set[str]
-) -> Generator[GenericDbtObject, None, None]:
+    manifest: Dict[str, Any],
+    filenames: Set[str]
+) -> Generator[Model, None, None]:
     nodes = manifest.get("nodes", {})
     for key, node in nodes.items():
-        if not node.get("config", {}).get("materialized") == "snapshot":
-            continue
         split_key = key.split(".")
         filename = split_key[-1]
         if filename in filenames and split_key[0] == "snapshot":
-            yield GenericDbtObject(
-                node.get("name"), filename, node
-            )  # pragma: no mutate
+            yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
 
 
 def get_tests(
