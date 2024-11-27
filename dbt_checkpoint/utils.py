@@ -1,10 +1,12 @@
 import argparse
 import json
+import os
 import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
+
 
 from yaml import safe_load
 
@@ -770,7 +772,8 @@ def get_missing_file_paths(
             for filename in paths_with_missing
             if not exclude_re.search(filename)
         ]
-    return paths_with_missing
+    file_paths_with_missing = [p for p in paths_with_missing if not os.path.isdir(p)]
+    return file_paths_with_missing
 
 
 def red(string: Optional[Any]) -> str:
