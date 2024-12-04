@@ -35,31 +35,42 @@ def check_column_name_contract(
     status_code = 0
     sqls = get_filenames(paths, [".sql"])
     filenames = set(sqls.keys())
-    models = get_models(catalog, filenames, include_disabled=include_disabled)
+    models = get_models(manifest, filenames, include_disabled=include_disabled)
+    
+    catalog_nodes = catalog.get("nodes", {})
 
     for model in models:
-        for col in model.node.get("columns", []).values():
-            col_name = col.get("name")
-            col_type = col.get("type")
+        catalog_node = catalog_nodes.get(model.model_id, {})
+        if catalog_node:
+            for col in catalog_node.get('columns', {}).values():
+                col_name = col.get("name")
+                col_type = col.get("type")
+            
+                # Check all files on dtypes follow naming pattern
+                if any(col_type.lower() == dtype.lower() for dtype in dtypes):
+                    if re.match(pattern, col_name, re.IGNORECASE) is None:
+                        status_code = 1
+                        print(
+                            f"model {red(model.model_id)}, in file {yellow(model.filename + '.sql')} \n"
+                            f"{yellow(col_name)}: column is of type {yellow(col_type)} and "
+                            f"does not match regex pattern {yellow(pattern)}."
+                        )
 
-            # Check all files on dtypes follow naming pattern
-            if any(col_type.lower() == dtype.lower() for dtype in dtypes):
-                if re.match(pattern, col_name, re.IGNORECASE) is None:
+                # Check all files with naming pattern are one of dtypes
+                elif re.match(pattern, col_name, re.IGNORECASE):
                     status_code = 1
                     print(
                         f"model {red(model.model_id)}, in file {yellow(model.filename + '.sql')} \n"
-                        f"{yellow(col_name)}: column is of type {yellow(col_type)} and "
-                        f"does not match regex pattern {yellow(pattern)}."
+                        f"{yellow(col_name)}: name matches regex pattern {yellow(pattern)} "
+                        f"and is of type {yellow(col_type)} instead of {yellow(', '.join(dtypes))}."
                     )
 
-            # Check all files with naming pattern are one of dtypes
-            elif re.match(pattern, col_name, re.IGNORECASE):
-                status_code = 1
-                print(
-                    f"model {red(model.model_id)}, in file {yellow(model.filename + '.sql')} \n"
-                    f"{yellow(col_name)}: name matches regex pattern {yellow(pattern)} "
-                    f"and is of type {yellow(col_type)} instead of {yellow(', '.join(dtypes))}."
-                )
+        else:
+            status_code = 1
+            print(
+                f"Unable to find model `{red(model.model_id)}` in catalog file. "
+                f"Make sure you run `dbt docs generate` before executing this hook."
+            )
 
     return {"status_code": status_code}
 

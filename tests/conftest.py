@@ -347,6 +347,33 @@ MANIFEST = {
                 "materialized": "snapshot",
             },
         },
+        "model.test.with_boolean_column_with_prefix": {
+            "name": "with_boolean_column_with_prefix",
+            "patch_path": "project://bb/with_boolean_column_with_prefix.yml",
+            "path": "aa/bb/with_boolean_column_with_prefix.sql",
+        },
+        "model.test.with_boolean_column_with_prefix_version.v1": {
+            "name": "with_boolean_column_with_prefix_version",
+            "patch_path": "project://bb/with_boolean_column_with_prefix_version.yml",
+            "path": "aa/bb/with_boolean_column_with_prefix_version_v1.sql",
+            "version": 1,
+            "latest_version": 1,
+        },
+        "model.test.with_boolean_column_without_prefix": {
+            "name": "with_boolean_column_without_prefix",
+            "patch_path": "project://bb/with_boolean_column_without_prefix.yml",
+            "path": "aa/bb/with_boolean_column_without_prefix.sql",
+        },
+        "model.test.without_boolean_column_with_prefix": {
+            "name": "without_boolean_column_with_prefix",
+            "patch_path": "project://bb/without_boolean_column_with_prefix.yml",
+            "path": "aa/bb/without_boolean_column_with_prefix.sql",
+        },
+        "model.test.without_boolean_column_without_prefix": {
+            "name": "without_boolean_column_without_prefix",
+            "patch_path": "project://bb/without_boolean_column_without_prefix.yml",
+            "path": "aa/bb/without_boolean_column_without_prefix.sql",
+        },
     },
     "sources": {
         "source.source1.table1": {
@@ -474,6 +501,14 @@ CATALOG = {
         },
         "model.test.only_model_cols": {"metadata": {}, "columns": {}},
         "model.test.with_boolean_column_with_prefix": {
+            "metadata": {},
+            "columns": {
+                "is_boolean": {"type": "boolean", "name": "is_boolean"},
+                "COL2": {"type": "TEXT", "name": "COL2"},
+                "IS_ALSO_BOOLEAN": {"type": "BOOLEAN", "name": "IS_ALSO_BOOLEAN"},
+            },
+        },
+        "model.test.with_boolean_column_with_prefix_version.v1": {
             "metadata": {},
             "columns": {
                 "is_boolean": {"type": "boolean", "name": "is_boolean"},
