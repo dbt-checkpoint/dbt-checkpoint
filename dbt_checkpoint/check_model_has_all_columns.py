@@ -1,21 +1,26 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Set, Tuple
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Tuple
 
+from dbt_checkpoint.result_logging import ResultLogger
+from dbt_checkpoint.result_logging import ResultSummary
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_catalog_args,
-    add_default_args,
-    get_dbt_catalog,
-    get_dbt_manifest,
-    get_missing_file_paths,
-    get_model_sqls,
-    get_models,
-    red,
-    yellow,
-)
+from dbt_checkpoint.utils import add_catalog_args
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_catalog
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import red
+from dbt_checkpoint.utils import yellow
 
 
 def compare_columns(
@@ -28,15 +33,25 @@ def compare_columns(
     return model_only, catalog_only
 
 
+def all_columns(
+    catalog_columns: Dict[str, Any], model_columns: Dict[str, Any]
+) -> Set[str]:
+    catalog_cols = {col.lower() for col in catalog_columns.keys()}
+    model_cols = {col.lower() for col in model_columns.keys()}
+    return catalog_cols.union(model_cols)
+
+
 def check_model_columns(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     catalog: Dict[str, Any],
     exclude_pattern: str,
     include_disabled: bool = False,
-) -> int:
-    paths = get_missing_file_paths(
-        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+) -> Tuple[int, int, int]:
+    paths = list(
+        get_missing_file_paths(
+            paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+        )
     )
 
     status_code = 0
@@ -48,13 +63,27 @@ def check_model_columns(
 
     catalog_nodes = catalog.get("nodes", {})
 
+    total = 0
+    passed = 0
+
     for model in models:
         catalog_node = catalog_nodes.get(model.model_id, {})
         if catalog_node:
-            model_only, catalog_only = compare_columns(
-                catalog_columns=catalog_node.get("columns", {}),
-                model_columns=model.node.get("columns", {}),
+            model_columns = model.node.get("columns", {})
+            catalog_columns = catalog_node.get("columns", {})
+
+            this_total = len(
+                all_columns(
+                    catalog_columns=catalog_columns,
+                    model_columns=model_columns,
+                )
             )
+            model_only, catalog_only = compare_columns(
+                catalog_columns=catalog_columns,
+                model_columns=model_columns,
+            )
+            total += this_total
+            passed += this_total - len(catalog_only.union(model_only))
             schema_path = model.node.get("patch_path", "schema")  # pragma: no mutate
             if not schema_path:
                 schema_path = "any .yml file"
@@ -86,7 +115,7 @@ def check_model_columns(
                 f"Unable to find model `{red(model.model_id)}` in catalog file. "
                 f"Make sure you run `dbt docs generate` before executing this hook."
             )
-    return status_code
+    return status_code, total, passed
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -109,7 +138,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = check_model_columns(
+    status_code, total, passed = check_model_columns(
         paths=args.filenames,
         manifest=manifest,
         catalog=catalog,
@@ -131,6 +160,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "is_pytest": script_args.get("is_test"),
         },
     )
+
+    result_summary = ResultSummary(
+        name=os.path.basename(__file__),
+        description="Check model has all columns",
+        status_code=status_code,
+        total=total,
+        passed=passed,
+        execution_time=end_time - start_time,
+    )
+    ResultLogger(script_args=script_args).log_result(result_summary)
 
     return status_code
 
