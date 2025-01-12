@@ -16,7 +16,7 @@
  </a>
 </p>
 
-## Brough to you by your friends at Datacoves
+## Brought to you by your friends at Datacoves
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="images/datacoves-dark.png">
@@ -67,7 +67,7 @@ Since `dbt-checkpoint 1.1.0`, certain hooks implement an implicit logic that "di
 
 For a complete background please refer to [#118](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/118).
 
-Since the root-level `exclude` statement is handled by pre-commit, when those hooks discover their related sql/yml files, this root exclusion is ommitted (dbt-checkpoint re-includes files that may have been excluded). To exclude files from being discovered by this logic, the `exclude` path/regex must be provided in each hook ([#119](https://github.com/dbt-checkpoint/dbt-checkpoint/pull/119))
+Since the root-level `exclude` statement is handled by pre-commit, when those hooks discover their related sql/yml files, this root exclusion is omitted (dbt-checkpoint re-includes files that may have been excluded). To exclude files from being discovered by this logic, the `exclude` path/regex must be provided in each hook ([#119](https://github.com/dbt-checkpoint/dbt-checkpoint/pull/119))
 
 ## List of `dbt-checkpoint` hooks
 
@@ -161,7 +161,7 @@ pip install pre-commit
 ## Setup
 
 1. Create a file named `.pre-commit-config.yaml` in your project root folder.
-2. Add [list of hooks](#list-of-dbt-checkpoint-hooks) you want to run befor every commit. E.g.:
+2. Add [list of hooks](#list-of-dbt-checkpoint-hooks) you want to run before every commit. E.g.:
 
 ```
 repos:
