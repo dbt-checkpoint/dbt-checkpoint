@@ -90,7 +90,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-model-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
 - [`check-model-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
 - [`check-model-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
-- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
+- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and children.
 - [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
 - [`check-model-parents-name-prefix`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-name-prefix): Check the parent model names have a specific prefix.
 - [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
@@ -117,7 +117,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-source-has-tests-by-type`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-type): Check the source has a number of tests by test type.
 - [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
 - [`check-source-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
-- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
+- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of children.
 
 **Macro checks:**
 
