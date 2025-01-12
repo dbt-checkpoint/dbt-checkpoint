@@ -52,23 +52,23 @@
 
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
-- [`check-macro-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-meta-keys): Check the macro has meta keys
+- [`check-macro-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-meta-keys): Check the macro has meta keys.
 
 **Exposure checks:**
 
-- [`check-exposure-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-exposure-has-meta-keys): Check the exposure has meta keys
+- [`check-exposure-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-exposure-has-meta-keys): Check the exposure has meta keys.
 
 **Seed checks:**
 
-- [`check-seed-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-seed-has-meta-keys): Check the seed has meta keys
+- [`check-seed-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-seed-has-meta-keys): Check the seed has meta keys.
 
 **Snapshot checks:**
 
-- [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys
+- [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys.
 
 **Tests checks:**
 
-- [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys
+- [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys.
 
 **Modifiers:**
 
@@ -91,9 +91,9 @@
 ---
 
 :warning: Since v1.1.0, we've implemented a file discovery logic that "fills in" the missing files so that if the yml file is changed we find the corresponding sql file, to make sure we do the proper check.
-With this implementation, certain Hooks now can receive `"--exclude", "pattern"` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
+With this implementation, certain hooks now can receive `"--exclude", "pattern"` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit.
 
-Instead of doing this
+Instead of doing this:
 
 ```
 - id: check-model-has-tests
@@ -165,8 +165,8 @@ Check that column name abides to a contract, as described in [this blog post](ht
 
 #### Arguments
 
-`--pattern`: Regex pattern to match column names.
-`--dtypes`: Data types.
+`--pattern`: Regex pattern to match column names.<br/>
+`--dtypes`: Data types.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -327,13 +327,13 @@ When you want to force developers to define model contracts.
 
 #### How it works
 
-It checks the generated manifest for the contract configuration
+It checks the generated manifest for the contract configuration.
 
 ---
 
 ### `check-model-has-constraints`
 
-Checks that model's yaml has specific constraints defined, eg:
+Checks that model's yaml has specific constraints defined, e.g.:
 
 ```
   - name: products
@@ -349,7 +349,7 @@ Checks that model's yaml has specific constraints defined, eg:
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--constraints`: JSON string escaped by single quotes
+`--constraints`: JSON string escaped by single quotes.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -370,7 +370,7 @@ When you want to force developers to define model constraints.
 
 #### How it works
 
-It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parameter, ie the actual constraint could have more parameters configured in dbt.
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parameter, i.e. the actual constraint could have more parameters configured in dbt.
 
 ---
 
@@ -852,8 +852,8 @@ Ensures the parent models or sources are from certain database.
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: List of allowed databases.
-`--blacklist`: List of disabled databases.
+`--whitelist`: List of allowed databases.<br/>
+`--blacklist`: List of disabled databases.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -898,8 +898,8 @@ Ensures the parent model names have a certain prefix.
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: List of allowed prefixes.
-`--blacklist`: List of non-allowed prefixes.
+`--whitelist`: List of allowed prefixes.<br/>
+`--blacklist`: List of non-allowed prefixes.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -945,7 +945,7 @@ Ensures the parent models or sources are from certain schema.
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: List of allowed schemas.
+`--whitelist`: List of allowed schemas.<br/>
 `--blacklist`: List of disabled schemas.
 
 #### Example
@@ -990,7 +990,7 @@ Ensures that the model has only valid tags from the provided list.
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tags`: A list of tags that models can have.
+`--tags`: A list of tags that models can have.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -1080,7 +1080,7 @@ repos:
 
 #### When to use it
 
-Make sure you have only valid ref and sources in your script and you do not want to wait for `dbt run` to find them. This hook also finds all missing ref and sources, not find first missing only.
+Make sure you have only valid refs and sources in your script, and you do not want to wait for `dbt run` to find them. This hook also finds all missing ref and sources, not find first missing only.
 
 #### Requirements
 
@@ -1574,7 +1574,7 @@ Ensures that the source has a number of tests from a group of tests.
 
 #### Arguments
 
-`--tests`: List of test names.
+`--tests`: List of test names.<br/>
 `--test_cnt`: Number of tests required across test group.
 
 #### Example
@@ -1660,7 +1660,7 @@ Ensures the source has a specific number (max/min) of children.
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--min-child-cnt`: Minimal number of child models.
+`--min-child-cnt`: Minimal number of child models.<br/>
 `--max-child-cnt`: Maximal number of child models.
 
 #### Example
@@ -1704,7 +1704,7 @@ Ensures that the macro has a description in the properties file (usually `macro.
 
 #### Arguments
 
-`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -2006,7 +2006,7 @@ repos:
 
 #### When to use it
 
-You are too lazy or forgetful to delete one character at the end of the script.
+If you are too lazy or forgetful to delete one character at the end of the script.
 
 #### Requirements
 
@@ -2117,7 +2117,7 @@ Run the` dbt parse` command. When running dbt >= 1.5, generates `manifest.json` 
 #### Arguments
 
 `--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
-`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.
 
 #### Example
 
@@ -2191,7 +2191,7 @@ Run `dbt test` command. Runs tests on data in deployed models.
 `--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
 `--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
-`--model-postfix`: Postfix dbt selector, for selecting children.
+`--model-postfix`: Postfix dbt selector, for selecting children.<br/>
 `--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
 
 #### Example
@@ -2222,7 +2222,7 @@ repos:
 
 ### `check-macro-has-meta-keys`
 
-Ensures that the macro has a list of valid meta keys. (usually `schema.yml`).
+Ensures that the macro has a list of valid meta keys (usually `schema.yml`).
 
 By default, it does not allow the macro to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
 
