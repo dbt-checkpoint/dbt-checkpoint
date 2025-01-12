@@ -21,7 +21,7 @@
 - [`check-model-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
 - [`check-model-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
 - [`check-model-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
-- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
+- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and children.
 - [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
 - [`check-model-parents-name-prefix`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-name-prefix): Check the parent model names have a specific prefix.
 - [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
@@ -48,7 +48,7 @@
 - [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
 - [`check-source-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-group): Check the source has a number of tests from a group of tests.
 - [`check-source-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
-- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
+- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of children.
 
 **Macro checks:**
 
@@ -372,7 +372,7 @@ When you want to force developers to define model constraints.
 
 #### How it works
 
-It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parameter, ie the actual constraint could have more parameters configured in dbt.
 
 ---
 
@@ -802,7 +802,7 @@ You want to make sure your model names follow a naming convention (e.g., staging
 
 ### `check-model-parents-and-childs`
 
-Ensures the model has a specific number (max/min) of parents or/and childs.
+Ensures the model has a specific number (max/min) of parents or/and children.
 
 #### Arguments
 
@@ -843,7 +843,7 @@ You want to find orphaned models (empty file, hard-coded reference, etc.). Or yo
 - Hook takes all changed `SQL` files.
 - The model name is obtained from the `SQL` file name.
 - The manifest is scanned for a parent and child models.
-- If any model does not have a number of required parents/childs, the hook fails.
+- If any model does not have a number of required parents/children, the hook fails.
 
 ---
 
@@ -1032,7 +1032,7 @@ Make sure you did not typo in tags.
 
 ### `check-model-materialization-by-childs`
 
-Checks the model materialization by a given threshold of child models. All models with less child models then the treshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
+Checks the model materialization by a given threshold of child models. All models with less child models then the threshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
 
 #### Arguments
 
@@ -1657,7 +1657,7 @@ Make sure you did not typo in tags.
 
 ### `check-source-childs`
 
-Ensures the source has a specific number (max/min) of childs.
+Ensures the source has a specific number (max/min) of children.
 
 #### Arguments
 
@@ -1696,7 +1696,7 @@ You want to find orphaned sources without any dependencies. Or you want to make 
 - Hook takes all changed `yml`.
 - All sources from yml file are parsed.
 - The manifest is scanned for child models.
-- If any source does not have a number of required childs, the hook fails.
+- If any source does not have a number of required children, the hook fails.
 
 ---
 
