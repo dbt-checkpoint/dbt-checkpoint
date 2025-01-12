@@ -115,7 +115,7 @@ Hooks that use `--exclude` in their args, should receive it this way:
   args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
 ```
 
-:exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
+:exclamation:**If you have a suggestion for a new hook or find a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new).**:exclamation:
 
 ## Available Hooks
 
@@ -125,7 +125,7 @@ Check the models have the same descriptions for the same column names.
 
 #### Arguments
 
-`--ignore`: columns for which do not check whether have a different description.
+`--ignore`: Columns that should not be checked for having a different description.
 
 #### Example
 
@@ -213,7 +213,7 @@ Ensures that the model has columns with descriptions in the properties file (usu
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 
 #### Example
 
@@ -259,8 +259,8 @@ Ensures that all columns in the database are also specified in the properties fi
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -310,7 +310,7 @@ Checks that model's yaml has:
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -350,7 +350,7 @@ Checks that model's yaml has specific constraints defined, eg:
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--constraints`: JSON string escaped by single quotes
 `--exclude`: Regex pattern to exclude files.
 
@@ -382,7 +382,7 @@ Ensures that the model has a description in the properties file (usually `schema
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -431,9 +431,9 @@ By default, it does not allow the model to have any other meta keys other than t
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the model.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the model.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -484,9 +484,9 @@ By default, it does not allow the model to have any other labels keys other than
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--labels-keys`: list of the required keys in the labels part of the model.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--labels-keys`: List of the required keys in the labels part of the model.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -535,7 +535,7 @@ Ensures that the model has a properties file (schema file).
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 
 #### Example
 
@@ -579,7 +579,7 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
 `--exclude`: Regex pattern to exclude files.
 
@@ -624,7 +624,7 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
 `--exclude`: Regex pattern to exclude files.
 
@@ -669,9 +669,9 @@ Ensures that the model has a number of tests from a group of tests.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: list of test names.<br/>
-`--test_cnt`: number of tests required across test group.<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--tests`: List of test names.<br/>
+`--test_cnt`: Number of tests required across test group.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -715,7 +715,7 @@ Ensures that the model has a number of tests.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--test-cnt`: Minimum number of tests required.<br/>
 `--exclude`: Regex pattern to exclude files.
 
@@ -806,7 +806,7 @@ Ensures the model has a specific number (max/min) of parents or/and childs.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--min-parent-cnt`: Minimal number of parent sources and models.
 `--max-parent-cnt`: Maximal number of parent sources and models.
 `--min-child-cnt`: Minimal number of child models.
@@ -853,9 +853,9 @@ Ensures the parent models or sources are from certain database.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: list of allowed databases.
-`--blacklist`: list of disabled databases.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: List of allowed databases.
+`--blacklist`: List of disabled databases.
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -899,9 +899,9 @@ Ensures the parent model names have a certain prefix.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: list of allowed prefixes.
-`--blacklist`: list of non-allowed prefixes.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: List of allowed prefixes.
+`--blacklist`: List of non-allowed prefixes.
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -946,9 +946,9 @@ Ensures the parent models or sources are from certain schema.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: list of allowed schemas.
-`--blacklist`: list of disabled schemas.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: List of allowed schemas.
+`--blacklist`: List of disabled schemas.
 
 #### Example
 
@@ -991,7 +991,7 @@ Ensures that the model has only valid tags from the provided list.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tags`: A list of tags that models can have.
 `--exclude`: Regex pattern to exclude files.
 
@@ -1036,7 +1036,7 @@ Checks the model materialization by a given threshold of child models. All model
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--threshold-childs`: An integer threshold of the number of child models.
 
 #### Example
@@ -1068,7 +1068,7 @@ Ensures that the script contains only existing sources or macros.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 
 #### Example
 
@@ -1140,7 +1140,7 @@ Ensures that the script is using only source or ref macro to specify the table n
 
 #### Arguments
 
-`--ignore-dotless-table`: consider all tables without dot in name as CTE
+`--ignore-dotless-table`: Consider all tables without a dot in their name as CTEs.
 
 #### Example
 
@@ -1213,8 +1213,8 @@ Ensures that all columns in the database are also specified in the properties fi
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**
 
 #### Example
 
@@ -1366,7 +1366,7 @@ Ensures that the source has a list of valid meta keys. (usually `schema.yml`).
 
 #### Arguments
 
-`--meta-keys`: list of the required keys in the meta part of the model.
+`--meta-keys`: List of the required keys in the meta part of the model.
 
 #### Example
 
@@ -1408,7 +1408,7 @@ Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
 
 #### Arguments
 
-`--labels-keys`: list of the required keys in the labels part of the model.
+`--labels-keys`: List of the required keys in the labels part of the model.
 
 #### Example
 
@@ -1576,8 +1576,8 @@ Ensures that the source has a number of tests from a group of tests.
 
 #### Arguments
 
-`--tests`: list of test names.
-`--test_cnt`: number of tests required across test group.
+`--tests`: List of test names.
+`--test_cnt`: Number of tests required across test group.
 
 #### Example
 
@@ -1661,7 +1661,7 @@ Ensures the source has a specific number (max/min) of childs.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--min-child-cnt`: Minimal number of child models.
 `--max-child-cnt`: Maximal number of child models.
 
@@ -1706,7 +1706,7 @@ Ensures that the macro has a description in the properties file (usually `macro.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -1753,7 +1753,7 @@ Ensures that the macro has arguments with descriptions in the properties file (u
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 
 #### Example
 
@@ -1799,7 +1799,7 @@ If any source is missing this hook tries to create it.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.</br>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.</br>
 `--schema-file`: Location of schema.yml file. Where new source tables should be created.
 
 #### Example
@@ -1857,7 +1857,7 @@ Unify column descriptions across all models.
 
 #### Arguments
 
-`--ignore`: Columns for which do not check whether have a different description.
+`--ignore`: Columns that should not be checked for having a different description.
 
 #### Example
 
@@ -1904,7 +1904,7 @@ Replace table names with `source` or `ref` macros in the script.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.
 
 #### Example
 
@@ -1948,8 +1948,8 @@ Generate model properties file if does not exist.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
 `--properties-file`: Location of file where new model properties should be generated. Suffix has to be `yml` or `yaml`. It can also include {database}, {schema}, {name} and {alias} variables. E.g. /models/{schema}/{name}.yml for model `foo.bar` will create properties file in /models/foo/bar.yml. If path already exists, properties are appended.
 
 #### Example
@@ -2230,9 +2230,9 @@ By default, it does not allow the macro to have any other meta keys other than t
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the macro.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the macro.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -2281,9 +2281,9 @@ By default, it does not allow the seed to have any other meta keys other than th
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the seed.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the seed.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -2332,9 +2332,9 @@ By default, it does not allow the snapshot to have any other meta keys other tha
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the snapshot.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the snapshot.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -2383,9 +2383,9 @@ By default, it does not allow the test to have any other meta keys other than th
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the test.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the test.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -2432,8 +2432,8 @@ compare Manifest and Catalog to ensure DB and Schemas have the same casing.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
 
 #### Example
 
