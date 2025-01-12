@@ -580,7 +580,7 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
+`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests e.g. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -625,7 +625,7 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
+`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required e.g. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -1450,7 +1450,7 @@ Ensures that the source has a number of tests of a certain name (e.g. data, uniq
 
 #### Arguments
 
-`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests e.g. --test unique=1 not_null=2 (do not put spaces before or after the = sign).
 
 #### Example
 
@@ -1492,7 +1492,7 @@ Ensures that the source has a number of tests of a certain type (data, schema).
 
 #### Arguments
 
-`--tests`: key-value pairs of test types. Key is a type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test types. Key is a type of test (data or schema) and value is required e.g. --test data=1 schema=2 (do not put spaces before or after the = sign).
 
 #### Example
 
