@@ -2,8 +2,6 @@
 
 :bulb: Click on hook name to view the details.
 
-[`check-column-name-contract`]: https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract
-
 **Model checks:**
 
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
