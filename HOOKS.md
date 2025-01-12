@@ -31,7 +31,7 @@
 **Script checks:**
 
 - [`check-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-semicolon): Check the script does not contain a semicolon.
-- [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has not table name (is not using `source()` or `ref()` macro for all tables).
+- [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has no table name (is not using `source()` or `ref()` macro for all tables).
 - [`check-script-ref-and-source`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-ref-and-source): Check the script has only existing refs and sources.
 
 **Source checks:**
@@ -1032,7 +1032,7 @@ Make sure you did not typo in tags.
 
 ### `check-model-materialization-by-childs`
 
-Checks the model materialization by a given threshold of child models. All models with less child models then the threshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
+Checks the model materialization based on a given threshold of child models. All models with fewer child models than the threshold should be materialized as views (or ephemerals), while the rest should be materialized as tables or incrementals.
 
 #### Arguments
 
@@ -1944,7 +1944,7 @@ You are running and debugging your `SQL` in the editor. This editor does not kno
 
 ### `generate-model-properties-file`
 
-Generate model properties file if does not exist.
+Generate model properties file if it does not exist.
 
 #### Arguments
 
@@ -2428,7 +2428,7 @@ If you `run` your test and then you delete meta keys from a properties file, the
 
 ### `check-database-casing-consistency`
 
-compare Manifest and Catalog to ensure DB and Schemas have the same casing.
+Compare manifest and catalog to ensure DB and Schemas have the same casing.
 
 #### Arguments
 
@@ -2447,7 +2447,7 @@ repos:
 
 #### When to use it
 
-If you want to make sure your dbt project (Manifest) and database (Catalog) are db.schema consistent
+If you want to make sure your dbt project (Manifest) and database (Catalog) are "db.schema" consistent
 
 #### How it works
 
