@@ -8,8 +8,8 @@
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
-- [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
+- [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
 - [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
@@ -66,7 +66,7 @@
 
 - [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys.
 
-**Tests checks:**
+**Test checks:**
 
 - [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys.
 
@@ -87,6 +87,10 @@
 - [`dbt-parse`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-parse): Run `dbt parse` command.
 - [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
 - [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
+
+**dbt checks:**
+
+- [`check-database-casing-consistency`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-database-casing-consistency): Compare manifest and catalog to ensure DB and Schemas have the same casing.
 
 ---
 
