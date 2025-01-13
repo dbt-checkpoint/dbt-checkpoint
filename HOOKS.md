@@ -95,7 +95,7 @@ With this implementation, certain hooks now can receive `"--exclude", "pattern"`
 
 Instead of doing this:
 
-```
+```yaml
 - id: check-model-has-tests
   description: "Ensures that the model has a number of tests"
   args: ["--test-cnt", "1", "--"]
@@ -107,7 +107,7 @@ Instead of doing this:
 
 Hooks that use `--exclude` in their args, should receive it this way:
 
-```
+```yaml
 - id: check-model-has-tests
   description: "Ensures that the model has a number of tests"
   args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
@@ -127,12 +127,12 @@ Check the models have the same descriptions for the same column names.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-column-desc-are-same
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-column-desc-are-same
 ```
 
 #### When to use it
@@ -171,13 +171,13 @@ Check that column name abides to a contract, as described in [this blog post](ht
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp, "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-column-name-contract
+        args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp, "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -215,12 +215,12 @@ Ensures that the model has columns with descriptions in the properties file (usu
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-columns-have-desc
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-columns-have-desc
 ```
 
 #### When to use it
@@ -263,12 +263,12 @@ Ensures that all columns in the database are also specified in the properties fi
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-all-columns
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-all-columns
 ```
 
 #### When to use it
@@ -313,12 +313,12 @@ Checks that model's yaml has:
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-contract
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-contract
 ```
 
 #### When to use it
@@ -335,7 +335,7 @@ It checks the generated manifest for the contract configuration.
 
 Checks that model's yaml has specific constraints defined, e.g.:
 
-```
+```yaml
   - name: products
     config:
       contract:
@@ -354,14 +354,14 @@ Checks that model's yaml has specific constraints defined, e.g.:
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/xasm83/dbt-checkpoint
-  rev: v1.0.0
-  hooks:
-  - id: check-model-has-contract
-  - id: check-model-has-constraints
-    args: ["--constraints", '[{"type": "primary_key", "columns": ["product_id"]}]', "--"]
+  - repo: https://github.com/xasm83/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-contract
+      - id: check-model-has-constraints
+        args: ["--constraints", '[{"type": "primary_key", "columns": ["product_id"]}]', "--"]
 ```
 
 #### When to use it
@@ -385,12 +385,12 @@ Ensures that the model has a description in the properties file (usually `schema
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-description
 ```
 
 #### When to use it
@@ -435,13 +435,13 @@ By default, it does not allow the model to have any other meta keys other than t
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-meta-keys
+        args: ["--meta-keys", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -488,13 +488,13 @@ By default, it does not allow the model to have any other labels keys other than
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-labels-keys
-   args: ['--labels-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-labels-keys
+        args: ["--labels-keys", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -537,12 +537,12 @@ Ensures that the model has a properties file (schema file).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-properties-file
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-properties-file
 ```
 
 #### When to use it
@@ -583,13 +583,13 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests-by-name
-   args: ["--tests", "unique=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-tests-by-name
+        args: ["--tests", "unique=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -628,13 +628,13 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests-by-type
-   args: ["--tests", "schema=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-tests-by-type
+        args: ["--tests", "schema=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -674,13 +674,13 @@ Ensures that the model has a number of tests from a group of tests.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests-by-group
-   args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+    - id: check-model-has-tests-by-group
+      args: [ "--tests", "unique", "unique_where", "--test-cnt", "1", "--" ]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -719,13 +719,13 @@ Ensures that the model has a number of tests.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests
-   args: ["--test-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-tests
+        args: ["--test-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -763,17 +763,17 @@ Check that model name abides to a contract (similar to [`check-column-name-contr
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-name-contract
-   args: [--pattern, "(base_|stg_).*"]
-   files: models/staging/
- - id: check-model-name-contract
-   args: [--pattern, "(dim_|fct_).*"]
-   files: models/marts/
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-name-contract
+        args: [--pattern, "(base_|stg_).*"]
+        files: models/staging/
+      - id: check-model-name-contract
+        args: [--pattern, "(dim_|fct_).*"]
+        files: models/marts/
 ```
 
 #### When to use it
@@ -812,13 +812,13 @@ Ensures the model has a specific number (max/min) of parents or/and children.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-and-childs
-   args: ["--min-parent-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-and-childs
+        args: ["--min-parent-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -858,13 +858,13 @@ Ensures the parent models or sources are from certain database.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-database
-   args: ["--blacklist", "SRC", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-database
+        args: ["--blacklist", "SRC", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -904,14 +904,14 @@ Ensures the parent model names have a certain prefix.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-name-prefix
-   exclude: ^models/stage/
-   args: ["--whitelist", "stage_", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-name-prefix
+        exclude: ^models/stage/
+        args: ["--whitelist", "stage_", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -950,13 +950,13 @@ Ensures the parent models or sources are from certain schema.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-schema
-   args: ["--blacklist", "stage", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-schema
+        args: ["--blacklist", "stage", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -995,13 +995,13 @@ Ensures that the model has only valid tags from the provided list.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-tags
-   args: ["--tags", "foo", "bar", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-tags
+        args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1039,12 +1039,12 @@ Checks the model materialization based on a given threshold of child models. All
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-materialization-by-childs
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-materialization-by-childs
 ```
 
 #### When to use it
@@ -1070,12 +1070,12 @@ Ensures that the script contains only existing sources or macros.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-script-ref-and-source
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-script-ref-and-source
 ```
 
 #### When to use it
@@ -1097,12 +1097,12 @@ Ensure that the script does not have a semicolon at the end of the file.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-script-semicolon
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-script-semicolon
 ```
 
 #### When to use it
@@ -1142,12 +1142,12 @@ Ensures that the script is using only source or ref macro to specify the table n
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-script-has-no-table-name
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-script-has-no-table-name
 ```
 
 #### When to use it
@@ -1176,12 +1176,12 @@ Ensures that the source has columns with descriptions in the properties file (us
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-columns-have-desc
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-columns-have-desc
 ```
 
 #### When to use it
@@ -1216,12 +1216,12 @@ Ensures that all columns in the database are also specified in the properties fi
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-all-columns
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-all-columns
 ```
 
 #### When to use it
@@ -1256,12 +1256,12 @@ Ensures that the source table has a description in the properties file (usually 
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-table-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-table-has-description
 ```
 
 #### When to use it
@@ -1291,13 +1291,13 @@ Ensures that the source has freshness options in the properties file (usually `s
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-freshness
-   args: ["--freshness", "error_after", "warn_after", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-freshness
+        args: ["--freshness", "error_after", "warn_after", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1329,12 +1329,12 @@ Ensures that the source has a loader option in the properties file (usually `sch
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-loader
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-loader
 ```
 
 #### When to use it
@@ -1368,13 +1368,13 @@ Ensures that the source has a list of valid meta keys. (usually `schema.yml`).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1410,13 +1410,13 @@ Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-labels-keys
-   args: ['--labels-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-labels-keys
+        args: ['--labels-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1452,13 +1452,13 @@ Ensures that the source has a number of tests of a certain name (e.g. data, uniq
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests-by-name
-   args: ["--tests", "unique=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests-by-name
+        args: ["--tests", "unique=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1494,13 +1494,13 @@ Ensures that the source has a number of tests of a certain type (data, schema).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests-by-type
-   args: ["--tests", "schema=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests-by-type
+        args: ["--tests", "schema=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1536,13 +1536,13 @@ Ensures that the source has a number of tests.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests
-   args: ["--test-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests
+        args: ["--test-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1579,13 +1579,13 @@ Ensures that the source has a number of tests from a group of tests.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests-by-group
-   args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests-by-group
+        args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1621,13 +1621,13 @@ Ensures that the source has only valid tags from the provided list.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-tags
-   args: ["--tags", "foo", "bar", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-tags
+        args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1665,13 +1665,13 @@ Ensures the source has a specific number (max/min) of children.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-childs
-   args: ["--min-child-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-childs
+        args: ["--min-child-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1709,12 +1709,12 @@ Ensures that the macro has a description in the properties file (usually `macro.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-macro-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-macro-has-description
 ```
 
 #### When to use it
@@ -1802,13 +1802,13 @@ If any source is missing this hook tries to create it.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: generate-missing-sources
-   args: ["--schema-file", "models/schema.yml", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: generate-missing-sources
+        args: ["--schema-file", "models/schema.yml", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1859,13 +1859,13 @@ Unify column descriptions across all models.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: unify-column-description
-   args: ["--ignore", "foo", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: unify-column-description
+        args: ["--ignore", "foo", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1906,12 +1906,12 @@ Replace table names with `source` or `ref` macros in the script.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: replace-script-table-names
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: replace-script-table-names
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1952,13 +1952,13 @@ Generate model properties file if it does not exist.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: generate-model-properties-file
-   args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: generate-model-properties-file
+        args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1996,12 +1996,12 @@ Remove the semicolon at the end of the script.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: remove-script-semicolon
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: remove-script-semicolon
 ```
 
 #### When to use it
@@ -2030,12 +2030,12 @@ Run the` dbt clean` command. Deletes all folders specified in the clean-targets.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-clean
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-clean
 ```
 
 ---
@@ -2054,24 +2054,24 @@ Run the` dbt compile` command. Generates executable SQL from source model, test,
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-compile
-   args: ["--model-prefix", "+", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-compile
+        args: ["--model-prefix", "+", "--"]
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-compile
-   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-compile
+        args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2084,12 +2084,12 @@ Run `dbt deps` command. Pulls the most recent version of the dependencies listed
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-deps
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-deps
 ```
 
 ---
@@ -2100,12 +2100,12 @@ Run `dbt docs generate` command. The command is responsible for generating your 
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-docs-generate
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-docs-generate
 ```
 
 ---
@@ -2121,23 +2121,23 @@ Run the` dbt parse` command. When running dbt >= 1.5, generates `manifest.json` 
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-parse
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-parse
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-parse
-   args: ["--cmd-flags", "++profiles-dir", ".", "++project-dir", ".", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-parse
+        args: ["--cmd-flags", "++profiles-dir", ".", "++project-dir", ".", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2158,24 +2158,24 @@ Run `dbt run` command. Executes compiled SQL model files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-run
-   args: ["--model-prefix", "+", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-run
+        args: ["--model-prefix", "+", "--"]
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-run
-   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-run
+        args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2196,24 +2196,24 @@ Run `dbt test` command. Runs tests on data in deployed models.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-test
-   args: ["--model-prefix", "+", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-test
+        args: ["--model-prefix", "+", "--"]
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-test
-   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-test
+        args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2234,13 +2234,13 @@ By default, it does not allow the macro to have any other meta keys other than t
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-macro-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-macro-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2285,13 +2285,13 @@ By default, it does not allow the seed to have any other meta keys other than th
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-seed-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-seed-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2336,13 +2336,13 @@ By default, it does not allow the snapshot to have any other meta keys other tha
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-snapshot-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-snapshot-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2387,13 +2387,13 @@ By default, it does not allow the test to have any other meta keys other than th
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-test-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-test-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.

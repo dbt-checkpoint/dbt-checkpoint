@@ -163,24 +163,24 @@ pip install pre-commit
 1. Create a file named `.pre-commit-config.yaml` in your project root folder.
 2. Add [list of hooks](#list-of-dbt-checkpoint-hooks) you want to run before every commit. E.g.:
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-  rev: v1.2.1
-  hooks:
-  - id: dbt-parse
-  - id: dbt-docs-generate
-    args: ["--cmd-flags", "++no-compile"]
-  - id: check-script-semicolon
-  - id: check-script-has-no-table-name
-  - id: check-model-has-all-columns
-    name: Check columns - core
-    files: ^models/core
-  - id: check-model-has-all-columns
-    name: Check columns - mart
-    files: ^models/mart
-  - id: check-model-columns-have-desc
-    files: ^models/mart
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: dbt-parse
+      - id: dbt-docs-generate
+        args: ["--cmd-flags", "++no-compile"]
+      - id: check-script-semicolon
+      - id: check-script-has-no-table-name
+      - id: check-model-has-all-columns
+        name: Check columns - core
+        files: ^models/core
+      - id: check-model-has-all-columns
+        name: Check columns - mart
+        files: ^models/mart
+      - id: check-model-columns-have-desc
+        files: ^models/mart
 ```
 
 3. Optionally, run `pre-commit install` to set up the git hook scripts. Once installed, `pre-commit` will run automatically on `git commit`! You can also manually run `pre-commit run` after you `stage` all files you want to run. Or `pre-commit run --all-files` to run the hooks against all the files (not just `staged` files).
@@ -194,32 +194,32 @@ To be able to parse dbt, you also need [profiles.yml](https://docs.getdbt.com/db
 
 Say you want to check that a model contains at least two tests, you would use this configuration:
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-model-has-tests
-   args: ["--test-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-model-has-tests
+        args: ["--test-cnt", "2", "--"]
 ```
 
 To be able to run this in GitHub CI you need to modified it to:
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: dbt-parse
- - id: check-model-has-tests
-   args: ["--test-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: dbt-parse
+      - id: check-model-has-tests
+        args: ["--test-cnt", "2", "--"]
 ```
 
 ### Create profiles.yml
 
 First step is to create [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile). E.g.
 
-```
+```yaml
 # example profiles.yml file
 jaffle_shop:
   target: dev
@@ -245,7 +245,7 @@ and store this file in project root `./profiles.yml`.
 - create new file e.g. `pr.yml`
 - specify your workflow e.g.:
 
-```
+```yaml
 name: dbt-checkpoint
 
 on:
