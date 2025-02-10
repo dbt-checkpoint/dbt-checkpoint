@@ -72,6 +72,8 @@
 
 - [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys
 
+- [`check-test-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-tags): Check the tests has valid tags.
+
 **Modifiers:**
 
 - [`generate-missing-sources`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
@@ -2425,6 +2427,58 @@ If every test needs to have certain meta keys.
 If you `run` your test and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
 
 ---
+
+### `check-test-tags`
+
+Ensures that the test has only valid tags from the provided list.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--tags`: A list of tags that models can have.
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-test-tags
+   args: ["--tags", "foo", "bar", "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+- Make sure you did not typo in tags.
+- Make sure all of your tests has a tags.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned to find test attached to the models.
+- If any test has different tags than specified, the hook fails.
+
+- Hook takes all changed `yml` or `yaml` files.
+- The manifest is scanned to find test attached to these `yml` or `yaml` files.
+- If any test has different tags than specified, the hook fails.
+
+---
+
+
 
 ### `check-database-casing-consistency`
 
