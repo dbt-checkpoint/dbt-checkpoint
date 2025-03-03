@@ -846,5 +846,45 @@ def validate_meta_keys(
     return 0
 
 
+def validate_column_meta_keys(
+    meta: Dict[str, Any],  # The column's meta dictionary
+    required_meta_keys: Set[str],  # The required meta keys
+    allow_extra_keys: bool,  # Whether extra keys are allowed
+    model_name: str,  # Name of the model
+    column_name: str,  # Name of the column
+) -> bool:
+    """
+    Validates whether a column contains the required meta keys.
+
+    Args:
+        meta: The meta dictionary of the column.
+        required_meta_keys: Set of required meta keys.
+        allow_extra_keys: If False, no extra keys should be present.
+        model_name: Name of the model (for logging).
+        column_name: Name of the column being checked.
+
+    Returns:
+        True if the column meets the requirements, False if it is missing required keys or has extra keys.
+    """
+    meta_keys = set(meta.keys())  # Get the keys present in the column's meta
+    missing_keys = required_meta_keys - meta_keys  # Identify missing keys
+    extra_keys = meta_keys - required_meta_keys  # Identify extra keys
+
+    # If missing required keys, print warning
+    if missing_keys:
+        print(
+            f"{red(model_name)}: Column {yellow(column_name)} is missing required meta keys: {yellow(', '.join(missing_keys))}"
+        )
+
+    # If extra keys are not allowed, check for extra keys
+    if not allow_extra_keys and extra_keys:
+        print(
+            f"{red(model_name)}: Column {yellow(column_name)} has extra meta keys that are not allowed: {yellow(', '.join(extra_keys))}"
+        )
+
+    # Return False if there are missing keys or disallowed extra keys
+    return not missing_keys and (allow_extra_keys or not extra_keys)
+
+
 def strings_differ_in_case(str1: str, str2: str) -> bool:
     return str1.lower() == str2.lower() and str1 != str2
