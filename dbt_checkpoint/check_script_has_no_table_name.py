@@ -3,7 +3,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Generator, Optional, Sequence, Set, Tuple
+from typing import Generator, Optional, Sequence, Set, Tuple, List
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
@@ -16,9 +16,14 @@ from dbt_checkpoint.utils import (
 
 REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 REGEX_SPLIT = r"[\s]+"
-IGNORE_WORDS = ["", "(", "{{", "{"]  # pragma: no mutate
+IGNORE_WORDS = ["", "(", "{{", "{", "null"]  # pragma: no mutate
 REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
 REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
+
+# Add these new constants with type annotations
+COMMON_SQL_FUNCTIONS: List[str] = ["extract", "substring", "trim", "unnest", "filter"]
+ALLOWED_FROM_CONTEXTS: List[str] = ["distinct", "position", "unnest"]
+REGEX_STRING_LITERALS = r"'(?:[^']|'')*'"
 
 
 def prev_cur_next_iter(
@@ -53,11 +58,20 @@ def add_space_to_source_ref(sql: str) -> str:
     return sql.replace("{{", "{{ ").replace("}}", " }}")
 
 
+def replace_string_literals(sql: str) -> str:
+    """Replace string literals with placeholders to avoid false positives."""
+    return re.sub(REGEX_STRING_LITERALS, "''", sql)
+
+
 def has_table_name(
-    sql: str, filename: str, dotless: Optional[bool] = False
+    sql: str,
+    filename: str,
+    dotless: Optional[bool] = False,
 ) -> Tuple[int, Set[str]]:
     status_code = 0
     sql_clean = replace_comments(sql)
+    # Replace string literals with empty strings to avoid detecting 'foo from bar'
+    sql_clean = replace_string_literals(sql_clean)
     sql_clean = add_space_to_parenthesis(sql_clean)
     sql_clean = add_space_to_braces(sql_clean)
     sql_clean = add_space_to_source_ref(sql_clean)
@@ -65,13 +79,67 @@ def has_table_name(
     tables = set()
     cte = set()
 
-    for prev, cur, nxt in prev_cur_next_iter(sql_split):
-        if prev in ["from", "join"] and cur not in IGNORE_WORDS:
-            table = cur.lower().strip().replace(",", "") if cur else cur
+    # Keep track of function context
+    inside_function = False
+    is_distinct_context = False
+
+    for i, (prev, cur, nxt) in enumerate(prev_cur_next_iter(sql_split)):
+        # Track "IS DISTINCT FROM" expressions
+        if (
+            prev
+            and prev.lower() == "is"
+            and cur
+            and cur.lower() == "distinct"
+            and nxt
+            and nxt.lower() == "from"
+        ):
+            is_distinct_context = True
+        elif is_distinct_context and prev and prev.lower() == "from":
+            # We've processed the token after FROM in an IS DISTINCT FROM expression
+            is_distinct_context = False
+            continue
+
+        # Check if we're entering a function call
+        if cur and nxt and nxt == "(" and cur.lower() in COMMON_SQL_FUNCTIONS:
+            inside_function = True
+
+        # Exit function context when we see the closing parenthesis
+        if cur == ")" and inside_function:
+            inside_function = False
+
+        # Handle table references, with additional context checks
+        if (
+            prev
+            and prev.lower() in ["from", "join"]
+            and cur
+            and cur.lower() not in IGNORE_WORDS
+        ):
+            # Skip if inside a function that commonly uses FROM
+            if inside_function:
+                continue
+
+            # Skip if this matches common non-table FROM patterns
+            if cur.lower() in ALLOWED_FROM_CONTEXTS:
+                continue
+
+            # Skip if in an "IS DISTINCT FROM" expression
+            if is_distinct_context:
+                continue
+
+            # Look ahead to check for "DISTINCT FROM" pattern
+            if (
+                cur.lower() == "distinct"
+                and i + 1 < len(sql_split)
+                and sql_split[i + 1].lower() == "from"
+            ):
+                continue
+
+            table = cur.lower().strip().replace(",", "")
             if dotless and "." not in table:
                 pass
             else:
                 tables.add(table)
+
         if (
             cur.lower() == "as" and nxt and nxt[0] == "(" and prev not in IGNORE_WORDS
         ):  # pragma: no mutate
@@ -87,7 +155,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
 
-    parser.add_argument("--ignore-dotless-table", action="store_true")
+    parser.add_argument(
+        "--ignore-dotless-table",
+        action="store_true",
+        help="Ignore tables without schema qualification (no dots)",
+    )
 
     args = parser.parse_args(argv)
     status_code = 0
@@ -123,7 +195,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check the script has no table name (is not using source() or ref() macro for all tables).",  # pragma: no mutate
+            "description": (
+                "Check the script has no table name "
+                "(is not using source() or ref() macro for all tables)."
+            ),  # pragma: no mutate
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
