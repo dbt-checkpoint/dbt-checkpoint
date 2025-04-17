@@ -4,6 +4,7 @@ from dbt_checkpoint.check_script_has_no_table_name import has_table_name
 from dbt_checkpoint.check_script_has_no_table_name import main
 from dbt_checkpoint.check_script_has_no_table_name import prev_cur_next_iter
 from dbt_checkpoint.check_script_has_no_table_name import replace_comments
+from dbt_checkpoint.check_script_has_no_table_name import replace_string_literals
 
 # Input, args, expected return value, expected output
 TESTS = (  # type: ignore
@@ -327,6 +328,144 @@ select * from unioned
         1,
         {"aa"},
     ),
+    (
+        """
+    SELECT
+        EXTRACT(YEAR FROM date_day) AS year
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    WITH source AS (
+        SELECT * FROM {{ source('aa', 'bb') }}
+    )
+    SELECT
+        value
+    FROM source,
+    UNNEST([1,2,3,4]) AS value
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT
+        SUBSTRING(column_name FROM 1 FOR 3) AS substring_value
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT
+        'This text contains the word from in it' AS string_with_from,
+        'Another string FROM with caps' AS another_string
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT
+        CASE
+            WHEN column_a IS DISTINCT FROM column_b THEN 'Different'
+            ELSE 'Same'
+        END AS comparison
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT
+        value
+    FROM {{ ref('model') }}
+    CROSS JOIN UNNEST(array_column) AS value
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    WITH source AS (
+        SELECT * FROM {{ source('aa', 'bb') }}
+    )
+    SELECT
+        TRIM(BOTH 'x' FROM column_name) AS trimmed_value
+    FROM source
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT
+        COUNT(*) FILTER (WHERE is_active) AS active_count
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT *
+    FROM {{ ref('model') }}
+    WHERE col1 = 'value'
+      AND col2 DISTINCT FROM NULL
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    WITH source AS (
+        SELECT * FROM {{ source('aa', 'bb') }}
+    )
+    SELECT
+        EXTRACT(YEAR FROM date_day) AS year,
+        *
+    FROM source
+    JOIN actual_table ON source.id = actual_table.id
+    """,
+        [],
+        True,
+        True,
+        1,
+        {"actual_table"},
+    ),
 )
 
 
@@ -412,3 +551,59 @@ def test_prev_cur_next_iter():
     assert prv == "bb"
     assert cur == "cc"
     assert nxt is None
+
+
+def test_replace_string_literals():
+    # Simple string
+    sql = "'select * from table'"
+    assert replace_string_literals(sql) == "''"
+
+    # String with FROM keyword
+    sql = "SELECT * FROM table WHERE col = 'contains FROM keyword'"
+    assert replace_string_literals(sql) == "SELECT * FROM table WHERE col = ''"
+
+    # Multiple strings
+    sql = "SELECT 'string1', 'string2 FROM multiple'"
+    assert replace_string_literals(sql) == "SELECT '', ''"
+
+    # String with escaped quotes
+    sql = "SELECT 'don''t use FROM in strings'"
+    assert replace_string_literals(sql) == "SELECT ''"
+
+    # Empty string
+    sql = "''"
+    assert replace_string_literals(sql) == "''"
+
+
+def test_context_aware_parsing():
+    # Test IS DISTINCT FROM tracking
+    sql = "SELECT * FROM table WHERE col IS DISTINCT FROM NULL"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"table"}  # Only 'table' should be detected, not 'NULL'
+
+    # Test function context tracking with EXTRACT
+    sql = "SELECT EXTRACT(YEAR FROM date_field) FROM table"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"table"}  # Only 'table' should be detected, not 'date_field'
+
+    # Test SUBSTRING function
+    sql = "SELECT SUBSTRING(name FROM 1 FOR 3) FROM employees"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"employees"}  # Only 'employees' should be detected
+
+    # Test TRIM function
+    sql = "SELECT TRIM(BOTH '0' FROM col) FROM data"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"data"}  # Only 'data' should be detected
+
+    # Test multiple context patterns in one query
+    sql = """
+    SELECT
+        EXTRACT(YEAR FROM date_field),
+        CASE WHEN col IS DISTINCT FROM NULL THEN 'Valid' ELSE 'Invalid' END,
+        'String with FROM in it'
+    FROM table
+    JOIN valid_table ON table.id = valid_table.id
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"table", "valid_table"}  # Only actual tables should be detected
