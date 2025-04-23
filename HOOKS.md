@@ -95,8 +95,33 @@
 :warning: Since v1.1.0, we've implemented a file discovery logic that "fills in" the missing files so that if the yml file is changed we find the corresponding sql file, to make sure we do the proper check.
 With this implementation, certain Hooks now can receive `"--exclude", "pattern"` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
 
-Instead of doing this
+For these hooks:
+```
+- check column name contract
+- check macro has description
+- check model columns have description
+- check model has all columns
+- check model has constraints
+- check model has contract
+- check model has description
+- check model has properties file
+- check model has tests by group
+- check model has tests by name
+- check model has tests by type
+- check model has tests
+- check model name contract
+- check model parents database
+- check model tags
+```
 
+Use `--exclude` in their args, as follows:
+```
+- id: check-model-has-tests
+  description: "Ensures that the model has a number of tests"
+  args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
+```
+
+For the rest of hooks, file exclusion should be done using [precommit's `exclude:` configuration](https://pre-commit.com/#config-exclude):
 ```
 - id: check-model-has-tests
   description: "Ensures that the model has a number of tests"
@@ -107,13 +132,9 @@ Instead of doing this
     )
 ```
 
-Hooks that use `--exclude` in their args, should receive it this way:
 
-```
-- id: check-model-has-tests
-  description: "Ensures that the model has a number of tests"
-  args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
-```
+
+
 
 :exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
 
@@ -2452,3 +2473,6 @@ If you want to make sure your dbt project (Manifest) and database (Catalog) are 
 #### How it works
 
 It compares models and sources databases and schemas in `manifest vs catalog`. If a db/schema in one of them presents a different casing, the hook fails.
+
+## File Descovery Hooks
+
