@@ -19,6 +19,8 @@ def validate_tags(
     manifest: Dict[str, Any],
     tags: Sequence[str],
     exclude_pattern: str,
+    has_any_tag: bool = False,
+    has_all_tags: bool = False,
     include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
@@ -31,10 +33,13 @@ def validate_tags(
 
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames, include_disabled=include_disabled)
+
     for model in models:
         # tags can be specified only from manifest
         model_tags = set(model.node.get("tags", []))
         valid_tags = set(tags)
+
+        # check if model has any tags that are not in the valid list
         if not model_tags.issubset(valid_tags):
             status_code = 1
             list_diff = list(model_tags.difference(valid_tags))
@@ -43,6 +48,25 @@ def validate_tags(
                 f"{model.node.get('original_file_path', model.filename)}: "
                 f"has invalid tags:\n- {result}",
             )
+
+        if has_any_tag:
+            # check if model has at least one tag in the provided tags list
+            if not any(valid_tag in model_tags for valid_tag in valid_tags):
+                status_code = 1
+                print(
+                    f"{model.node.get('original_file_path', model.filename)}: "
+                    f"does not have any valid tags: {valid_tags}",
+                )
+
+        if has_all_tags:
+            # check if model has all tags in the provided tags list
+            if not all(valid_tag in model_tags for valid_tag in valid_tags):
+                status_code = 1
+                print(
+                    f"{model.node.get('original_file_path', model.filename)}: "
+                    f"does not have all valid tags: {valid_tags}",
+                )
+
     return status_code
 
 
@@ -55,6 +79,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         nargs="+",
         required=True,
         help="A list of tags that models can have.",
+    )
+
+    parser.add_argument(
+        "--has-any-tag",
+        action="store_true",
+        required=False,
+        help="True/False check if the model has at least one valid tag",
+    )
+
+    parser.add_argument(
+        "--has-all-tags",
+        action="store_true",
+        required=False,
+        help="True/False check if the model has all expected valid tags",
     )
 
     args = parser.parse_args(argv)
