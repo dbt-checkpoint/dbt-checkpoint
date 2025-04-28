@@ -14,6 +14,15 @@ TESTS = (
         0,
     ),
     (
+        ["aa/bb/with_boolean_column_with_prefix_version_v1.sql", "is_test"],
+        "is_.*",
+        "boolean",
+        True,
+        True,
+        True,
+        0,
+    ),
+    (
         ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
