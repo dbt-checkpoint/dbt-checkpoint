@@ -9,6 +9,7 @@
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
+- [`check-model-columns-have-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-meta-keys): Check the model columns have keys in the meta part.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
@@ -250,6 +251,59 @@ You want to make sure that all specified columns in the properties files (usuall
 #### Known limitations
 
 If you `run` your model and then you delete column description from a properties file, the hook success since the description is still present in `manifest.json`.
+
+---
+
+### `check-model-columns-have-meta-keys`
+
+Ensures that the columns of a model have a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the columns to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: list of the required keys in the meta part of the model.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-columns-have-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every column of a model needs to have certain meta keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a model.
+- Modified `yml` files are scanned for a model.
+- If any column of a model (from a manifest or `yml` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your model and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
 
 ---
 
