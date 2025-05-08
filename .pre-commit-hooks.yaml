@@ -348,6 +348,12 @@
   entry: check-test-has-meta-keys
   language: python
   types_or: [sql]
+- id: check-test-tags
+  name: Check the test has valid tags
+  description: Ensures that the test has only valid tags from the provided list.
+  entry: check-test-tags
+  language: python
+  types_or: [sql, yaml]
 - id: check-database-casing-consistency
   name: Check databases and schemas casing are consistent
   description: Check databases and schemas casing are consistent
