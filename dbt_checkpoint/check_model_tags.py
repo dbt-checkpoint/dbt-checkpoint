@@ -81,18 +81,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="A list of tags that models can have.",
     )
 
-    parser.add_argument(
+    opt_args = parser.add_mutually_exclusive_group()
+
+    opt_args.add_argument(
         "--has-any-tag",
         action="store_true",
         required=False,
         help="True/False check if the model has at least one valid tag",
     )
 
-    parser.add_argument(
+    opt_args.add_argument(
         "--has-all-tags",
         action="store_true",
         required=False,
-        help="True/False check if the model has all expected valid tags",
+        help="True/False check if the model has all expected tags",
     )
 
     args = parser.parse_args(argv)

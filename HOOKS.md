@@ -987,12 +987,15 @@ You want to be sure that certain models are using only models from specified sch
 
 ### `check-model-tags`
 
-Ensures that the model has only valid tags from the provided list.
+Default: Ensures that the model has only valid tags from the provided list.<br/>
+Also can enforce that the model has any or all tags from the provided list when optional arguments are passed.
 
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tags`: A list of tags that models can have.
+`--tags`: A list of tags that models can have.<br/>
+`--has-any-tag`: Optional argument to enforce the model has at least one tag from the provided list.<br/>
+`--has-all-tags`: Optional argument to enforce the model has all tags from the provided list.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
