@@ -39,16 +39,6 @@ def validate_tags(
         model_tags = set(model.node.get("tags", []))
         valid_tags = set(tags)
 
-        # check if model has any tags that are not in the valid list
-        if not model_tags.issubset(valid_tags):
-            status_code = 1
-            list_diff = list(model_tags.difference(valid_tags))
-            result = "\n- ".join(list_diff)  # pragma: no mutate
-            print(
-                f"{model.node.get('original_file_path', model.filename)}: "
-                f"has invalid tags:\n- {result}",
-            )
-
         if has_any_tag:
             # check if model has at least one tag in the provided tags list
             if not any(valid_tag in model_tags for valid_tag in valid_tags):
@@ -58,13 +48,24 @@ def validate_tags(
                     f"does not have any valid tags: {valid_tags}",
                 )
 
-        if has_all_tags:
+        elif has_all_tags:
             # check if model has all tags in the provided tags list
             if not all(valid_tag in model_tags for valid_tag in valid_tags):
                 status_code = 1
                 print(
                     f"{model.node.get('original_file_path', model.filename)}: "
                     f"does not have all valid tags: {valid_tags}",
+                )
+
+        else:
+            # check if model has any tags that are not in the valid list
+            if not model_tags.issubset(valid_tags):
+                status_code = 1
+                list_diff = list(model_tags.difference(valid_tags))
+                result = "\n- ".join(list_diff)  # pragma: no mutate
+                print(
+                    f"{model.node.get('original_file_path', model.filename)}: "
+                    f"has invalid tags:\n- {result}",
                 )
 
     return status_code
