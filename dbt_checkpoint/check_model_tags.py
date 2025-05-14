@@ -111,6 +111,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         paths=args.filenames,
         manifest=manifest,
         tags=args.tags,
+        has_all_tags=args.has_all_tags,
+        has_any_tag=args.has_any_tag,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )
