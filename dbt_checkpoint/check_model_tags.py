@@ -45,7 +45,7 @@ def validate_tags(
                 status_code = 1
                 print(
                     f"{model.node.get('original_file_path', model.filename)}: "
-                    f"does not have any valid tags: {valid_tags}",
+                    f"does not have any required tags: {valid_tags}",
                 )
 
         elif has_all_tags:
@@ -54,7 +54,7 @@ def validate_tags(
                 status_code = 1
                 print(
                     f"{model.node.get('original_file_path', model.filename)}: "
-                    f"does not have all valid tags: {valid_tags}",
+                    f"does not have all required tags: {valid_tags}",
                 )
 
         else:
