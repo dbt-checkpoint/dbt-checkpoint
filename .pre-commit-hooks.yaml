@@ -31,6 +31,13 @@
   language: python
   types_or: [yaml, sql]
   require_serial: true # because we need to process yaml and sql
+- id: check-model-columns-have-meta-keys
+  name: Check the model columns have keys in the meta part
+  description: Ensures that the model columns have a list of valid meta keys.
+  entry: check-model-columns-have-meta-keys
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process yaml and sql
 - id: check-model-has-all-columns
   name: Check the model has all columns in properties file
   description: Ensures that all columns in database are specified in properties file.
