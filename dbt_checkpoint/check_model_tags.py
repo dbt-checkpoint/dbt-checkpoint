@@ -19,7 +19,7 @@ def validate_tags(
     manifest: Dict[str, Any],
     tags: Sequence[str],
     exclude_pattern: str,
-    has_any_tag: bool = False,
+    has_any_tags: bool = False,
     has_all_tags: bool = False,
     include_disabled: bool = False,
 ) -> int:
@@ -39,7 +39,7 @@ def validate_tags(
         model_tags = set(model.node.get("tags", []))
         valid_tags = set(tags)
 
-        if has_any_tag:
+        if has_any_tags:
             # check if model has at least one tag in the provided tags list
             if not any(valid_tag in model_tags for valid_tag in valid_tags):
                 status_code = 1
@@ -85,7 +85,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     opt_args = parser.add_mutually_exclusive_group()
 
     opt_args.add_argument(
-        "--has-any-tag",
+        "--has-any-tags",
         action="store_true",
         required=False,
         help="True/False check if the model has at least one valid tag",
@@ -112,7 +112,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         tags=args.tags,
         has_all_tags=args.has_all_tags,
-        has_any_tag=args.has_any_tag,
+        has_any_tags=args.has_any_tags,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )

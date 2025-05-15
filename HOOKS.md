@@ -994,7 +994,7 @@ Can also enforce that the model has any or all tags from the provided list when 
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tags`: A list of tags that models can or should have depending on optional arguments.<br/>
-`--has-any-tag`: Optional argument to enforce the model has at least one tag from the provided list.<br/>
+`--has-any-tags`: Optional argument to enforce the model has at least one tag from the provided list.<br/>
 `--has-all-tags`: Optional argument to enforce the model has all tags from the provided list.<br/>
 `--exclude`: Regex pattern to exclude files.
 
@@ -1017,7 +1017,7 @@ repos:
  rev: v1.0.0
  hooks:
  - id: check-model-tags
-   args: ["--tags", "foo", "bar", "--has-any-tag", "--"]
+   args: ["--tags", "foo", "bar", "--has-any-tags", "--"]
 ```
 
 #### Example (has all required tags)
