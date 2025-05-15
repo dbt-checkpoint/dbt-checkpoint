@@ -13,13 +13,13 @@ DEFAULT_TESTS = (
 )
 
 ANY_TAGS_TESTS = (
-    (["aa/bb/without_tags_any.sql", "--is_test", "--tags", "waldo", "--has-any-tag"], True, True, 1),
-    (["aa/bb/with_tags_any.sql", "--is_test", "--tags", "foo", "bar", "waldo", "--has-any-tags"], True, True, 0),      
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "waldo", "--has-any-tag"], True, True, 1),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar", "waldo", "--has-any-tags"], True, True, 0),     
 )
 
 ALL_TAGS_TESTS = (
-    (["aa/bb/without_tags_all.sql", "--is_test", "--tags", "foo", "bar", "waldo", "--has-all-tags"], True, True, 1),
-    (["aa/bb/with_tags_all.sql", "--is_test", "--tags", "foo", "bar", "--has-all-tags"], True, True, 0),     
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar", "waldo", "--has-all-tags"], True, True, 1),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar", "--has-all-tags"], True, True, 0),     
 )
 
 
