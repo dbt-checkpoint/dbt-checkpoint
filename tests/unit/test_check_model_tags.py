@@ -74,7 +74,7 @@ models:
 @pytest.mark.parametrize(
     ("input_args", "valid_manifest", "valid_config", "expected_status_code"), ANY_TAGS_TESTS
 )
-def test_check_model_tags(
+def test_check_model_tags_any(
     input_args,
     valid_manifest,
     valid_config,
@@ -92,55 +92,7 @@ def test_check_model_tags(
     assert status_code == expected_status_code
 
 
-def test_check_model_tags_in_changed(tmpdir, manifest_path_str):
-    schema_yml = """
-version: 2
-models:
--   name: in_schema_tags
-    tags:
-        - foo
-        - bar
--   name: xxx
-    """
-    yml_file = tmpdir.join("schema.yml")
-    yml_file.write(schema_yml)
-    result = main(
-        argv=[
-            "in_schema_tags.sql",
-            str(yml_file),
-            "--is_test",
-            "--tags",
-            "foo",
-            "bar",
-            "--has-all-tags",
-            "--manifest",
-            manifest_path_str,
-        ],
-    )
-    assert result == 0    
-
-@pytest.mark.parametrize(
-    ("input_args", "valid_manifest", "valid_config", "expected_status_code"), ALL_TAGS_TESTS
-)
-def test_check_model_tags(
-    input_args,
-    valid_manifest,
-    valid_config,
-    expected_status_code,
-    manifest_path_str,
-    config_path_str,
-):
-    if valid_manifest:
-        input_args.extend(["--manifest", manifest_path_str])
-
-    if valid_config:
-        input_args.extend(["--config", config_path_str])
-
-    status_code = main(input_args)
-    assert status_code == expected_status_code
-
-
-def test_check_model_tags_in_changed(tmpdir, manifest_path_str):
+def test_check_model_tags_any_in_changed(tmpdir, manifest_path_str):
     schema_yml = """
 version: 2
 models:
@@ -161,6 +113,54 @@ models:
             "foo",
             "bar",
             "--has-any-tags",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 0    
+
+@pytest.mark.parametrize(
+    ("input_args", "valid_manifest", "valid_config", "expected_status_code"), ALL_TAGS_TESTS
+)
+def test_check_model_tags_all(
+    input_args,
+    valid_manifest,
+    valid_config,
+    expected_status_code,
+    manifest_path_str,
+    config_path_str,
+):
+    if valid_manifest:
+        input_args.extend(["--manifest", manifest_path_str])
+
+    if valid_config:
+        input_args.extend(["--config", config_path_str])
+
+    status_code = main(input_args)
+    assert status_code == expected_status_code
+
+
+def test_check_model_tags_all_in_changed(tmpdir, manifest_path_str):
+    schema_yml = """
+version: 2
+models:
+-   name: in_schema_tags
+    tags:
+        - foo
+        - bar
+-   name: xxx
+    """
+    yml_file = tmpdir.join("schema.yml")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_tags.sql",
+            str(yml_file),
+            "--is_test",
+            "--tags",
+            "foo",
+            "bar",
+            "--has-all-tags",
             "--manifest",
             manifest_path_str,
         ],
