@@ -11,6 +11,7 @@ from dbt_checkpoint.utils import (
     red,
     yellow,
     get_dbt_semantic_manifest,
+    get_dbt_manifest,
 )
 
 
@@ -84,6 +85,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Unable to load manifest file ({e})")
         return 1
 
+    try:
+        manifest = get_dbt_manifest(args)
+    except JsonOpenError as e:
+        print(f"Unable to load manifest file ({e})")
+        return 1
+
     start_time = time.time()
     status_code, _ = check_semantic_manifest(
         semantic_manifest=semantic_manifest,
@@ -96,7 +103,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     tracker = dbtCheckpointTracking(script_args=script_args)
     tracker.track_hook_event(
         event_name="Hook Executed",
-        manifest=None,
+        manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
             "description": "Check semantic layer models/entities for required structure",
