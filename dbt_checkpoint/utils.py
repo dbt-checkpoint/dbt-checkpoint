@@ -509,6 +509,17 @@ def add_manifest_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_semantic_manifest_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--semantic-manifest",
+        type=str,
+        default=DEFAULT_SEMANTIC_MANIFEST_PATH,
+        help="""Location of semantic_manifest.json file. Usually target/manifest.json.
+        This file contains a full representation of dbt project.
+        """,
+    )
+
+
 def add_catalog_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--catalog",
@@ -550,6 +561,7 @@ def add_disabled_args(parser: argparse.ArgumentParser) -> None:
 def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)
     add_manifest_args(parser)
+    add_semantic_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
     add_exclude_args(parser)
