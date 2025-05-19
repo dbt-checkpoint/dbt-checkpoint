@@ -870,17 +870,17 @@ def validate_column_meta_keys(
     missing_keys = required_meta_keys - meta_keys  # Identify missing keys
     extra_keys = meta_keys - required_meta_keys  # Identify extra keys
 
-    # If missing required keys, print warning
-    if missing_keys:
-        print(
-            f"{red(model_name)}: Column {yellow(column_name)} is missing required meta keys: {yellow(', '.join(missing_keys))}"
-        )
+    # # If missing required keys, print warning
+    # if missing_keys:
+    #     print(
+    #         f"{red(model_name)}: Column {yellow(column_name)} is missing required meta keys: {yellow(', '.join(missing_keys))}"
+    #     )
 
-    # If extra keys are not allowed, check for extra keys
-    if not allow_extra_keys and extra_keys:
-        print(
-            f"{red(model_name)}: Column {yellow(column_name)} has extra meta keys that are not allowed: {yellow(', '.join(extra_keys))}"
-        )
+    # # If extra keys are not allowed, check for extra keys
+    # if not allow_extra_keys and extra_keys:
+    #     print(
+    #         f"{red(model_name)}: Column {yellow(column_name)} has extra meta keys that are not allowed: {yellow(', '.join(extra_keys))}"
+    #     )
 
     # Return False if there are missing keys or disallowed extra keys
     return not missing_keys and (allow_extra_keys or not extra_keys)
