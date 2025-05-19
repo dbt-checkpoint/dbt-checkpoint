@@ -30,7 +30,6 @@ def check_semantic_manifest(
     status_code = 0
     issues: Dict[str, List[str]] = {}
 
-    print(semantic_manifest)
     semantic_manifest = semantic_manifest
 
     for model in semantic_manifest.get("semantic_models", []):
