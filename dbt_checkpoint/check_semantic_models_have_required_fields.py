@@ -6,14 +6,16 @@ from typing import Any, Dict, Optional, Sequence, Set, Tuple, List
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
+    JsonOpenError,
     add_default_args,
     red,
     yellow,
+    get_dbt_semantic_manifest,
 )
 
 
 def check_semantic_manifest(
-    paths: Sequence[str],
+    semantic_manifest: Dict[str, Any],
     required_entity_fields: Sequence[str],
     required_entity_meta_keys: Sequence[str],
 ) -> Tuple[int, Dict[str, Any]]:
@@ -27,47 +29,39 @@ def check_semantic_manifest(
     status_code = 0
     issues: Dict[str, List[str]] = {}
 
-    print(paths)
-    for path in paths:
-        try:
-            with open(path) as f:
-                semantic_manifest = json.load(f)
-        except Exception as e:
-            print(f"Unable to load file {path}: {e}")
-            return 1, {}
+    print(semantic_manifest)
+    semantic_manifest = semantic_manifest
 
-        for model in semantic_manifest.get("semantic_models", []):
-            model_issues = []
-            name = model.get("name", "<unnamed>")
+    for model in semantic_manifest.get("semantic_models", []):
+        model_issues = []
+        name = model.get("name", "<unnamed>")
 
-            if not model.get("description"):
-                model_issues.append("missing description")
+        if not model.get("description"):
+            model_issues.append("missing description")
 
-            if not model.get("node_relation"):
-                model_issues.append("missing node_relation")
+        if not model.get("node_relation"):
+            model_issues.append("missing node_relation")
 
-            for entity in model.get("entities", []):
-                entity_name = entity.get("name", "<unnamed>")
-                missing_fields = [
-                    field for field in required_entity_fields if not entity.get(field)
-                ]
-                if missing_fields:
-                    model_issues.append(
-                        f"entity '{entity_name}' missing fields: {', '.join(missing_fields)}"
-                    )
+        for entity in model.get("entities", []):
+            entity_name = entity.get("name", "<unnamed>")
+            missing_fields = [
+                field for field in required_entity_fields if not entity.get(field)
+            ]
+            if missing_fields:
+                model_issues.append(
+                    f"entity '{entity_name}' missing fields: {', '.join(missing_fields)}"
+                )
 
-                meta = entity.get("config", {}).get("meta", {})
-                missing_meta_keys = [
-                    k for k in required_entity_meta_keys if k not in meta
-                ]
-                if missing_meta_keys:
-                    model_issues.append(
-                        f"entity '{entity_name}' missing meta keys: {', '.join(missing_meta_keys)}"
-                    )
+            meta = entity.get("config", {}).get("meta", {})
+            missing_meta_keys = [k for k in required_entity_meta_keys if k not in meta]
+            if missing_meta_keys:
+                model_issues.append(
+                    f"entity '{entity_name}' missing meta keys: {', '.join(missing_meta_keys)}"
+                )
 
-            if model_issues:
-                status_code = 1
-                issues[name] = model_issues
+        if model_issues:
+            status_code = 1
+            issues[name] = model_issues
 
     for model, problems in issues.items():
         print(f"{red(model)}: Semantic model failed validation")
@@ -84,9 +78,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--entity-meta-keys", nargs="+", default=[])
     args = parser.parse_args(argv)
 
+    try:
+        semantic_manifest = get_dbt_semantic_manifest(args)
+    except JsonOpenError as e:
+        print(f"Unable to load manifest file ({e})")
+        return 1
+
     start_time = time.time()
     status_code, _ = check_semantic_manifest(
-        paths=args.filenames,
+        semantic_manifest=semantic_manifest,
         required_entity_fields=args.entity_fields,
         required_entity_meta_keys=args.entity_meta_keys,
     )

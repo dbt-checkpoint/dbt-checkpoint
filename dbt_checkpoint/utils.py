@@ -12,6 +12,7 @@ from yaml import safe_load
 
 DEFAULT_MANIFEST_PATH = "target/manifest.json"
 DEFAULT_CATALOG_PATH = "target/catalog.json"
+DEFAULT_SEMANTIC_MANIFEST_PATH = "target/semantic_manifest.json"
 
 
 class CalledProcessError(RuntimeError):
@@ -808,6 +809,24 @@ def get_dbt_manifest(args):  # type: ignore
         return get_json(f"{config_project_dir}/target/manifest.json")
     else:
         return get_json(manifest_path)
+
+
+def get_dbt_semantic_manifest(args):  # type: ignore
+    """
+    Get dbt semantic manifest following the new config file approach. Precedence:
+        - custom `--semantic_manifest` flag
+        - .dbt-checkpoint.yaml `dbt-project-dir` key
+        - default `--semantic_manifest` flag
+    """
+    semantic_manifest_path = args.semantic_manifest
+    dbt_checkpoint_config = get_config_file(args.config)
+    config_project_dir = dbt_checkpoint_config.get("dbt-project-dir")
+    if semantic_manifest_path != DEFAULT_SEMANTIC_MANIFEST_PATH:
+        return get_json(semantic_manifest_path)
+    elif config_project_dir:
+        return get_json(f"{config_project_dir}/target/semantic_manifest.json")
+    else:
+        return get_json(semantic_manifest_path)
 
 
 def get_dbt_catalog(args):  # type: ignore
