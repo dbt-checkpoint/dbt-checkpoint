@@ -27,7 +27,7 @@ def check_semantic_manifest(
     status_code = 0
     issues: Dict[str, List[str]] = {}
 
-    print(path)
+    print(paths)
     for path in paths:
         try:
             with open(path) as f:
