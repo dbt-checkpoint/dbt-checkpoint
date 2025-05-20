@@ -82,7 +82,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "--required-fields",
         nargs="+",
-        default=["name", "type", "expr", "config.meta.displayName"],
+        default=["name", "type", "config.meta.displayName"],
         help="List of required fields for dimensions in semantic models",
     )
     args = parser.parse_args(argv)
