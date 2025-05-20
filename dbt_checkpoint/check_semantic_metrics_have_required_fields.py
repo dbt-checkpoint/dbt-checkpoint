@@ -61,6 +61,14 @@ def check_semantic_metrics_have_fields(
                     meta_field
                 ):
                     metric_issues.append(field)
+            elif field == "type_params.measure.name" and metric_type == "ratio":
+                # skip this check, instead check numerator and denominator names
+                numerator = get_nested_value(metric, "type_params.numerator.name")
+                denominator = get_nested_value(metric, "type_params.denominator.name")
+                if not numerator:
+                    metric_issues.append("type_params.numerator.name")
+                if not denominator:
+                    metric_issues.append("type_params.denominator.name")
             else:
                 value = (
                     get_nested_value(metric, field)
@@ -93,8 +101,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "description",
             "label",
             "type_params.measure.name",
-            "config.meta.isDefaultMetric",
-            "config.meta.displayFormat",
             "config.meta.displayName",
         ],
         help="List of required fields for metrics (config.meta.* checked in corresponding measure)",
