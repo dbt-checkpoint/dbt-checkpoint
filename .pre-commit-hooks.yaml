@@ -375,3 +375,10 @@
   language: python
   types_or: [yaml, sql]
   require_serial: true
+- id: check-semantic-dimensions-have-required-fields
+  name: Check the model columns have keys in the meta part
+  description: Ensures that the model columns have a list of valid meta keys.
+  entry: check-semantic-dimensions-have-required-fields
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true
