@@ -20,7 +20,7 @@ FIELD_MAPPING = {
 }
 
 
-def check_semantic_model_required_fields(
+def check_semantic_models_have_required_fields(
     semantic_manifest: Dict[str, Any], required_fields: Sequence[str]
 ) -> Tuple[int, Dict[str, Any]]:
     """
@@ -89,7 +89,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code, _ = check_semantic_model_required_fields(
+    status_code, _ = check_semantic_models_have_required_fields(
         semantic_manifest=semantic_manifest,
         required_fields=args.required_fields,
     )
