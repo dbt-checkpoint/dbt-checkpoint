@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Set, Tuple, List
+from typing import Any, Dict, Optional, Sequence, Tuple, List
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
@@ -15,13 +15,16 @@ from dbt_checkpoint.utils import (
 )
 
 
-def check_semantic_manifest(
-    semantic_manifest: Dict[str, Any],
-    required_entity_fields: Sequence[str],
-    required_entity_meta_keys: Sequence[str],
+FIELD_MAPPING = {
+    "model": "node_relation",
+}
+
+
+def check_semantic_model_required_fields(
+    semantic_manifest: Dict[str, Any], required_fields: Sequence[str]
 ) -> Tuple[int, Dict[str, Any]]:
     """
-    Checks that each semantic model has required fields and entities meet structural/meta criteria.
+    Checks that each semantic model has user-specified required top-level fields.
 
     Returns:
         status_code: 0 if all checks pass, 1 otherwise.
@@ -30,34 +33,16 @@ def check_semantic_manifest(
     status_code = 0
     issues: Dict[str, List[str]] = {}
 
-    semantic_manifest = semantic_manifest
+    # Map custom aliases like 'model' to actual field names
+    resolved_fields = [FIELD_MAPPING.get(f, f) for f in required_fields]
 
     for model in semantic_manifest.get("semantic_models", []):
         model_issues = []
         name = model.get("name", "<unnamed>")
 
-        if not model.get("description"):
-            model_issues.append("missing description")
-
-        if not model.get("node_relation"):
-            model_issues.append("missing node_relation")
-
-        for entity in model.get("entities", []):
-            entity_name = entity.get("name", "<unnamed>")
-            missing_fields = [
-                field for field in required_entity_fields if not entity.get(field)
-            ]
-            if missing_fields:
-                model_issues.append(
-                    f"entity '{entity_name}' missing fields: {', '.join(missing_fields)}"
-                )
-
-            meta = entity.get("config", {}).get("meta", {})
-            missing_meta_keys = [k for k in required_entity_meta_keys if k not in meta]
-            if missing_meta_keys:
-                model_issues.append(
-                    f"entity '{entity_name}' missing meta keys: {', '.join(missing_meta_keys)}"
-                )
+        for field in resolved_fields:
+            if not model.get(field):
+                model_issues.append(f"missing {field}")
 
         if model_issues:
             status_code = 1
@@ -74,8 +59,12 @@ def check_semantic_manifest(
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
-    parser.add_argument("--entity-fields", nargs="+", default=["name", "type", "expr"])
-    parser.add_argument("--entity-meta-keys", nargs="+", default=[])
+    parser.add_argument(
+        "--required-fields",
+        nargs="+",
+        default=["description", "model"],
+        help="List of required fields for semantic models (e.g., description model)",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -91,10 +80,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code, _ = check_semantic_manifest(
+    status_code, _ = check_semantic_model_required_fields(
         semantic_manifest=semantic_manifest,
-        required_entity_fields=args.entity_fields,
-        required_entity_meta_keys=args.entity_meta_keys,
+        required_fields=args.required_fields,
     )
     end_time = time.time()
     script_args = vars(args)
@@ -105,7 +93,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check semantic layer models/entities for required structure",
+            "description": "Check semantic model has required fields",
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
