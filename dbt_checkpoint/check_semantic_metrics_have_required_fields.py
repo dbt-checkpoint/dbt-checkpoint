@@ -52,7 +52,7 @@ def check_semantic_metrics_have_fields(
 
         for field in required_fields:
             if field.startswith("config.meta."):
-                if metric_type == "ratio":
+                if metric_type in ["ratio", "derived"]:
                     continue  # skip meta field checks for ratio metrics
                 meta_field = field.replace("config.meta.", "")
                 measure_name = get_nested_value(metric, "type_params.measure.name")
@@ -61,14 +61,29 @@ def check_semantic_metrics_have_fields(
                     meta_field
                 ):
                     metric_issues.append(field)
-            elif field == "type_params.measure.name" and metric_type == "ratio":
-                # skip this check, instead check numerator and denominator names
-                numerator = get_nested_value(metric, "type_params.numerator.name")
-                denominator = get_nested_value(metric, "type_params.denominator.name")
-                if not numerator:
-                    metric_issues.append("type_params.numerator.name")
-                if not denominator:
-                    metric_issues.append("type_params.denominator.name")
+            elif field == "type_params.measure.name":
+                if metric_type == "ratio":
+                    # skip this check, instead check numerator and denominator names
+                    numerator = get_nested_value(metric, "type_params.numerator.name")
+                    denominator = get_nested_value(
+                        metric, "type_params.denominator.name"
+                    )
+                    if not numerator:
+                        metric_issues.append("type_params.numerator.name")
+                    if not denominator:
+                        metric_issues.append("type_params.denominator.name")
+                elif metric_type == "derived":
+                    derived_metrics = get_nested_value(metric, "type_params.metrics")
+                    if (
+                        not derived_metrics
+                        or not isinstance(derived_metrics, list)
+                        or not derived_metrics
+                    ):
+                        metric_issues.append("type_params.metrics")
+                else:
+                    value = get_nested_value(metric, field)
+                    if value in [None, ""]:
+                        metric_issues.append(field)
             else:
                 value = (
                     get_nested_value(metric, field)
