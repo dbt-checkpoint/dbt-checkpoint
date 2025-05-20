@@ -47,10 +47,13 @@ def check_semantic_metrics_have_fields(
 
     for metric in semantic_manifest.get("metrics", []):
         metric_name = metric.get("name", "<unnamed>")
+        metric_type = metric.get("type")
         metric_issues = []
 
         for field in required_fields:
             if field.startswith("config.meta."):
+                if metric_type == "ratio":
+                    continue  # skip meta field checks for ratio metrics
                 meta_field = field.replace("config.meta.", "")
                 measure_name = get_nested_value(metric, "type_params.measure.name")
                 measure = measure_map.get(measure_name)
