@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.dbt_test import main, prepare_cmd
+from dbt_checkpoint.dbt_test import main
+from dbt_checkpoint.dbt_test import prepare_cmd
 
 
 def test_dbt_test():

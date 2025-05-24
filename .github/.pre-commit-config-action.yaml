@@ -3,4 +3,3 @@ repos:
       rev: v1.2.0
       hooks:
       - id: dbt-test
-    

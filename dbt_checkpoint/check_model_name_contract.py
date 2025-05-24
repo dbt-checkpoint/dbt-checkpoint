@@ -23,11 +23,11 @@ def check_model_name_contract(
     exclude_pattern: str,
     include_disabled: bool = False,
 ) -> int:
-    paths = get_missing_file_paths(
+    missing_file_paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
     status_code = 0
-    sqls = get_filenames(paths, [".sql"])
+    sqls = get_filenames(missing_file_paths, [".sql"])
     filenames = set(sqls.keys())
     models = get_models(manifest, filenames, include_disabled=include_disabled)
 

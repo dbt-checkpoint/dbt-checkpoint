@@ -45,14 +45,28 @@ TESTS = (
     ),
     (
         ["aa/bb/with_labels.sql", "--labels-keys", "foo", "--allow-extra-keys"],
-        {"models": [{"name": "with_labels", "config":{"labels": {"foo": "bar", "baz": "test"}}}]},
+        {
+            "models": [
+                {
+                    "name": "with_labels",
+                    "config": {"labels": {"foo": "bar", "baz": "test"}},
+                }
+            ]
+        },
         True,
         True,
         0,
     ),
     (
         ["aa/bb/with_labels.sql", "--labels-keys", "baz"],
-        {"models": [{"name": "with_labels", "config":{"labels": {"foo": "bar", "baz": "test"}}}]},
+        {
+            "models": [
+                {
+                    "name": "with_labels",
+                    "config": {"labels": {"foo": "bar", "baz": "test"}},
+                }
+            ]
+        },
         True,
         True,
         1,

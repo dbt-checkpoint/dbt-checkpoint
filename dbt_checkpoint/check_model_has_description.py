@@ -1,20 +1,21 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_filenames,
-    get_missing_file_paths,
-    get_model_schemas,
-    get_model_sqls,
-    get_models,
-    red,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_schemas
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import red
 
 
 def has_description(
@@ -76,19 +77,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     script_args = vars(args)
 
     tracker = dbtCheckpointTracking(script_args=script_args)
+    status_code = hook_properties["status_code"]
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
             "description": "Check the model has description",
-            "status": hook_properties.get("status_code"),
+            "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
         },
     )
 
-    return hook_properties.get("status_code")  # type: ignore
+    return status_code  # type: ignore
 
 
 if __name__ == "__main__":

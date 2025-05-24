@@ -1,18 +1,20 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Iterable, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_filenames,
-    get_model_schemas,
-    get_model_sqls,
-    get_models,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_model_schemas
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def validate_keys(
@@ -56,7 +58,7 @@ def has_labels_key(
     in_schemas = set()
     for schema in schemas:
         schema_config = schema.schema.get("config")
-        schema_labels_data = schema_config.get("labels")
+        schema_labels_data = schema_config.get("labels") if schema_config else None
         schema_labels = set(schema_labels_data.keys()) if schema_labels_data else set()
 
         if validate_keys(schema_labels, labels_keys, allow_extra_keys):
@@ -64,11 +66,11 @@ def has_labels_key(
 
     missing = filenames.difference(in_models, in_schemas)
 
-    for model in missing:
+    for missing_model in missing:
         status_code = 1
         result = "\n- ".join(list(labels_keys))
         print(
-            f"{sqls.get(model)}: "
+            f"{sqls.get(missing_model)}: "
             f"does not have some of the labels keys defined:\n- {result}",
         )
 

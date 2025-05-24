@@ -2,21 +2,23 @@ import argparse
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
 
-from yaml import dump, safe_load
+from yaml import dump
+from yaml import safe_load
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    Model,
-    add_catalog_args,
-    add_default_args,
-    get_dbt_catalog,
-    get_dbt_manifest,
-    get_filenames,
-    get_models,
-)
+from dbt_checkpoint.utils import add_catalog_args
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_catalog
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import Model
 
 
 def append_to_properties_file(path: Path, model_schema: Dict[str, Any]) -> None:
@@ -108,7 +110,7 @@ def generate_properties_file(
     return {"status_code": status_code}
 
 
-def main(argv: Optional[Sequence[str]] = None) -> Dict[str, Any]:
+def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
     add_catalog_args(parser)
@@ -158,19 +160,20 @@ def main(argv: Optional[Sequence[str]] = None) -> Dict[str, Any]:
     script_args = vars(args)
 
     tracker = dbtCheckpointTracking(script_args=script_args)
+    status_code = hook_properties["status_code"]
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
             "description": "Generate model properties file.",
-            "status": hook_properties.get("status_code"),
+            "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
         },
     )
 
-    return hook_properties.get("status_code")
+    return status_code
 
 
 if __name__ == "__main__":

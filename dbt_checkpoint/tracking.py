@@ -1,7 +1,6 @@
 import os
 from typing import Any
 from typing import Dict
-from typing import NoReturn
 from typing import Optional
 
 from mixpanel import Mixpanel
@@ -86,7 +85,7 @@ class dbtCheckpointTracking:
 
     @staticmethod
     def _remove_ext_in_hook_name(
-        event_properties: Optional[Dict[str, Any]]
+        event_properties: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
         transformed_properties = {} if event_properties is None else event_properties
         hook_name = transformed_properties.get("hook_name")

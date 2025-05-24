@@ -2,13 +2,20 @@ import argparse
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, FrozenSet, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import FrozenSet
+from typing import Optional
+from typing import Sequence
 
-from yaml import dump, safe_load
+from yaml import dump
+from yaml import safe_load
 
 from dbt_checkpoint.check_script_ref_and_source import check_refs_sources
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_dbt_manifest
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def create_missing_sources(
@@ -76,7 +83,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         paths=args.filenames, manifest=manifest
     )
 
-    sources = check_refs_sources_properties.get("sources")
+    sources = check_refs_sources_properties.get("sources", {})
 
     hook_properties = create_missing_sources(sources, output_path=args.schema_file)
     end_time = time.time()
@@ -84,18 +91,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     script_args = vars(args)
 
     tracker = dbtCheckpointTracking(script_args=script_args)
+    status_code = hook_properties["status_code"]
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
             "description": "If any source is missing this hook tries to create it.",
-            "status": hook_properties.get("status_code"),
+            "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
         },
     )
-    return hook_properties.get("status_code")
+    return status_code
 
 
 if __name__ == "__main__":

@@ -1,10 +1,15 @@
 import argparse
 import os
 import time
-from typing import IO, Optional, Sequence
+from typing import IO
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_dbt_manifest, red
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import red
 
 
 def check_semicolon(file_obj: IO[bytes], replace: bool = False) -> int:

@@ -1,19 +1,19 @@
 import argparse
-import os
-import time
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Sequence
 
-from dbt_checkpoint.utils import (
-    add_config_args,
-    add_dbt_cmd_args,
-    add_dbt_cmd_model_args,
-    add_filenames_args,
-    extend_dbt_project_dir_flag,
-    get_config_file,
-    get_flags,
-    paths_to_dbt_models,
-    run_dbt_cmd,
-)
+from dbt_checkpoint.utils import add_config_args
+from dbt_checkpoint.utils import add_dbt_cmd_args
+from dbt_checkpoint.utils import add_dbt_cmd_model_args
+from dbt_checkpoint.utils import add_filenames_args
+from dbt_checkpoint.utils import extend_dbt_project_dir_flag
+from dbt_checkpoint.utils import get_config_file
+from dbt_checkpoint.utils import get_flags
+from dbt_checkpoint.utils import paths_to_dbt_models
+from dbt_checkpoint.utils import run_dbt_cmd
 
 
 def prepare_cmd(
@@ -53,7 +53,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         args.model_prefix,
         args.model_postfix,
         args.models,
-        config
+        config,
     )
     return run_dbt_cmd(cmd)
 

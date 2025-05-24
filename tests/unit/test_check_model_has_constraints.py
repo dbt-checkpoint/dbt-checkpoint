@@ -3,11 +3,13 @@ import pytest
 from dbt_checkpoint.check_model_has_constraints import main
 
 
-CONSTRAINTS = ('[{"type":"primary_key","columns":["col_a","col_b"]},'
-               '{"type":"foreign_key","columns":["col_a","col_b"]},'
-               '{"type":"check","columns":["col_a","col_b"]},'
-               '{"type":"not_null","columns":["col_a","col_b"]},'
-               '{"type":"unique","columns":["col_a","col_b"]},{"type":"custom"}]')
+CONSTRAINTS = (
+    '[{"type":"primary_key","columns":["col_a","col_b"]},'
+    '{"type":"foreign_key","columns":["col_a","col_b"]},'
+    '{"type":"check","columns":["col_a","col_b"]},'
+    '{"type":"not_null","columns":["col_a","col_b"]},'
+    '{"type":"unique","columns":["col_a","col_b"]},{"type":"custom"}]'
+)
 
 PRIMARY_KEY = '[{"type":"primary_key","columns":["col_a","col_b"]}]'
 

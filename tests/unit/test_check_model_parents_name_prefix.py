@@ -20,7 +20,7 @@ TESTS = (  # type: ignore
         True,
         1,
     ),
-(
+    (
         ["aa/bb/parent_child.sql", "--is_test"],
         ["--whitelist", "somthing_else"],
         True,
