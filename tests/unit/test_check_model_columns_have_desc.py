@@ -1,8 +1,10 @@
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_model_columns_have_desc import check_column_desc, main
+from dbt_checkpoint.check_model_columns_have_desc import check_column_desc
+from dbt_checkpoint.check_model_columns_have_desc import main
 
 # Input args, valid manifest, expected return value
 TESTS = (

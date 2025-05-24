@@ -1,22 +1,24 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_filenames,
-    get_missing_file_paths,
-    get_models,
-    get_parent_childs,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import get_parent_childs
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def check_parents_database(
-    paths: Sequence[str],
+    paths: Iterable[str],
     manifest: Dict[str, Any],
     blacklist: Optional[Sequence[str]],
     whitelist: Optional[Sequence[str]],
@@ -24,7 +26,7 @@ def check_parents_database(
     include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
-        paths, manifest, [".sql"], exclude_pattern=exclude_pattern
+        paths, manifest, True, exclude_pattern=exclude_pattern
     )
 
     status_code = 0

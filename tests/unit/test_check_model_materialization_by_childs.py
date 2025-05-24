@@ -49,7 +49,7 @@ def test_check_model_materialization_by_childs(
     expected_return_code,
     manifest_path_str,
     config_path_str,
-) -> None:
+):
     """Test the check_model_materialization_by_childs function."""
     if valid_manifest:
         input_args.extend(["--manifest", manifest_path_str])

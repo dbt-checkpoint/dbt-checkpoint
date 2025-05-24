@@ -396,10 +396,13 @@ MANIFEST = {
         "macro.without_description": {
             "description": "",
             "path": "macros/aa/without_description.sql",
+            "macro_sql": "{% macro without_description("
+            "test1, test2) %}{% endmacro %}",
         },
         "macro.with_description": {
             "description": "test description",
             "path": "macros/aa/with_description.sql",
+            "macro_sql": "{% macro with_description(" "test1, test2) %}{% endmacro %}",
         },
         "macro.with_argument_description": {
             "path": "macros/aa/with_argument_description.sql",
@@ -407,6 +410,8 @@ MANIFEST = {
                 {"name": "test1", "description": "test"},
                 {"name": "test2", "description": "test"},
             ],
+            "macro_sql": "{% macro with_argument_description("
+            "test1, test2) %}{% endmacro %}",
         },
         "macro.with_some_argument_description": {
             "path": "macros/aa/with_some_argument_description.sql",
@@ -414,10 +419,64 @@ MANIFEST = {
                 {"name": "test1", "description": "test"},
                 {"name": "test2"},
             ],
+            "macro_sql": "{% macro with_some_argument_description("
+            "test1, test2) %}{% endmacro %}",
         },
         "macro.without_arguments_description": {
             "path": "macros/aa/without_arguments_description.sql",
             "arguments": [{"name": "test1"}, {"name": "test2"}],
+            "macro_sql": "{% macro without_arguments_description("
+            "test1, test2) %}{% endmacro %}",
+        },
+        "macro.with_arguments_not_listed_in_yml": {
+            "path": "macros/aa/with_arguments_not_listed_in_yml.sql",
+            "description": "test description",
+            "macro_sql": "{% macro with_arguments_not_listed_in_yml("
+            "test1, test2) %}{% endmacro %}",
+        },
+        "macro.with_unexpected_args_in_yml_not_in_sql": {
+            "path": "macros/aa/with_unexpected_args_in_yml_not_in_sql.sql",
+            "description": "test description",
+            "arguments": [
+                {"name": "test1", "description": "test"},
+                {"name": "test2", "description": "test"},
+                {"name": "test3", "description": "test"},
+            ],
+            "macro_sql": "{% macro with_unexpected_args_in_yml_not_in_sql("
+            "test1, test2) %}{% endmacro %}",
+        },
+        "macro.test_custom_generic_test_macro": {
+            "path": "tests/generic/custom_generic_test_macro.sql",
+            "description": "test description",
+            "arguments": [
+                {"name": "test1", "description": "test"},
+                {"name": "test2", "description": "test"},
+            ],
+            "macro_sql": "{% test custom_generic_test_macro("
+            "test1, test2) %}{% endtest %}",
+        },
+        "macro.test_custom_generic_test_macro_no_description": {
+            "path": "tests/generic/custom_generic_test_macro_no_description.sql",
+            "macro_sql": "{% test custom_generic_test_macro_no_description("
+            "test1, test2) %}{% endtest %}",
+        },
+        "macro.test_custom_generic_test_macro_in_custom_tests_dir": {
+            "path": "data_tests/generic/"
+            "custom_generic_test_macro_in_custom_tests_dir.sql",
+            "description": "test description",
+            "arguments": [
+                {"name": "test1", "description": "test"},
+                {"name": "test2", "description": "test"},
+            ],
+            "macro_sql": "{% test custom_generic_test_macro_in_custom_tests_dir("
+            "test1, test2) %}{% endtest %}",
+        },
+        "macro.test_custom_generic_test_macro_no_description_in_custom_tests_dir": {
+            "path": "data_tests/generic/"
+            "custom_generic_test_macro_no_description_in_custom_tests_dir.sql",
+            "macro_sql": "{% test "
+            "custom_generic_test_macro_no_description_in_custom_tests_dir"
+            "(test1, test2) %}{% endtest %}",
         },
     },
     "child_map": {

@@ -1,6 +1,7 @@
 import pytest
 
-from dbt_checkpoint.replace_script_table_names import get_source_from_name, main
+from dbt_checkpoint.replace_script_table_names import get_source_from_name
+from dbt_checkpoint.replace_script_table_names import main
 
 # Input, expected return value, expected output
 TESTS = (  # type: ignore

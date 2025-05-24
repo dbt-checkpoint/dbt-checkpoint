@@ -1,16 +1,17 @@
 """Pre-commit hook that compares the number of childs with a given treshold to
 improve on the chosen materialization of the models."""
 import argparse
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_model_sqls,
-    get_models,
-    get_parent_childs,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import get_parent_childs
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def check_model_materialization_by_childs(
@@ -71,7 +72,7 @@ def check_model_materialization_by_childs(
     return status_code
 
 
-def main(argv: List[str] = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     """Run the pre-commit hook to check the materialization of the models.
 
     :param args: Command line arguments that are parsed, defaults to None.

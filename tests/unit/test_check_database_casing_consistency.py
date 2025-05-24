@@ -1,12 +1,13 @@
-from unittest.mock import MagicMock, patch
+from typing import Set
+from unittest.mock import patch
 
 import pytest
 
+from dbt_checkpoint.check_database_casing_consistency import _find_inconsistent_objects
 from dbt_checkpoint.check_database_casing_consistency import (
-    _find_inconsistent_objects,
     check_database_casing_consistency,
-    main,
 )
+from dbt_checkpoint.check_database_casing_consistency import main
 
 
 @pytest.fixture
@@ -58,7 +59,7 @@ def catalog():
 
 
 def test_find_inconsistent_objects(manifest, catalog):
-    results = set()
+    results: Set[str] = set()
     _find_inconsistent_objects(
         manifest["nodes"], catalog["nodes"], ["model.test_model"], results
     )
@@ -83,7 +84,8 @@ def test_check_database_casing_consistency(manifest, catalog):
 @patch("dbt_checkpoint.check_database_casing_consistency.get_dbt_manifest")
 @patch("dbt_checkpoint.check_database_casing_consistency.get_dbt_catalog")
 @patch(
-    "dbt_checkpoint.check_database_casing_consistency.argparse.ArgumentParser.parse_args"
+    "dbt_checkpoint.check_database_casing_consistency."
+    "argparse.ArgumentParser.parse_args"
 )
 def test_main(
     mock_parse_args,

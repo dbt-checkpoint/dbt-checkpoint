@@ -1,8 +1,9 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_macro_has_meta_keys import has_meta_key, main
+from dbt_checkpoint.check_macro_has_meta_keys import has_meta_key
 
 
 @pytest.fixture
@@ -21,7 +22,7 @@ def test_has_meta_key_match(mock_macro):
 
     with patch(
         "dbt_checkpoint.check_macro_has_meta_keys.get_filenames",
-        return_value=["macro.sql"],
+        return_value={"macro.sql": None},
     ), patch(
         "dbt_checkpoint.check_macro_has_meta_keys.get_macros", return_value=[mock_macro]
     ):
@@ -38,7 +39,7 @@ def test_has_meta_key_extra_keys(mock_macro):
 
     with patch(
         "dbt_checkpoint.check_macro_has_meta_keys.get_filenames",
-        return_value=["macro.sql"],
+        return_value={"macro.sql": None},
     ), patch(
         "dbt_checkpoint.check_macro_has_meta_keys.get_macros", return_value=[mock_macro]
     ):
@@ -55,7 +56,7 @@ def test_has_meta_key_allow_extra_keys(mock_macro):
 
     with patch(
         "dbt_checkpoint.check_macro_has_meta_keys.get_filenames",
-        return_value=["macro.sql"],
+        return_value={"macro.sql": None},
     ), patch(
         "dbt_checkpoint.check_macro_has_meta_keys.get_macros", return_value=[mock_macro]
     ):

@@ -3,16 +3,19 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Generator, Optional, Sequence, Set, Tuple, List
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Tuple
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    red,
-    yellow,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import red
+from dbt_checkpoint.utils import yellow
 
 REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 REGEX_SPLIT = r"[\s]+"

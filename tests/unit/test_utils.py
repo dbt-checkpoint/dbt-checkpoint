@@ -1,29 +1,30 @@
-import unittest
-from dataclasses import dataclass
 from pathlib import Path
+from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from jinja2 import Environment
 
-from dbt_checkpoint.utils import (
-    CalledProcessError,
-    CompilationException,
-    MacroSchema,
-    Model,
-    ModelSchema,
-    SourceSchema,
-    check_yml_version,
-    cmd_output,
-    extend_dbt_project_dir_flag,
-    get_dbt_catalog,
-    get_dbt_manifest,
-    get_filenames,
-    get_macro_schemas,
-    get_missing_file_paths,
-    get_model_schemas,
-    obj_in_deps,
-    paths_to_dbt_models,
-)
+from dbt_checkpoint.utils import CalledProcessError
+from dbt_checkpoint.utils import check_yml_version
+from dbt_checkpoint.utils import cmd_output
+from dbt_checkpoint.utils import CompilationException
+from dbt_checkpoint.utils import extend_dbt_project_dir_flag
+from dbt_checkpoint.utils import get_dbt_catalog
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_macro_args_from_sql_code
+from dbt_checkpoint.utils import get_macro_schemas
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_schemas
+from dbt_checkpoint.utils import get_path_relative_to_dbt_project_dir
+from dbt_checkpoint.utils import Jinja2TestMacroExtension
+from dbt_checkpoint.utils import MacroSchema
+from dbt_checkpoint.utils import Model
+from dbt_checkpoint.utils import ModelSchema
+from dbt_checkpoint.utils import obj_in_deps
+from dbt_checkpoint.utils import paths_to_dbt_models
+from dbt_checkpoint.utils import SourceSchema
 
 
 def test_cmd_output_error():
@@ -148,39 +149,6 @@ def test_check_yml_version_with_non_1_version():
         check_yml_version("file_path", yaml_dct)
 
 
-# Input files, valid manifest, expected files
-TESTS = (
-    (
-        ["aa/bb/with_description.sql"],
-        "bb/with_description.yml",
-        True,
-        "",
-        ["aa/bb/with_description.sql", "bb/with_description.yml"],
-    ),
-    (
-        ["aa/bb/with_description.sql"],
-        "",
-        False,
-        "",
-        ["aa/bb/with_description.sql"],
-    ),
-    (
-        ["aa/bb/with_description.sql"],
-        "aa/bb/with_description.yml",
-        True,
-        r"^(.+)\/([^\/]+)$",
-        [],
-    ),
-    (
-        ["aa/bb/with_description.yml"],
-        "bb/with_description.sql",
-        True,
-        "",
-        ["aa/bb/with_description.yml", "bb/with_description.sql"],
-    ),
-)
-
-
 @pytest.mark.parametrize(
     (
         "input_files",
@@ -189,7 +157,36 @@ TESTS = (
         "exclude_regex",
         "expected_files",
     ),
-    TESTS,
+    (
+        (
+            ["aa/bb/with_description.sql"],
+            "bb/with_description.yml",
+            True,
+            "",
+            ["aa/bb/with_description.sql", "bb/with_description.yml"],
+        ),
+        (
+            ["aa/bb/with_description.sql"],
+            "",
+            False,
+            "",
+            ["aa/bb/with_description.sql"],
+        ),
+        (
+            ["aa/bb/with_description.sql"],
+            "aa/bb/with_description.yml",
+            True,
+            r"^(.+)\/([^\/]+)$",
+            [],
+        ),
+        (
+            ["aa/bb/with_description.yml"],
+            "bb/with_description.sql",
+            True,
+            "",
+            ["aa/bb/with_description.yml", "bb/with_description.sql"],
+        ),
+    ),
 )
 def test_get_missing_file_paths(
     input_files,
@@ -262,3 +259,101 @@ def test_get_dbt_catalog_with_config_project_dir():
             expected_result = {"key": "value"}
             result = get_dbt_catalog(Args())
             assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    argnames=(
+        "filepath",
+        "project_dir_path",
+        "expected_relative_path",
+    ),
+    argvalues=(
+        (
+            Path("macros/with_description.sql"),
+            None,
+            Path("macros/with_description.sql"),
+        ),
+        (
+            Path("path/to/dbt/project/macros/with_description.sql"),
+            "path/to/dbt/project",
+            Path("macros/with_description.sql"),
+        ),
+        (
+            Path("non-dbt-project-file.yaml"),
+            "path/to/dbt/project",
+            Path("non-dbt-project-file.yaml"),
+        ),
+    ),
+)
+def test_get_path_relative_to_dbt_project_dir(
+    filepath, project_dir_path, expected_relative_path
+):
+    actual = get_path_relative_to_dbt_project_dir(
+        filepath,
+        project_dir_path,
+    )
+    assert actual == expected_relative_path
+
+
+@pytest.mark.parametrize(
+    argnames=("macro_id", "macro_sql", "expected_args"),
+    argvalues=(
+        ("test_macro", "{% macro test_macro() %}...{% endmacro %}", set()),
+        (
+            "test_macro",
+            "{% macro test_macro(test_arg) %}...{% endmacro %}",
+            {"test_arg"},
+        ),
+        (
+            "package.test_macro",
+            "{% macro test_macro(test_arg) %}...{% endmacro %}",
+            {"test_arg"},
+        ),
+        (
+            "test_macro",
+            "{% macro test_macro(test_arg1, test_arg2) %}...{% endmacro %}",
+            {"test_arg1", "test_arg2"},
+        ),
+        (
+            "test_macro",
+            "{% macro test_macro(test_arg) %}...{% endmacro %}..."
+            "{% macro another_macro(test_arg) %}...{% endmacro %}",
+            {"test_arg"},
+        ),
+    ),
+)
+def test_get_macro_args_from_sql_code(macro_id, macro_sql, expected_args):
+    macro = MagicMock()
+    macro.macro_sql = macro_sql
+    macro.macro_id = macro_id
+    assert get_macro_args_from_sql_code(macro) == expected_args
+
+
+@pytest.mark.parametrize(
+    argnames=("template_text", "expected_name", "expected_args"),
+    argvalues=(
+        (
+            "{% test test_name(test_arg_1, test_arg_2) %}test body{% endtest %}",
+            "test_test_name",
+            ["test_arg_1", "test_arg_2"],
+        ),
+        (
+            "{% test another_test_name() %}test body{% endtest %}",
+            "test_another_test_name",
+            [],
+        ),
+        (
+            "{% macro test_macro() %}test body{% endmacro %}",
+            "test_macro",
+            [],
+        ),
+    ),
+)
+def test_test_jinja2_macro_extension_parse(template_text, expected_name, expected_args):
+    template_text = template_text
+    env = Environment()
+    env.add_extension(Jinja2TestMacroExtension)
+    result = env.parse(template_text)
+    test = result.body[0]
+    assert getattr(test, "name") == expected_name
+    assert [arg.name for arg in getattr(test, "args", [])] == expected_args

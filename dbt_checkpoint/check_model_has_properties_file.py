@@ -1,19 +1,21 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Set, Tuple
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Tuple
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_missing_file_paths,
-    get_model_sqls,
-    get_models,
-    get_snapshot_filenames,
-    red,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import get_snapshot_filenames
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import red
 
 
 def has_properties_file(

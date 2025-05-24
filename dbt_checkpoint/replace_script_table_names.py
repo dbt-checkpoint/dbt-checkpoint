@@ -4,11 +4,19 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Any, Dict, Generator, Optional, Sequence, Set, Tuple
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Tuple
 
 from dbt_checkpoint.check_script_has_no_table_name import has_table_name
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_dbt_manifest
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def get_ref_from_name(

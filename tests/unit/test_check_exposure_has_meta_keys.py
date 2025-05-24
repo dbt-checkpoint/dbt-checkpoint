@@ -1,8 +1,9 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_exposure_has_meta_keys import has_meta_key, main
+from dbt_checkpoint.check_exposure_has_meta_keys import has_meta_key
 
 
 @pytest.fixture

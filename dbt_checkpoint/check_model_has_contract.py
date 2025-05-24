@@ -1,17 +1,18 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_missing_file_paths,
-    get_model_sqls,
-    get_models,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def check_contract(
@@ -20,12 +21,12 @@ def check_contract(
     exclude_pattern: str,
     include_disabled: bool = False,
 ) -> int:
-    paths = get_missing_file_paths(
+    missing_file_paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
 
     status_code = 0
-    sqls = get_model_sqls(paths, manifest, include_disabled)
+    sqls = get_model_sqls(missing_file_paths, manifest, include_disabled)
     filenames = set(sqls.keys())
 
     # get manifest nodes that pre-commit found as changed
@@ -33,11 +34,10 @@ def check_contract(
 
     for model in models:
         config = model.node.get("config", {})
-        if not config.get('contract', {}).get('enforced'):
+        if not config.get("contract", {}).get("enforced"):
             status_code = 1
             print(
-                f"{model.model_name}: "
-                "doesn't have contract defined.",
+                f"{model.model_name}: " "doesn't have contract defined.",
             )
     return status_code
 

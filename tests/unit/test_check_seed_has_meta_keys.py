@@ -1,8 +1,9 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.check_seed_has_meta_keys import has_meta_key, main
+from dbt_checkpoint.check_seed_has_meta_keys import has_meta_key
 
 
 @pytest.fixture
@@ -21,7 +22,7 @@ def test_has_meta_key_match(mock_seed):
 
     with patch(
         "dbt_checkpoint.check_seed_has_meta_keys.get_filenames",
-        return_value=["seed.sql"],
+        return_value={"seed.sql": None},
     ), patch(
         "dbt_checkpoint.check_seed_has_meta_keys.get_seeds", return_value=[mock_seed]
     ):
@@ -38,7 +39,7 @@ def test_has_meta_key_extra_keys(mock_seed):
 
     with patch(
         "dbt_checkpoint.check_seed_has_meta_keys.get_filenames",
-        return_value=["seed.sql"],
+        return_value={"seed.sql": None},
     ), patch(
         "dbt_checkpoint.check_seed_has_meta_keys.get_seeds", return_value=[mock_seed]
     ):
@@ -55,7 +56,7 @@ def test_has_meta_key_allow_extra_keys(mock_seed):
 
     with patch(
         "dbt_checkpoint.check_seed_has_meta_keys.get_filenames",
-        return_value=["seed.sql"],
+        return_value={"seed.sql": None},
     ), patch(
         "dbt_checkpoint.check_seed_has_meta_keys.get_seeds", return_value=[mock_seed]
     ):

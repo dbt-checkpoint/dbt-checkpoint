@@ -1,11 +1,14 @@
 import argparse
 import os
 import time
-from typing import Optional, Sequence
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.check_script_semicolon import check_semicolon
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_dbt_manifest
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import JsonOpenError
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

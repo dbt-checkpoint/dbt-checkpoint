@@ -5,19 +5,23 @@ from collections import Counter
 from dataclasses import dataclass
 from itertools import groupby
 from pathlib import Path
-from typing import Any, Dict, Generator, Iterator, Optional, Sequence, Tuple
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import Iterator
+from typing import Optional
+from typing import Sequence
+from typing import Tuple
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    ModelSchema,
-    add_default_args,
-    get_dbt_manifest,
-    get_filenames,
-    get_model_schemas,
-    red,
-    yellow,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_model_schemas
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import ModelSchema
+from dbt_checkpoint.utils import red
+from dbt_checkpoint.utils import yellow
 
 
 @dataclass
@@ -97,19 +101,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     script_args = vars(args)
 
     tracker = dbtCheckpointTracking(script_args=script_args)
+    status_code = hook_properties["status_code"]
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
             "description": "Check column descriptions are the same.",
-            "status": hook_properties.get("status_code"),
+            "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
         },
     )
 
-    return hook_properties.get("status_code")
+    return status_code
 
 
 if __name__ == "__main__":

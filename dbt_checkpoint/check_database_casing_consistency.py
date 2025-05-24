@@ -1,23 +1,26 @@
 import argparse
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Set
 
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_catalog_args,
-    add_default_args,
-    get_dbt_catalog,
-    get_dbt_manifest,
-    red,
-    strings_differ_in_case,
-)
+from dbt_checkpoint.utils import add_catalog_args
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_catalog
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import red
+from dbt_checkpoint.utils import strings_differ_in_case
 
 
 def _find_inconsistent_objects(
     manifest_objects: Dict[str, Any],
     catalog_objects: Dict[str, Any],
-    objects: list,
-    results: set,
-):
+    objects: List[str],
+    results: Set[str],
+) -> None:
     for object in objects:
         result = {}
         if strings_differ_in_case(
@@ -32,21 +35,27 @@ def _find_inconsistent_objects(
             catalog_objects[object].get("metadata", {}).get("schema", ""),
         ):
             result["manifest"] = (
-                f"{manifest_objects[object].get('database')}.{manifest_objects[object].get('schema')}"
+                f"{manifest_objects[object].get('database')}."
+                f"{manifest_objects[object].get('schema')}"
             )
             result["catalog"] = (
-                f"{catalog_objects[object].get('metadata').get('database')}.{catalog_objects[object].get('metadata').get('schema')}"
+                f"{catalog_objects[object].get('metadata').get('database')}"
+                f".{catalog_objects[object].get('metadata').get('schema')}"
             )
         if result:
-            result_message = f"{red(result['manifest'])} in dbt project (manifest) does not match {red(result['catalog'])} in database (catalog)"
+            result_message = (
+                f"{red(result['manifest'])} in dbt project"
+                f" (manifest) does not match {red(result['catalog'])}"
+                f" in database (catalog)"
+            )
             results.add(result_message)
 
 
 def check_database_casing_consistency(
     manifest: Dict[str, Any], catalog: Dict[str, Any]
-):
+) -> int:
     return_code = 0
-    results = set()
+    results: Set[str] = set()
     catalog_nodes = catalog.get("nodes", {})
     manifest_nodes = manifest.get("nodes", {})
     matching_nodes = [

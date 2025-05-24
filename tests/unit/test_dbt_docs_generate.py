@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
-from dbt_checkpoint.dbt_docs_generate import docs_generate_cmd, main
+from dbt_checkpoint.dbt_docs_generate import docs_generate_cmd
+from dbt_checkpoint.dbt_docs_generate import main
 
 
 def test_dbt_docs_generate():

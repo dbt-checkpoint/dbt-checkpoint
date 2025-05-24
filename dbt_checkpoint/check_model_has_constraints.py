@@ -1,29 +1,30 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_missing_file_paths,
-    get_model_sqls,
-    get_models,
-    Model,
-    ParseJson,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import Model
+from dbt_checkpoint.utils import ParseJson
 
 
-def is_equal(constraint:Dict[str, Any], model_constraint:Dict[str, Any]) -> bool:
+def is_equal(constraint: Dict[str, Any], model_constraint: Dict[str, Any]) -> bool:
     for key, value in constraint.items():
         if key not in model_constraint or model_constraint[key] != value:
             return False
     return True
 
 
-def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
+def has_constraints(constraints: Sequence[Dict[str, Any]], model: Model) -> bool:
     model_constraints = model.node.get("constraints", [])
     for constraint in constraints:
         found = False
@@ -34,9 +35,9 @@ def has_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> bool:
     return True
 
 
-def is_incremental_or_table(model:Model) -> bool:
-    materialized = model.node.get("config").get("materialized")
-    return (materialized == "table" or materialized == "incremental")
+def is_incremental_or_table(model: Model) -> bool:
+    materialized = model.node.get("config", {}).get("materialized")
+    return materialized == "table" or materialized == "incremental"
 
 
 def check_constraints(
@@ -44,13 +45,13 @@ def check_constraints(
     manifest: Dict[str, Any],
     constraints: Sequence[Dict[str, Any]],
     exclude_pattern: str,
-    include_disabled: bool = False
+    include_disabled: bool = False,
 ) -> int:
-    paths = get_missing_file_paths(
+    missing_file_paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
 
-    sqls = get_model_sqls(paths, manifest, include_disabled)
+    sqls = get_model_sqls(missing_file_paths, manifest, include_disabled)
     filenames = set(sqls.keys())
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     status_code = 0
@@ -61,7 +62,7 @@ def check_constraints(
             print(
                 f"{model.model_id}: "
                 "Doesn't have necessary constraints defined. Model constraints:",
-                f"{model.node.get('constraints')}"
+                f"{model.node.get('constraints')}",
             )
     return status_code
 
