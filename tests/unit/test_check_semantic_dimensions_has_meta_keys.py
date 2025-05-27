@@ -1,6 +1,7 @@
 import json
 import pytest
 from dbt_checkpoint.check_semantic_dimensions_has_meta_keys import main
+from dbt_checkpoint.utils import JsonOpenError
 
 
 @pytest.mark.parametrize(
@@ -129,3 +130,46 @@ def test_main_various_meta_key_scenarios(
     # Invoke main and assert exit code
     result = main(argv=args)
     assert result == expected_exit_code
+
+
+def test_main_fails_on_bad_semantic_manifest(tmp_path, monkeypatch, manifest_path_str):
+    # point at a dummy file
+    sm = tmp_path / "bad.json"
+    sm.write_text("{}")
+    # force the loader to blow up
+    monkeypatch.setattr(
+        "dbt_checkpoint.check_semantic_dimensions_has_meta_keys.get_dbt_semantic_manifest",
+        lambda args: (_ for _ in ()).throw(JsonOpenError("bang")),
+    )
+    code = main(
+        argv=[
+            "--manifest",
+            manifest_path_str,
+            "--semantic-manifest",
+            str(sm),
+            "--meta-keys",
+            "",
+        ]
+    )
+    assert code == 1
+
+
+def test_main_fails_on_bad_dbt_manifest(tmp_path, monkeypatch, manifest_path_str):
+    sm = tmp_path / "good.json"
+    sm.write_text("{}")
+    # now have semantic load fine, but manifest loader fail
+    monkeypatch.setattr(
+        "dbt_checkpoint.check_semantic_dimensions_has_meta_keys.get_dbt_manifest",
+        lambda args: (_ for _ in ()).throw(JsonOpenError("ouch")),
+    )
+    code = main(
+        argv=[
+            "--manifest",
+            manifest_path_str,
+            "--semantic-manifest",
+            str(sm),
+            "--meta-keys",
+            "",
+        ]
+    )
+    assert code == 1
