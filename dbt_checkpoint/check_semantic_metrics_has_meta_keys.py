@@ -1,7 +1,7 @@
 import argparse
 import os
 import time
-from typing import Sequence, Optional, Tuple, Dict, Any
+from typing import Sequence, Optional
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
@@ -12,9 +12,7 @@ from dbt_checkpoint.utils import (
     get_dbt_semantic_manifest,
     red,
     yellow,
-    SemanticModel,
     SemanticLayerMetric,
-    get_semantic_models,
     get_semantic_layer_metrics,
 )
 
@@ -37,7 +35,6 @@ def validate_meta_keys(
 
 
 def check_semantic_metrics_meta_keys(
-    models: Sequence[SemanticModel],
     metrics: Sequence[SemanticLayerMetric],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
@@ -56,54 +53,16 @@ def check_semantic_metrics_meta_keys(
     """
     status_code = 0
 
-    # Build lookup: measure_name -> (model_name, measure_dict)
-    measure_map: Dict[str, Tuple[str, Dict[str, Any]]] = {}
-    for model in models:
-        for measure in model.measures:
-            m_name = measure.get("name")
-            if m_name:
-                measure_map[m_name] = (model.name or "<unnamed>", measure)
-
     # Validate each metric
     for metric in metrics:
         metric_name = metric.name or "<unnamed>"
-        # Extract referenced measure name
-        measure_info: Dict[str, Any] = metric.type_params.get("measure", {}) or {}
-        measure_name = measure_info.get("name")
-        if not measure_name:
+        # Extract meta dict under config
+        meta = metric.config.get("meta", {})
+        if not validate_meta_keys(meta.keys(), meta_keys, allow_extra_keys):
             status_code = 1
-            print(
-                f"{red('<unknown>')}: metric '{metric_name}' does not specify a measure"
-            )
-            continue
-
-        # Lookup measure
-        entry = measure_map.get(measure_name)
-        if not entry:
-            status_code = 1
-            print(
-                f"{red('<unknown>')}: metric '{metric_name}' references unknown measure '{measure_name}'"
-            )
-            continue
-
-        model_name, measure = entry
-        # Extract meta dict from measure config
-        meta = measure.get("config", {}).get("meta", {})
-        actual_keys = list(meta.keys())
-
-        # Compare actual vs expected
-        if not validate_meta_keys(actual_keys, meta_keys, allow_extra_keys):
-            status_code = 1
-            print(
-                f"{red(model_name)}: metric '{metric_name}' (measure '{measure_name}') failed meta key validation"
-            )
-            missing = [k for k in meta_keys if k not in actual_keys]
-            if missing:
-                print(f"  - {yellow('missing: ' + ', '.join(missing))}")
-            if not allow_extra_keys:
-                extra = [k for k in actual_keys if k not in meta_keys]
-                if extra:
-                    print(f"  - {yellow('extra: ' + ', '.join(extra))}")
+            print(f"{red(metric_name)}: is missing or has extra meta keys")
+            print(f"  - {yellow('Expected: ' + ', '.join(meta_keys))}")
+            print(f"  - {yellow('Actual: ' + ', '.join(meta.keys()))}")
 
     return status_code
 
@@ -135,13 +94,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     # Extract dataclass objects
-    models = list(get_semantic_models(semantic_manifest))
     metrics = list(get_semantic_layer_metrics(semantic_manifest))
 
     # Perform validation
     start_time = time.time()
     status_code = check_semantic_metrics_meta_keys(
-        models=models,
         metrics=metrics,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
