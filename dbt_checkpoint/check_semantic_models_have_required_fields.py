@@ -1,52 +1,57 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Tuple, List
+from typing import Sequence, Optional, Tuple, Dict, List
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    get_dbt_manifest,
+    get_dbt_semantic_manifest,
     red,
     yellow,
-    get_dbt_semantic_manifest,
-    get_dbt_manifest,
+    SemanticModel,
+    get_semantic_models,
 )
 
-
-FIELD_MAPPING = {
+FIELD_MAPPING: Dict[str, str] = {
     "model": "node_relation",
 }
 
 
 def check_semantic_models_have_required_fields(
-    semantic_manifest: Dict[str, Any], required_fields: Sequence[str]
-) -> Tuple[int, Dict[str, Any]]:
+    models: Sequence[SemanticModel],
+    required_fields: Sequence[str],
+) -> Tuple[int, Dict[str, List[str]]]:
     """
-    Checks that each semantic model has user-specified required top-level fields.
-    Also ensures that if a model has measures, it includes defaults.agg_time_dimension.
+    Validate each SemanticModel has the required top-level fields.
+    Also ensures that if a model defines measures, it specifies `defaults.agg_time_dimension`.
+
+    Args:
+        models: Sequence of SemanticModel instances.
+        required_fields: List of field names (top‑level or aliases) that must be present.
 
     Returns:
-        status_code: 0 if all checks pass, 1 otherwise.
-        issues: Dictionary of problems per semantic model.
+        A tuple (status_code, issues) where:
+          - status_code is 0 if all models pass, 1 if any failures.
+          - issues maps model names to lists of error messages.
     """
     status_code = 0
     issues: Dict[str, List[str]] = {}
-
-    # Map custom aliases like 'model' to actual field names
+    # Resolve any aliases (e.g., "model" → "node_relation")
     resolved_fields = [FIELD_MAPPING.get(f, f) for f in required_fields]
 
-    for model in semantic_manifest.get("semantic_models", []):
-        model_issues = []
-        name = model.get("name", "<unnamed>")
-
+    for model in models:
+        model_issues: List[str] = []
         for field in resolved_fields:
-            if not model.get(field):
+            # Use getattr since dataclass attributes map to actual properties
+            if not getattr(model, field, None):
                 model_issues.append(f"missing {field}")
 
-        # Check if measures exist, then agg_time_dimension must be present
-        if model.get("measures"):
-            agg_time = model.get("defaults", {}).get("agg_time_dimension")
+        # If the model has measures, ensure agg_time_dimension is set
+        if model.measures:
+            agg_time = model.defaults.get("agg_time_dimension")
             if not agg_time:
                 model_issues.append(
                     "missing defaults.agg_time_dimension despite having measures"
@@ -54,10 +59,11 @@ def check_semantic_models_have_required_fields(
 
         if model_issues:
             status_code = 1
-            issues[name] = model_issues
+            issues[model.name] = model_issues
 
-    for model, problems in issues.items():
-        print(f"{red(model)}: Semantic model failed validation")
+    # Print any validation failures
+    for model_name, problems in issues.items():
+        print(f"{red(model_name)}: Semantic model failed validation")
         for prob in problems:
             print(f"  - {yellow(prob)}")
 
@@ -65,7 +71,13 @@ def check_semantic_models_have_required_fields(
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser()
+    """
+    CLI entrypoint: parse args, load manifests, extract SemanticModel objects,
+    and validate that each semantic model has user‑specified required fields.
+    """
+    parser = argparse.ArgumentParser(
+        description="Check semantic models have required fields"
+    )
     add_default_args(parser)
     parser.add_argument(
         "--required-fields",
@@ -75,27 +87,33 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    # Load semantic manifest
     try:
         semantic_manifest = get_dbt_semantic_manifest(args)
     except JsonOpenError as e:
-        print(f"Unable to load manifest file ({e})")
+        print(f"Unable to load semantic manifest file: {e}")
         return 1
 
+    # Load dbt manifest for tracking context
     try:
         manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
-        print(f"Unable to load manifest file ({e})")
+        print(f"Unable to load manifest file: {e}")
         return 1
 
+    # Extract strongly‑typed models
+    models = list(get_semantic_models(semantic_manifest))
+
+    # Run validation
     start_time = time.time()
     status_code, _ = check_semantic_models_have_required_fields(
-        semantic_manifest=semantic_manifest,
+        models=models,
         required_fields=args.required_fields,
     )
-    end_time = time.time()
-    script_args = vars(args)
+    elapsed = time.time() - start_time
 
-    tracker = dbtCheckpointTracking(script_args=script_args)
+    # Track hook execution
+    tracker = dbtCheckpointTracking(script_args=vars(args))
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
@@ -103,8 +121,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "hook_name": os.path.basename(__file__),
             "description": "Check semantic model has required fields",
             "status": status_code,
-            "execution_time": end_time - start_time,
-            "is_pytest": script_args.get("is_test"),
+            "execution_time": elapsed,
+            "is_pytest": vars(args).get("is_test"),
         },
     )
 

@@ -1,148 +1,108 @@
 import argparse
-import json
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Tuple, List
+from typing import Sequence, Optional, Tuple, Dict, List
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    get_dbt_manifest,
+    get_dbt_semantic_manifest,
     red,
     yellow,
-    get_dbt_semantic_manifest,
-    get_dbt_manifest,
+    SemanticLayerMetric,
+    get_semantic_layer_metrics,
 )
 
 
-def get_nested_value(obj: Dict[str, Any], path: str) -> Any:
-    keys = path.split(".")
-    for key in keys:
-        if not isinstance(obj, dict):
-            return None
-        obj = obj.get(key)
-    return obj
-
-
-def check_semantic_metrics_have_fields(
-    semantic_manifest: Dict[str, Any], required_fields: Sequence[str]
-) -> Tuple[int, Dict[str, Any]]:
+def check_semantic_metrics_have_required_fields(
+    metrics: Sequence[SemanticLayerMetric],
+    required_fields: Sequence[str],
+) -> Tuple[int, Dict[str, List[str]]]:
     """
-    Checks that each metric has the required fields.
-    If a field starts with config.meta., it looks up the corresponding measure.
+    Validate that each semantic layer metric includes the required top-level fields.
+
+    Args:
+        metrics: Sequence of SemanticLayerMetric instances.
+        required_fields: List of metric attribute names that must be non-empty.
 
     Returns:
-        status_code: 0 if all checks pass, 1 otherwise.
-        issues: Dictionary of problems per metric.
+        status_code: 0 if all metrics pass validation, 1 otherwise.
+        issues: Mapping from metric name to list of missing-field messages.
     """
     status_code = 0
     issues: Dict[str, List[str]] = {}
 
-    # Index all measures by name across all semantic models
-    measure_map = {
-        measure["name"]: measure
-        for model in semantic_manifest.get("semantic_models", [])
-        for measure in model.get("measures", [])
-    }
+    for metric in metrics:
+        metric_name = metric.name or "<unnamed>"
+        # Check each required field on the dataclass
+        missing_fields = [
+            field
+            for field in required_fields
+            # getattr returns the attribute or None if missing
+            if not getattr(metric, field, None)
+        ]
 
-    for metric in semantic_manifest.get("metrics", []):
-        metric_name = metric.get("name", "<unnamed>")
-        metric_type = metric.get("type")
-        metric_issues = []
-
-        for field in required_fields:
-            if field.startswith("config.meta."):
-                if metric_type in ["ratio", "derived"]:
-                    continue  # skip meta field checks for ratio metrics
-                meta_field = field.replace("config.meta.", "")
-                measure_name = get_nested_value(metric, "type_params.measure.name")
-                measure = measure_map.get(measure_name)
-                if not measure or not measure.get("config", {}).get("meta", {}).get(
-                    meta_field
-                ):
-                    metric_issues.append(field)
-            elif field == "type_params.measure.name":
-                if metric_type == "ratio":
-                    # skip this check, instead check numerator and denominator names
-                    numerator = get_nested_value(metric, "type_params.numerator.name")
-                    denominator = get_nested_value(
-                        metric, "type_params.denominator.name"
-                    )
-                    if not numerator:
-                        metric_issues.append("type_params.numerator.name")
-                    if not denominator:
-                        metric_issues.append("type_params.denominator.name")
-                elif metric_type == "derived":
-                    derived_metrics = get_nested_value(metric, "type_params.metrics")
-                    if (
-                        not derived_metrics
-                        or not isinstance(derived_metrics, list)
-                        or not derived_metrics
-                    ):
-                        metric_issues.append("type_params.metrics")
-                else:
-                    value = get_nested_value(metric, field)
-                    if value in [None, ""]:
-                        metric_issues.append(field)
-            else:
-                value = (
-                    get_nested_value(metric, field)
-                    if "." in field
-                    else metric.get(field)
-                )
-                if value in [None, ""]:
-                    metric_issues.append(field)
-
-        if metric_issues:
+        if missing_fields:
             status_code = 1
-            issues[metric_name] = metric_issues
+            issues[metric_name] = [
+                f"missing field: {field}" for field in missing_fields
+            ]
 
-    for metric, fields in issues.items():
-        print(f"{red(metric)}: Metric field check failed")
-        print(f"  - Missing: {yellow(', '.join(fields))}")
+    # Print any failures
+    for metric_name, errs in issues.items():
+        print(f"{red(metric_name)}: Metric field check failed")
+        for err in errs:
+            print(f"  - {yellow(err)}")
 
     return status_code, issues
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser()
+    """
+    CLI entry point. Parses arguments, loads manifests, extracts metrics,
+    and validates that each metric has the required fields.
+    """
+    parser = argparse.ArgumentParser(
+        description="Check semantic model metrics have required fields"
+    )
     add_default_args(parser)
     parser.add_argument(
         "--required-fields",
         nargs="+",
-        default=[
-            "name",
-            "type",
-            "description",
-            "label",
-            "type_params.measure.name",
-            "config.meta.displayName",
-        ],
-        help="List of required fields for metrics (config.meta.* checked in corresponding measure)",
+        default=["name", "type", "description", "label"],
+        help="List of required fields for semantic layer metrics",
     )
     args = parser.parse_args(argv)
 
+    # Load the semantic manifest JSON
     try:
         semantic_manifest = get_dbt_semantic_manifest(args)
     except JsonOpenError as e:
-        print(f"Unable to load semantic manifest file ({e})")
+        print(f"Unable to load semantic manifest file: {e}")
         return 1
 
+    # Load the dbt manifest for tracking metadata
     try:
         manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
-        print(f"Unable to load manifest file ({e})")
+        print(f"Unable to load dbt manifest file: {e}")
         return 1
 
+    # Extract typed metric objects
+    metrics = list(get_semantic_layer_metrics(semantic_manifest))
+
+    # Perform validation
     start_time = time.time()
-    status_code, _ = check_semantic_metrics_have_fields(
-        semantic_manifest=semantic_manifest,
+    status_code, _ = check_semantic_metrics_have_required_fields(
+        metrics=metrics,
         required_fields=args.required_fields,
     )
-    end_time = time.time()
-    script_args = vars(args)
+    elapsed = time.time() - start_time
 
-    tracker = dbtCheckpointTracking(script_args=script_args)
+    # Track the hook execution
+    tracker = dbtCheckpointTracking(script_args=vars(args))
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
@@ -150,8 +110,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "hook_name": os.path.basename(__file__),
             "description": "Check semantic model metrics have required fields",
             "status": status_code,
-            "execution_time": end_time - start_time,
-            "is_pytest": script_args.get("is_test"),
+            "execution_time": elapsed,
+            "is_pytest": vars(args).get("is_test"),
         },
     )
 

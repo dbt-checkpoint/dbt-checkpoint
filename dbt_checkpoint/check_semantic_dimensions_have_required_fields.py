@@ -1,75 +1,73 @@
 import argparse
-import json
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Tuple, List
+from typing import Sequence, Optional, Tuple, Dict, List
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
-    red,
-    yellow,
     get_dbt_semantic_manifest,
     get_dbt_manifest,
+    red,
+    yellow,
+    SemanticModel,
+    get_semantic_models,
 )
 
 
-def get_nested_value(obj: Dict[str, Any], path: str) -> Any:
-    keys = path.split(".")
-    for key in keys:
-        if not isinstance(obj, dict):
-            return None
-        obj = obj.get(key)
-    return obj
-
-
-def check_semantic_dimensions_have_fields(
-    semantic_manifest: Dict[str, Any], required_fields: Sequence[str]
-) -> Tuple[int, Dict[str, Any]]:
+def check_semantic_dimensions_have_required_fields(
+    models: Sequence[SemanticModel],
+    required_fields: Sequence[str],
+) -> Tuple[int, Dict[str, List[str]]]:
     """
-    Checks that each dimension in a semantic model has required fields.
-    Ensures that:
-      - required_fields like name/type/expr/config.meta.displayName are present
-      - time dimensions have type_params.time_granularity
+    Ensure each dimension in each SemanticModel has the required fields.
+    Also enforces that dimensions of type 'time' include 'time_granularity' under 'type_params'.
+
+    Args:
+        models: Sequence of SemanticModel instances.
+        required_fields: Sequence of dimension keys that must be present.
 
     Returns:
-        status_code: 0 if all checks pass, 1 otherwise.
-        issues: Dictionary of problems per semantic model.
+        status_code: 0 if all dimensions pass validation, 1 otherwise.
+        issues: Mapping from model name to list of error messages.
     """
     status_code = 0
     issues: Dict[str, List[str]] = {}
 
-    for model in semantic_manifest.get("semantic_models", []):
-        model_issues = []
-        model_name = model.get("name", "<unnamed>")
+    # Iterate over all semantic models
+    for model in models:
+        model_issues: List[str] = []
 
-        for dim in model.get("dimensions", []):
+        # Check each dimension within the model
+        for dim in model.dimensions:
             dim_name = dim.get("name", "<unnamed>")
-            missing = []
+            missing: List[str] = []
 
+            # Check top-level required fields
             for field in required_fields:
-                value = get_nested_value(dim, field) if "." in field else dim.get(field)
-                if not value:
+                if not dim.get(field):
                     missing.append(field)
 
+            # Enforce time granularity for time dimensions
+            if dim.get("type") == "time":
+                time_gran = dim.get("type_params", {}).get("time_granularity")
+                if not time_gran:
+                    missing.append("type_params.time_granularity")
+
+            # Record any missing fields
             if missing:
                 model_issues.append(
                     f"dimension '{dim_name}' missing fields: {', '.join(missing)}"
                 )
 
-            if dim.get("type") == "time":
-                if not dim.get("type_params", {}).get("time_granularity"):
-                    model_issues.append(
-                        f"dimension '{dim_name}' is type 'time' but missing type_params.time_granularity"
-                    )
-
         if model_issues:
             status_code = 1
-            issues[model_name] = model_issues
+            issues[model.name or "<unnamed>"] = model_issues
 
-    for model, problems in issues.items():
-        print(f"{red(model)}: Dimension field check failed")
+    # Print formatted output for any issues
+    for model_name, problems in issues.items():
+        print(f"{red(model_name)}: Dimension field check failed")
         for prob in problems:
             print(f"  - {yellow(prob)}")
 
@@ -77,37 +75,49 @@ def check_semantic_dimensions_have_fields(
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser()
+    """
+    CLI entry point. Parses arguments, loads manifests, extracts SemanticModel
+    objects, and runs dimension field validation.
+    """
+    parser = argparse.ArgumentParser(
+        description="Validate semantic dimension required fields"
+    )
     add_default_args(parser)
     parser.add_argument(
         "--required-fields",
         nargs="+",
-        default=["name", "type", "config.meta.displayName"],
-        help="List of required fields for dimensions in semantic models",
+        default=["name", "type"],
+        help="List of required top-level fields for dimensions in semantic models",
     )
     args = parser.parse_args(argv)
 
+    # Load semantic manifest (with custom path precedence)
     try:
         semantic_manifest = get_dbt_semantic_manifest(args)
     except JsonOpenError as e:
-        print(f"Unable to load manifest file ({e})")
+        print(f"Unable to load semantic manifest file: {e}")
         return 1
 
+    # Load dbt manifest for tracking metadata
     try:
         manifest = get_dbt_manifest(args)
     except JsonOpenError as e:
-        print(f"Unable to load manifest file ({e})")
+        print(f"Unable to load dbt manifest file: {e}")
         return 1
 
+    # Extract typed models
+    models = list(get_semantic_models(semantic_manifest))
+
+    # Perform validation
     start_time = time.time()
-    status_code, _ = check_semantic_dimensions_have_fields(
-        semantic_manifest=semantic_manifest,
+    status_code, _ = check_semantic_dimensions_have_required_fields(
+        models=models,
         required_fields=args.required_fields,
     )
     end_time = time.time()
-    script_args = vars(args)
 
-    tracker = dbtCheckpointTracking(script_args=script_args)
+    # Track execution event
+    tracker = dbtCheckpointTracking(script_args=vars(args))
     tracker.track_hook_event(
         event_name="Hook Executed",
         manifest=manifest,
@@ -116,7 +126,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "description": "Check semantic model dimensions have required fields",
             "status": status_code,
             "execution_time": end_time - start_time,
-            "is_pytest": script_args.get("is_test"),
+            "is_pytest": vars(args).get("is_test"),
         },
     )
 
