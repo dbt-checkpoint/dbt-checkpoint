@@ -78,6 +78,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
+- [`check-model-columns-have-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-meta-keys): Check the model columns have keys in the meta part.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enforced.
 - [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has specific constraints defined.
@@ -123,6 +124,16 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
+
+**Semantic Layer checks:**
+
+- [`check-semantic-dimensions-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-dimensions-has-meta-keys): Check semantic dimensions has keys in meta part.
+- [`check-semantic-dimensions-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-dimensions-have-required-fields): Check semantic dimensions have required fields.
+- [`check-semantic-entities-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-entities-have-required-fields): Check semantic entities have required fields.
+- [`check-semantic-measures-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-measures-have-required-fields): Check semantic measures have required fields.
+- [`check-semantic-metrics-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-metrics-has-meta-keys): Check semantic metrics have required fields.
+- [`check-semantic-metrics-have-required-fields](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-metrics-have-required-fields): Check semantic metrics have required fields.
+- [`check-semantic-models-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-models-have-required-fields): Check semantic models have required fields.
 
 **Modifiers:**
 

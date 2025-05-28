@@ -9,6 +9,7 @@
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
+- [`check-model-columns-have-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-meta-keys): Check the model columns have keys in the meta part.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
@@ -71,6 +72,16 @@
 **Tests checks:**
 
 - [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys
+
+**Semantic Layer checks:**
+
+- [`check-semantic-dimensions-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-dimensions-has-meta-keys): Check semantic dimensions has keys in meta part.
+- [`check-semantic-dimensions-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-dimensions-have-required-fields): Check semantic dimensions have required fields.
+- [`check-semantic-entities-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-entities-have-required-fields): Check semantic entities have required fields.
+- [`check-semantic-measures-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-measures-have-required-fields): Check semantic measures have required fields.
+- [`check-semantic-metrics-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-metrics-has-meta-keys): Check semantic metrics have required fields.
+- [`check-semantic-metrics-have-required-fields](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-metrics-have-required-fields): Check semantic metrics have required fields.
+- [`check-semantic-models-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-models-have-required-fields): Check semantic models have required fields.
 
 **Modifiers:**
 
@@ -250,6 +261,59 @@ You want to make sure that all specified columns in the properties files (usuall
 #### Known limitations
 
 If you `run` your model and then you delete column description from a properties file, the hook success since the description is still present in `manifest.json`.
+
+---
+
+### `check-model-columns-have-meta-keys`
+
+Ensures that the columns of a model have a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the columns to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: list of the required keys in the meta part of the model.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-model-columns-have-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every column of a model needs to have certain meta keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a model.
+- Modified `yml` files are scanned for a model.
+- If any column of a model (from a manifest or `yml` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your model and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
 
 ---
 
@@ -786,7 +850,7 @@ You want to make sure your model names follow a naming convention (e.g., staging
 
 | Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
-|                       :white_check_mark: Yes                |                        :x: Not needed                      |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
 <sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
@@ -2452,3 +2516,243 @@ If you want to make sure your dbt project (Manifest) and database (Catalog) are 
 #### How it works
 
 It compares models and sources databases and schemas in `manifest vs catalog`. If a db/schema in one of them presents a different casing, the hook fails.
+
+---
+
+### `check-semantic-dimensions-has-meta-keys`
+
+Ensures that all semantic dimensions include required meta keys, and optionally restricts extra keys.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--meta-keys`: list of required meta keys for each semantic dimension.
+`--allow-extra-keys`: whether extra meta keys are allowed. **Default: `False`**
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-dimensions-has-meta-keys
+   args: ['--meta-keys', 'displayName', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to ensure that every semantic dimension includes specific meta keys and optionally restricts additional ones.
+
+#### How it works
+
+- Parses semantic dimension definitions from `semantic_manifest.json` file.
+- Checks for presence of required meta keys under each dimension’s metadata.
+- Fails if any required key is missing or if unexpected keys are found (when `--allow-extra-keys` is `False`).
+
+---
+
+### `check-semantic-dimensions-have-required-fields`
+
+Ensures that all semantic dimensions include required fields such as `name`, and `type`.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--required-fields`: list of required fields for each semantic dimension.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-dimensions-have-required-fields
+   args: ['--required-fields', 'name', 'type', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to enforce a consistent structure across all semantic dimension definitions.
+
+#### How it works
+
+- Parses semantic dimension definitions from `semantic_manifest.json` file.
+- Validates presence of required fields for each semantic dimension.
+- Fails if any required field is missing.
+
+---
+
+### `check-semantic-entities-have-required-fields`
+
+Ensures that all semantic entities include required fields such as `name`, `type`, and `expr`.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--required-fields`: list of required fields for each semantic entity.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-entities-have-required-fields
+   args: ['--required-fields', 'name', 'type', 'expr', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to enforce a consistent structure across all semantic entity definitions.
+
+#### How it works
+
+- Parses semantic entity definitions from `semantic_manifest.json` file.
+- Validates presence of required fields for each semantic entity.
+- Fails if any required field is missing.
+
+---
+
+### `check-semantic-measures-have-required-fields`
+
+Ensures that all semantic measures include required fields such as `name`, `expr`, and `agg`.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--required-fields`: list of required fields for each semantic measure.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-measures-have-required-fields
+   args: ['--required-fields', 'name', 'expr', 'agg', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to enforce a consistent structure across all semantic measure definitions.
+
+#### How it works
+
+- Parses semantic measure definitions from `semantic_manifest.json` file.
+- Validates presence of required fields for each semantic measure.
+- Fails if any required field is missing.
+
+---
+
+### `check-semantic-metrics-has-meta-keys`
+
+Ensures that all semantic metrics include required meta keys, and optionally restricts extra keys.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--meta-keys`: list of required meta keys for each semantic metric.
+`--allow-extra-keys`: whether extra meta keys are allowed. **Default: `False`**
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-metrics-has-meta-keys
+   args: ['--meta-keys', 'name', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to ensure that every semantic metric includes specific meta keys and optionally restricts additional ones.
+
+#### How it works
+
+- Parses semantic metric definitions from `semantic_manifest.json` file.
+- Checks for presence of required meta keys under each metric’s metadata.
+- Fails if any required key is missing or if unexpected keys are found (when `--allow-extra-keys` is `False`).
+
+---
+
+### `check-semantic-metrics-have-required-fields`
+
+Ensures that all semantic metrics include required fields such as `name`, `type`, `description`,`label`, `type_params.measure.name`.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--required-fields`: list of required fields for each semantic metric.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-metrics-have-required-fields
+   args: ['--required-fields', 'name', 'type', 'description', 'label', 'type_params.measure.name', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to enforce a consistent structure across all semantic metric definitions.
+
+#### How it works
+
+- Parses semantic metric definitions from `semantic_manifest.json` file.
+- Validates presence of required fields for each semantic metric.
+- Fails if any required field is missing.
+
+---
+
+### `check-semantic-models-have-required-fields`
+
+Ensures that all semantic models (defined in the YAML files) include required fields such as `model`, and `description`.
+
+#### Arguments
+
+`--semantic-manifest`: location of `semantic-manifest.json` file. Usually `target/semantic-manifest.json`. **Default: `target/semantic-manifest.json`**
+`--required-fields`: list of required top-level fields in a semantic model definition.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+ rev: v1.0.0
+ hooks:
+ - id: check-semantic-models-have-required-fields
+   args: ['--required-fields', 'model', 'description', '--']
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If you want to enforce a consistent structure across all semantic model definitions.
+
+#### How it works
+
+- Parses semantic model definitions from semantic_manifest.json file.
+- Validates presence of required fields for each semantic model.
+- Fails if any required field is missing.
