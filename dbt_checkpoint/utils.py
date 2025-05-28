@@ -6,12 +6,12 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
-
-
+from argparse import Namespace
 from yaml import safe_load
 
 DEFAULT_MANIFEST_PATH = "target/manifest.json"
 DEFAULT_CATALOG_PATH = "target/catalog.json"
+DEFAULT_SEMANTIC_MANIFEST_PATH = "target/semantic_manifest.json"
 
 
 class CalledProcessError(RuntimeError):
@@ -92,6 +92,44 @@ class GenericDbtObject:
     name: str
     filename: str
     schema: Dict[str, Any]
+
+
+@dataclass
+class SemanticModel:
+    name: str
+    description: str
+    defaults: Dict[str, Any]
+    node_relation: Dict[str, Any]
+    primary_entity: Any
+    entities: List[Dict[str, Any]]
+    measures: List[Dict[str, Any]]
+    dimensions: List[Dict[str, Any]]
+    label: Any
+    metadata: Any
+    config: Dict[str, Any]
+
+
+@dataclass
+class SemanticLayerMetric:
+    name: str
+    description: str
+    type: str
+    type_params: Dict[str, Any]
+    filter: Any
+    metadata: Any
+    label: Any
+    config: Dict[str, Any]
+    time_granularity: Any
+
+
+@dataclass
+class SemanticLayerSavedQuery:
+    name: str
+    description: str
+    label: Any
+    query_params: Dict[str, Any]
+    exports: List[Dict[str, Any]]
+    tags: List[Any]
 
 
 def cmd_output(
@@ -385,6 +423,56 @@ def get_exposures(
             )
 
 
+def get_semantic_models(
+    manifest: Dict[str, Any],
+) -> Generator[SemanticModel, None, None]:
+    for m in manifest.get("semantic_models", []):
+        yield SemanticModel(
+            name=m.get("name"),
+            description=m.get("description"),
+            defaults=m.get("defaults", {}),
+            node_relation=m.get("node_relation", {}),
+            primary_entity=m.get("primary_entity"),
+            entities=m.get("entities", []),
+            measures=m.get("measures", []),
+            dimensions=m.get("dimensions", []),
+            label=m.get("label"),
+            metadata=m.get("metadata"),
+            config=m.get("config", {}),
+        )
+
+
+def get_semantic_layer_metrics(
+    manifest: Dict[str, Any],
+) -> Generator[SemanticLayerMetric, None, None]:
+    for m in manifest.get("metrics", []):
+        yield SemanticLayerMetric(
+            name=m.get("name"),
+            description=m.get("description"),
+            type=m.get("type"),
+            type_params=m.get("type_params", {}),
+            filter=m.get("filter"),
+            metadata=m.get("metadata"),
+            label=m.get("label"),
+            config=m.get("config", {}),
+            time_granularity=m.get("time_granularity"),
+        )
+
+
+def get_semantic_layer_saved_queries(
+    manifest: Dict[str, Any],
+) -> Generator[SemanticLayerSavedQuery, None, None]:
+    for q in manifest.get("saved_queries", []):
+        yield SemanticLayerSavedQuery(
+            name=q.get("name"),
+            description=q.get("description"),
+            label=q.get("label"),
+            query_params=q.get("query_params", {}),
+            exports=q.get("exports", []),
+            tags=q.get("tags", []),
+        )
+
+
 def obj_in_deps(obj: Any, dep_name: str) -> bool:
     dep_split = set(dep_name.split("."))
     result = False
@@ -508,6 +596,17 @@ def add_manifest_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_semantic_manifest_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--semantic-manifest",
+        type=str,
+        default=DEFAULT_SEMANTIC_MANIFEST_PATH,
+        help="""Location of semantic_manifest.json file. Usually target/manifest.json.
+        This file contains a full representation of dbt project.
+        """,
+    )
+
+
 def add_catalog_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--catalog",
@@ -549,6 +648,7 @@ def add_disabled_args(parser: argparse.ArgumentParser) -> None:
 def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)
     add_manifest_args(parser)
+    add_semantic_manifest_args(parser)
     add_config_args(parser)
     add_tracking_args(parser)
     add_exclude_args(parser)
@@ -792,7 +892,7 @@ def extend_dbt_project_dir_flag(
     return cmd
 
 
-def get_dbt_manifest(args):  # type: ignore
+def get_dbt_manifest(args: Namespace) -> Dict[str, Any]:  # type: ignore
     """
     Get dbt manifest following the new config file approach. Precedence:
         - custom `--manifest` flag
@@ -810,7 +910,32 @@ def get_dbt_manifest(args):  # type: ignore
         return get_json(manifest_path)
 
 
-def get_dbt_catalog(args):  # type: ignore
+def get_dbt_semantic_manifest(args: Namespace) -> Dict[str, Any]:  # type: ignore
+    """
+    Get dbt semantic manifest following the new config file approach. Precedence:
+        - custom `--semantic_manifest` flag
+        - .dbt-checkpoint.yaml `dbt-project-dir` key
+        - default `--semantic_manifest` flag
+    """
+    # CLI-provided path (could be default)
+    semantic_manifest_path: str = args.semantic_manifest
+    # Load checkpoint config (may contain dbt-project-dir override)
+    config: Dict[str, Any] = get_config_file(args.config)
+    project_dir: Optional[str] = config.get("dbt-project-dir")
+
+    # Determine actual path based on precedence
+    if semantic_manifest_path != DEFAULT_SEMANTIC_MANIFEST_PATH:
+        manifest_path = semantic_manifest_path
+    elif project_dir:
+        manifest_path = f"{project_dir}/target/semantic_manifest.json"
+    else:
+        manifest_path = DEFAULT_SEMANTIC_MANIFEST_PATH
+
+    # Load and return JSON
+    return get_json(manifest_path)
+
+
+def get_dbt_catalog(args: Namespace) -> Dict[str, Any]:  # type: ignore
     """
     Get dbt catalog following the new config file approach
     """
@@ -870,17 +995,17 @@ def validate_column_meta_keys(
     missing_keys = required_meta_keys - meta_keys  # Identify missing keys
     extra_keys = meta_keys - required_meta_keys  # Identify extra keys
 
-    # If missing required keys, print warning
-    if missing_keys:
-        print(
-            f"{red(model_name)}: Column {yellow(column_name)} is missing required meta keys: {yellow(', '.join(missing_keys))}"
-        )
+    # # If missing required keys, print warning
+    # if missing_keys:
+    #     print(
+    #         f"{red(model_name)}: Column {yellow(column_name)} is missing required meta keys: {yellow(', '.join(missing_keys))}"
+    #     )
 
-    # If extra keys are not allowed, check for extra keys
-    if not allow_extra_keys and extra_keys:
-        print(
-            f"{red(model_name)}: Column {yellow(column_name)} has extra meta keys that are not allowed: {yellow(', '.join(extra_keys))}"
-        )
+    # # If extra keys are not allowed, check for extra keys
+    # if not allow_extra_keys and extra_keys:
+    #     print(
+    #         f"{red(model_name)}: Column {yellow(column_name)} has extra meta keys that are not allowed: {yellow(', '.join(extra_keys))}"
+    #     )
 
     # Return False if there are missing keys or disallowed extra keys
     return not missing_keys and (allow_extra_keys or not extra_keys)

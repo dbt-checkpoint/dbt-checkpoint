@@ -125,6 +125,16 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
 
+**Semantic Layer checks:**
+
+- [`check-semantic-dimensions-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-dimensions-has-meta-keys): Check semantic dimensions has keys in meta part.
+- [`check-semantic-dimensions-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-dimensions-have-required-fields): Check semantic dimensions have required fields.
+- [`check-semantic-entities-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-entities-have-required-fields): Check semantic entities have required fields.
+- [`check-semantic-measures-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-measures-have-required-fields): Check semantic measures have required fields.
+- [`check-semantic-metrics-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-metrics-has-meta-keys): Check semantic metrics have required fields.
+- [`check-semantic-metrics-have-required-fields](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-metrics-have-required-fields): Check semantic metrics have required fields.
+- [`check-semantic-models-have-required-fields`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-semantic-models-have-required-fields): Check semantic models have required fields.
+
 **Modifiers:**
 
 - [`generate-missing-sources`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#generate-missing-sources): If any source is missing this hook tries to create it.
