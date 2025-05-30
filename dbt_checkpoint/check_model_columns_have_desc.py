@@ -24,7 +24,7 @@ from dbt_checkpoint.utils import (
 def check_column_desc(
     paths: Sequence[str],
     manifest: Dict[str, Any],
-    exclude_pattern: str,
+    exclude_pattern: str = "",
     include_disabled: bool = False,
 ) -> Tuple[int, Dict[str, Any]]:
     paths = get_missing_file_paths(
