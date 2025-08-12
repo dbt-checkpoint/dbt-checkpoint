@@ -38,7 +38,7 @@
   language: python
   types_or: [sql, yaml]
 - id: check-model-has-columns-with-types
-  name: Check the model has required columns with specified types
+  name: Check the model has columns with given types
   description: Ensures that model has mandatory audit columns like _loaded_at, _updated_at etc with correct types.
   entry: check-model-has-columns-with-types
   language: python
