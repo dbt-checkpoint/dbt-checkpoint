@@ -14,6 +14,18 @@ TESTS = (
             "foo",
             "bar",
         ],
+        {"models": [{"name": "with_meta", "config": {"meta": {"foo": "bar"}}}]},
+        True,
+        True,
+        0,
+    ),
+    (
+        [
+            "aa/bb/with_meta.sql",
+            "--meta-keys",
+            "foo",
+            "bar",
+        ],
         {"models": [{"name": "with_meta", "meta": {"foo": "bar"}}]},
         True,
         True,
