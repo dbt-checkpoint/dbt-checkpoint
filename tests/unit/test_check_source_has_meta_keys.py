@@ -9,6 +9,22 @@ TESTS = (
 sources:
 -   name: src
     loader: test
+    config:
+        meta:
+            foo: test
+            bar: test
+    tables:
+    -   name: test
+    """,
+        True,
+        True,
+        0,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
     meta:
         foo: test
         bar: test

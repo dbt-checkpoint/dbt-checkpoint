@@ -8,6 +8,27 @@ TESTS = (
         """
 sources:
 -   name: test
+    config:
+        loaded_at_field: aa
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+            error_after:
+                count: 24
+                period: hour
+            filter: x > y
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        0,
+    ),    
+    (
+        """
+sources:
+-   name: test
     loaded_at_field: aa
     freshness:
         warn_after:
