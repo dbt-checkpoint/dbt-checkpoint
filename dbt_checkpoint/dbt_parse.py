@@ -7,6 +7,7 @@ from typing import Sequence
 
 from dbt_checkpoint.utils import add_config_args
 from dbt_checkpoint.utils import add_dbt_cmd_args
+from dbt_checkpoint.utils import extend_dbt_cloud_flags
 from dbt_checkpoint.utils import extend_dbt_project_dir_flag
 from dbt_checkpoint.utils import get_config_file
 from dbt_checkpoint.utils import get_flags
@@ -22,7 +23,9 @@ def prepare_cmd(
     cmd_flags = get_flags(cmd_flags)
     dbt_project_dir = config.get("dbt-project-dir")
     cmd = ["dbt", *global_flags, "parse", *cmd_flags]
-    return extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
+    cmd = extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
+    cmd = extend_dbt_cloud_flags(cmd, config)
+    return cmd
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

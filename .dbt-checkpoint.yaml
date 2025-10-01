@@ -1,2 +1,3 @@
 version: 1
 disable-tracking: true
+use-dbt-cloud: true

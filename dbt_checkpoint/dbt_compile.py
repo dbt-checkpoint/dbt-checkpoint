@@ -8,6 +8,7 @@ from dbt_checkpoint.utils import (
     add_dbt_cmd_args,
     add_dbt_cmd_model_args,
     add_filenames_args,
+    extend_dbt_cloud_flags,
     extend_dbt_project_dir_flag,
     get_config_file,
     get_flags,
@@ -33,7 +34,9 @@ def prepare_cmd(
     else:
         dbt_models = paths_to_dbt_models(paths, prefix, postfix)
     cmd = ["dbt", *global_flags, "compile", "-m", *dbt_models, *cmd_flags]
-    return extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
+    cmd = extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
+    cmd = extend_dbt_cloud_flags(cmd, config)
+    return cmd
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

@@ -61,6 +61,70 @@ dbt-project-dir: my_dbt_project
 
 This way, we will automatically look for the required manifest/catalog inside your `my_dbt_project` project folder.
 
+## dbt Cloud Authentication
+
+dbt-checkpoint now supports authentication with **dbt Cloud** in addition to dbt-core. To use dbt Cloud authentication, configure your `.dbt-checkpoint.yaml` file:
+
+```yaml
+version: 1
+use-dbt-cloud: true
+dbt-cloud-host: cloud.getdbt.com  # Optional, defaults to cloud.getdbt.com
+dbt-cloud-account-id: 12345  # Optional if set via environment variable
+dbt-cloud-project-id: 67890  # Optional if set via environment variable
+```
+
+### Authentication Methods
+
+**Option 1: Environment Variables (Recommended)**
+
+Set these environment variables for secure authentication:
+
+```bash
+export DBT_CLOUD_API_TOKEN="your-api-token"
+export DBT_CLOUD_ACCOUNT_ID="your-account-id"
+export DBT_CLOUD_PROJECT_ID="your-project-id"
+export DBT_CLOUD_HOST="cloud.getdbt.com"  # Optional
+```
+
+**Option 2: Configuration File**
+
+Add credentials to `.dbt-checkpoint.yaml` (not recommended for production):
+
+```yaml
+version: 1
+use-dbt-cloud: true
+dbt-cloud-api-token: your-api-token  # Not recommended - use env vars instead
+dbt-cloud-account-id: 12345
+dbt-cloud-project-id: 67890
+```
+
+### Getting Your API Token
+
+To authenticate with dbt Cloud, you'll need either:
+- **Personal Access Token (PAT)**: For individual user access - generate from your dbt Cloud account settings
+- **Service Token**: For automated/production workflows - generate from dbt Cloud account admin settings
+
+> **Note**: User API tokens have been deprecated. Please use Personal Access Tokens or Service Tokens.
+
+### Example Configuration
+
+```yaml
+# .dbt-checkpoint.yaml
+version: 1
+use-dbt-cloud: true
+dbt-project-dir: analytics  # Optional: if project is in subdirectory
+disable-tracking: false
+```
+
+Then set your environment variables:
+
+```bash
+export DBT_CLOUD_API_TOKEN="dbtc_xxxxxxxxxxxx"
+export DBT_CLOUD_ACCOUNT_ID="12345"
+```
+
+All dbt command hooks (`dbt-parse`, `dbt-compile`, `dbt-run`, etc.) will automatically use Cloud authentication when `use-dbt-cloud: true` is set.
+
 ## General `exclude` and per-hook excluding
 
 Since `dbt-checkpoint 1.1.0`, certain hooks implement an implicit logic that "discover" their sql/yml equivalent for checking.
@@ -187,10 +251,13 @@ repos:
 
 ## Run in CI/CD
 
-Unfortunately, you cannot natively use `dbt-checkpoint` if you are using **dbt Cloud**. But you can run checks after you push changes into Github.
+`dbt-checkpoint` can be used in CI/CD with both **dbt-core** and **dbt Cloud**.
 
 `dbt-checkpoint` for the most of the hooks needs `manifest.json` (see requirements section in hook documentation), that is in the `target` folder. Since this target folder is usually in `.gitignore`, you need to generate it. For that you need to run the `dbt-parse` command.
-To be able to parse dbt, you also need [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example).
+
+**For dbt-core**: You need a [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example below).
+
+**For dbt Cloud**: Set up your `.dbt-checkpoint.yaml` with `use-dbt-cloud: true` and provide authentication via environment variables (see [dbt Cloud Authentication](#dbt-cloud-authentication) section).
 
 Say you want to check that a model contains at least two tests, you would use this configuration:
 
