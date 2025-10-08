@@ -754,49 +754,77 @@ You want to make sure that every model was tested.
 
 ---
 
-### `check-model-name-contract`
+### `check-column-name-contract`
 
-Check that model name abides to a contract (similar to [`check-column-name-contract`]()). A contract consists of a regex pattern.
+Check that column name abides to a contract, as described in [this blog post](https://emilyriederer.netlify.app/post/column-name-contracts/) by Emily Riederer. A contract consists of a regex pattern and a series of data types.
+
+This hook is designed with flexibility in mind, understanding that data types can vary across different SQL databases (e.g., `INT` vs. `INT64`) and can be complex (e.g., `ARRAY<STRING>`).
+
+#### How It Works
+
+The hook validates columns in two ways:
+1.  If a column's data type matches one of the `dtypes` in your contract, its name must match the `pattern`.
+2.  If a column's name matches the `pattern`, its data type must be one of the `dtypes` specified in your contract.
+
+To handle the diversity of data types, the hook uses a "both-and" approach:
+* **Built-in Equivalencies:** The hook comes with pre-configured groups of equivalent data types. For example, if your contract specifies `numeric`, the hook will automatically recognize `decimal`, `float64`, and `double` as valid matches. This covers most common cross-database variations.
+* **Smart Type Parsing:** For complex types like `ARRAY<STRING>` or `STRUCT<...>`, the hook intelligently extracts the base type (`array` or `struct`) before checking it against the contract.
+* **User-Defined Overrides:** For unique, project-specific situations (like treating a BigQuery `ARRAY` as a `STRUCT`), you can define your own custom type mappings.
 
 #### Arguments
 
-`--pattern`: Regex pattern to match model names.<br/>
-`--exclude`: Regex pattern to exclude files.
+`--pattern`: Regex pattern to match column names.
+`--dtypes`: A list of data type categories that the column should fall into.
+`--exclude`: (Optional) Regex pattern to exclude files.
 
-#### Example
+#### Advanced Configuration (Optional)
 
+For project-specific needs, you can define custom `type_mappings` in your `.dbt-checkpoint.yaml` file. This allows you to extend the hook's built-in knowledge. User-defined mappings are merged with the defaults.
+
+For example, if you are using BigQuery and want to enforce a naming convention for columns that are either `STRUCT`s or `ARRAY`s of single-field structs, you can tell the hook to treat them as equivalent:
+
+```yaml
+# .dbt-checkpoint.yaml
+
+check-column-name-contract:
+  type_mappings:
+    STRUCT:  # When a contract expects a STRUCT...
+      - ARRAY    # ...also accept ARRAY as a valid type.
+      - RECORD
 ```
-repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-name-contract
-   args: [--pattern, "(base_|stg_).*"]
-   files: models/staging/
- - id: check-model-name-contract
-   args: [--pattern, "(dim_|fct_).*"]
-   files: models/marts/
+# Example Usage
+
+Here is a complete example for your `.pre-commit-config.yaml`:
+
+```yaml
+-   repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.7 # or your target version
+    hooks:
+      -   id: check-column-name-contract
+          args: ['--pattern', '^(is|has|do)_', '--dtypes', 'boolean']
+      -   id: check-column-name-contract
+          args: ['--pattern', '.*_(amount|cost|price)$', '--dtypes', 'numeric']
+      -   id: check-column-name-contract
+          args: ['--pattern', '.*_details$', '--dtypes', 'struct'] # Will also match ARRAYs if configured
 ```
 
-#### When to use it
+This setup:
 
-You want to make sure your model names follow a naming convention (e.g., staging models start with a `stg_` prefix).
+- Enforces that all boolean columns start with `is_`, `has_`, or `do_`.
+- Requires that columns ending in `_amount`, `_cost`, or `_price` are of a numeric type.
+- Requires that columns ending in `_details` are a STRUCT (or an ARRAY/RECORD if you've configured the mapping).
 
-#### Requirements
+# Requirements
 
-| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
-| :---------------------------------------------------------: | :--------------------------------------------------------: |
-|                       :white_check_mark: Yes                |                        :x: Not needed                      |
+| Model exists in manifest.json <sup id="a1">1</sup> | Model exists in catalog.json <sup id="a2">2</sup> |
+|---------------------------------------------------|---------------------------------------------------|
+| :white_check_mark: Yes                            | :white_check_mark: Yes                            |
 
-<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
-<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+# Export to Sheets
 
-#### How it works
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before running this hook (`dbt >= 1.5`).
 
-- Hook takes all changed `SQL` files.
-- The model name is obtained from the `SQL` file name.
-- The catalog is scanned for a model.
-- If any model does not match the regex pattern, the hook fails.
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before running this hook.
 
 ---
 

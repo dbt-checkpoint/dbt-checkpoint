@@ -347,6 +347,19 @@ MANIFEST = {
                 "materialized": "snapshot",
             },
         },
+        # New model entries for testing
+        "model.test.with_float_column": {
+            "path": "aa/bb/with_float_column.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.with_array_column": {
+            "path": "aa/bb/with_array_column.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.with_struct_column": {
+            "path": "aa/bb/with_struct_column.sql",
+            "root_path": "/path/to/aa",
+        },
     },
     "sources": {
         "source.source1.table1": {
@@ -501,6 +514,25 @@ CATALOG = {
             "columns": {
                 "COL1": {"type": "TEXT", "name": "COL1"},
                 "COL2": {"type": "TEXT", "name": "COL2"},
+            },
+        },
+        # New catalog entries for testing
+        "model.test.with_float_column": {
+            "metadata": {},
+            "columns": {
+                "total_amount": {"type": "FLOAT64", "name": "total_amount"}
+            },
+        },
+        "model.test.with_array_column": {
+            "metadata": {},
+            "columns": {
+                "user_ids": {"type": "ARRAY<STRING>", "name": "user_ids"}
+            },
+        },
+        "model.test.with_struct_column": {
+            "metadata": {},
+            "columns": {
+                "user_details": {"type": "STRUCT<id STRING, email STRING>", "name": "user_details"}
             },
         },
     },
