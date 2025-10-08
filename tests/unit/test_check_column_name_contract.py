@@ -3,108 +3,72 @@ import yaml
 
 from dbt_checkpoint.check_column_name_contract import main
 
-# Input args, valid manifest, valid_config, expected return value
 TESTS = (
     (
         ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
-        True,
-        True,
-        True,
-        0,
-        None,
-    ),
-    (
-        ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
-        "is_.*",
-        "boolean",
-        False,
-        True,
-        True,
-        1,
-        None,
-    ),
-    (
-        ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
-        "is_.*",
-        "boolean",
-        True,
-        False,
-        True,
-        1,
-        None,
-    ),
-    (
-        ["aa/bb/with_boolean_column_without_prefix.sql", "is_test"],
-        "is_.*",
-        "boolean",
-        True,
-        True,
-        True,
-        1,
-        None,
-    ),
-    (
-        ["aa/bb/without_boolean_column_with_prefix.sql", "is_test"],
-        "is_.*",
-        "boolean",
-        True,
-        True,
-        True,
-        1,
-        None,
+        True, True, True, 0, None,
     ),
     (
         ["aa/bb/without_boolean_column_without_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
-        True,
-        True,
-        True,
-        0,
-        None,
+        True, True, True, 0, None,
     ),
     (
         ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
         "is_.*",
         "boolean",
-        True,
-        True,
-        False,
-        0,
-        None,
+        True, True, False, 0, None,
     ),
-
-    # --- New Tests for Column Equivalency Features ---
-
-    # Test for default numeric equivalency (FLOAT64 should pass for numeric)
     (["aa/bb/with_float_column.sql", "is_test"], ".*_amount", "numeric", True, True, True, 0, None),
-
-    # Test for base type parsing (ARRAY<STRING> should pass for complex)
     (["aa/bb/with_array_column.sql", "is_test"], ".*_ids", "complex", True, True, True, 0, None),
-
-    # Test for base type parsing (STRUCT<...> should pass for complex)
     (["aa/bb/with_struct_column.sql", "is_test"], ".*_details", "complex", True, True, True, 0, None),
-
-    # Test for user-configured mapping (ARRAY should pass for STRUCT with custom config)
     (
-        ["aa/bb/with_array_column.sql", "is_test"],
-        ".*_ids",
-        "struct",
-        True,
-        True,
-        True,
-        0,
-        {
-            "check-column-name-contract": {
-                "type_mappings": {"STRUCT": ["ARRAY"]}
-            }
-        },
+        ["aa/bb/with_array_column.sql", "is_test"], ".*_ids", "struct", True, True, True, 0,
+        {"check-column-name-contract": {"type_mappings": {"struct": ["array"]}}},
     ),
+    # Test a file that is not a model, should pass
+    (["aa/bb/not_a_model.sql", "is_test"], ".*", "string", True, True, True, 0, None),
+
+    # Test a model in manifest but not in catalog, should pass
+    (["aa/bb/manifest_only_model.sql", "is_test"], ".*", "string", True, True, True, 0, None),
     
-    # Test for a clear failure case with the new types
+    # Test a model with weird/missing column types, should fail
+    (["aa/bb/column_with_edge_case_types.sql", "is_test"], ".*", "string", True, True, True, 1, None),
+    
+    # Test using a dtype that is not in the default mappings, should fail
+    (["aa/bb/with_float_column.sql", "is_test"], "total_amount", "money", True, True, True, 1, None),
+
+    # --- Failing Tests ---
+    (
+        ["aa/bb/with_boolean_column_without_prefix.sql", "is_test"],
+        "is_.*",
+        "boolean",
+        True, True, True, 1, None,
+    ),
+    (
+        ["aa/bb/without_boolean_column_with_prefix.sql", "is_test"],
+        "is_.*",
+        "boolean",
+        True, True, True, 1, None,
+    ),
     (["aa/bb/with_float_column.sql", "is_test"], ".*_amount", "string", True, True, True, 1, None),
+
+    # --- Coverage Increase: Test for missing manifest/catalog ---
+    (
+        ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
+        "is_.*",
+        "boolean",
+        False, True, True, 1, None,  # Missing manifest
+    ),
+    (
+        ["aa/bb/with_boolean_column_with_prefix.sql", "is_test"],
+        "is_.*",
+        "boolean",
+        True, False, True, 1, None,  # Missing catalog
+    ),
 )
 
 @pytest.fixture

@@ -606,27 +606,50 @@ def add_meta_keys_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
+def check_dbt_schema_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
+    """
+    Checks the version of a dbt schema yml file.
+    dbt requires `version: 2`.
+    """
     if "version" not in yaml_dct:
-        raise_invalid_property_yml_version(
-            file_path,
-            "the yml property file {} is missing a version tag".format(file_path),
+        raise CompilationException(
+            f"The dbt schema file at {file_path} is missing a version tag."
         )
 
-    version = yaml_dct["version"]
-    # if it's not an integer, the version is malformed, or not
-    # set. Either way, only 'version: 2' is supported.
-    if not isinstance(version, int):
-        raise_invalid_property_yml_version(
-            file_path,
-            "its 'version:' tag must be an integer (e.g. version: 2)."
-            " {} is not an integer".format(version),
+    version = yaml_dct.get("version")
+    if not isinstance(version, int) or version != 2:
+        raise CompilationException(
+            f"The dbt schema file at {file_path} must have `version: 2`, "
+            f"but found `version: {version}`."
         )
-    if version != 1:
-        raise_invalid_property_yml_version(
-            file_path,
-            "its 'version:' tag is set to {}.  Only 1 is supported".format(version),
+
+
+def _validate_checkpoint_config_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
+    """
+    Validates the version of the .dbt-checkpoint.yaml config file.
+    This tool requires `version: 1`.
+    """
+    version = yaml_dct.get("version")
+    if not isinstance(version, int) or version != 1:
+        raise CompilationException(
+            f"The .dbt-checkpoint.yaml file at {file_path} must have `version: 1`, "
+            f"but found `version: {version}`."
         )
+
+# Update the call inside get_config_file to use the renamed function
+def get_config_file(config_file_path: str) -> Dict[str, Any]:
+    try:
+        path = Path(config_file_path)
+        if not path.exists():
+            alt_path = path.with_suffix(".yml" if path.suffix == ".yaml" else ".yaml")
+            if alt_path.exists():
+                path = alt_path
+        config = checkpoint_safe_load(path.open())
+        # Call the renamed and corrected function
+        _validate_checkpoint_config_version(config_file_path, config)
+    except FileNotFoundError:
+        config = {}
+    return config
 
 
 def raise_invalid_property_yml_version(path: str, issue: str) -> None:

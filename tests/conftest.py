@@ -347,7 +347,14 @@ MANIFEST = {
                 "materialized": "snapshot",
             },
         },
-        # New model entries for testing
+        "model.test.with_boolean_column_without_prefix": {
+            "path": "aa/bb/with_boolean_column_without_prefix.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.without_boolean_column_with_prefix": {
+            "path": "aa/bb/without_boolean_column_with_prefix.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.test.with_float_column": {
             "path": "aa/bb/with_float_column.sql",
             "root_path": "/path/to/aa",
@@ -358,6 +365,14 @@ MANIFEST = {
         },
         "model.test.with_struct_column": {
             "path": "aa/bb/with_struct_column.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.manifest_only_model": {
+            "path": "aa/bb/manifest_only_model.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.column_with_edge_case_types": {
+            "path": "aa/bb/column_with_edge_case_types.sql",
             "root_path": "/path/to/aa",
         },
     },
@@ -516,7 +531,6 @@ CATALOG = {
                 "COL2": {"type": "TEXT", "name": "COL2"},
             },
         },
-        # New catalog entries for testing
         "model.test.with_float_column": {
             "metadata": {},
             "columns": {
@@ -533,6 +547,13 @@ CATALOG = {
             "metadata": {},
             "columns": {
                 "user_details": {"type": "STRUCT<id STRING, email STRING>", "name": "user_details"}
+            },
+        },
+        "model.test.column_with_edge_case_types": {
+            "metadata": {},
+            "columns": {
+                "col_no_type": {"name": "col_no_type"},
+                "col_unrecognized_type": {"name": "col_unrecognized_type", "type": "(internal)"},
             },
         },
     },
