@@ -354,22 +354,29 @@ def get_source_schemas(
     for yml_file in yml_files:
         schema = checkpoint_safe_load(yml_file.open())
         for source in schema.get("sources", []):
+            # This checks if the whole source is disabled
             if not include_disabled and not source.get("config", {}).get(
                 "enabled", True
             ):
                 continue
             source_name = source.get("name")
-            tables = source.pop("tables", [])
+            # Use .get() instead of .pop()
+            tables = source.get("tables", [])
+            source_schema_base = {k: v for k, v in source.items() if k != "tables"}
             for table in tables:
+                # Add the required check for each individual table
+                if not include_disabled and not table.get("config", {}).get(
+                    "enabled", True
+                ):
+                    continue
                 table_name = table.get("name")
                 yield SourceSchema(
                     source_name=source_name,
                     table_name=table_name,
                     filename=yml_file.stem,
-                    source_schema=source,
+                    source_schema=source_schema_base,
                     table_schema=table,
                 )
-
 
 def get_exposures(
     yml_files: Sequence[Path],

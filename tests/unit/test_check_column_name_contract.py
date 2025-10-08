@@ -1,5 +1,7 @@
 import pytest
 import yaml
+import subprocess
+import sys
 
 from dbt_checkpoint.check_column_name_contract import main
 
@@ -133,3 +135,29 @@ def test_check_column_name_contract(
     
     status_code = main(current_input_args)
     assert status_code == expected_status_code
+
+
+def test_check_column_name_contract_as_script(tmp_path):
+    """Test the script's entry point when run from the command line."""
+    # Create dummy files to pass to the script
+    sql_file = tmp_path / "model.sql"
+    sql_file.write_text("select 1")
+
+    script_path = "dbt_checkpoint/check_column_name_contract.py"
+
+    # We expect this to fail because we are not providing a manifest file
+    process = subprocess.run(
+        [
+            sys.executable,
+            script_path,
+            str(sql_file),
+            "--pattern",
+            ".*",
+            "--dtypes",
+            "string",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert process.returncode == 1
+    assert "Unable to load manifest file" in process.stdout

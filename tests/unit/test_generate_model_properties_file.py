@@ -1,8 +1,11 @@
 from unittest.mock import patch
 
 import pytest
+import json
+import yaml
+from dbt_checkpoint.utils import get_models
 
-from dbt_checkpoint.generate_model_properties_file import main
+from dbt_checkpoint.generate_model_properties_file import main, get_model_properties
 
 TESTS = (
     (
@@ -210,3 +213,88 @@ def test_generate_model_properties_file_path_template(
     main(input_args)
     ff = tmpdir.join(directory)
     print(ff)
+
+def test_get_model_properties_logic(capsys):
+    """Tests the get_model_properties function directly."""
+    from dbt_checkpoint.utils import Model
+    
+    node1 = {
+        "unique_id": "model.test.model_one", "path": "model_one.sql",
+        "name": "model_one", "patch_path": None, "resource_type": "model",
+        "package_name": "test", "columns": {}, "config": {},
+        "fqn": ["test", "model_one"],
+    }
+    node2 = {
+        "unique_id": "model.test.model_two", "path": "model_two.sql",
+        "name": "model_two", "patch_path": None, "resource_type": "model",
+        "package_name": "test", "columns": {}, "config": {},
+        "fqn": ["test", "model_two"],
+    }
+    catalog = {
+        "nodes": {
+            "model.test.model_one": {"columns": {"col_a": {}, "col_b": {}}}
+        }
+    }
+
+    # Manually create Model objects with the correct arguments
+    model_one_obj = Model(
+        model_id="model.test.model_one",
+        model_name="model_one",
+        filename="model_one.sql",
+        node=node1,
+    )
+    model_two_obj = Model(
+        model_id="model.test.model_two",
+        model_name="model_two",
+        filename="model_two.sql",
+        node=node2,
+    )
+
+    # SCENARIO 1: Model is found in the catalog
+    props1 = get_model_properties(model_one_obj, catalog["nodes"])
+    assert props1 == {"name": "model_one", "columns": [{"name": "col_a"}, {"name": "col_b"}]}
+    
+    # SCENARIO 2: Model is NOT found in the catalog
+    props2 = get_model_properties(model_two_obj, catalog["nodes"])
+    assert props2 == {"name": "model_two"}
+    
+    captured = capsys.readouterr()
+    assert "Unable to find model `model.test.model_two` in catalog file" in captured.out
+
+def test_generate_properties_file_include_disabled(tmpdir, catalog_path_str, config_path_str):
+    """
+    Tests that the --include-disabled flag correctly processes disabled models.
+    """
+    # 1. Setup a manifest with a disabled model
+    manifest_content = {
+        "nodes": {
+            "model.test.disabled_model": {
+                "unique_id": "model.test.disabled_model",
+                "resource_type": "model", "path": "disabled_model.sql",
+                "name": "disabled_model", "patch_path": None,
+                "config": {"enabled": False},
+            }
+        }, "macros": {}
+    }
+    manifest_path = tmpdir.join("manifest.json")
+    manifest_path.write_text(json.dumps(manifest_content), "utf-8")
+    
+    properties_file = tmpdir.join("schema.yml")
+    sql_file = tmpdir.join("disabled_model.sql")
+    sql_file.write_text("select 1", "utf-8")
+    
+    # 2. Run WITHOUT the flag (should do nothing, status 0)
+    argv1 = [
+        str(sql_file), "--is_test",
+        "--manifest", str(manifest_path), "--catalog", catalog_path_str,
+        "--config", config_path_str, "--properties-file", str(properties_file)
+    ]
+    status_code1 = main(argv1)
+    assert status_code1 == 0
+    assert not properties_file.exists()
+
+    # 3. Run WITH the flag (should create the file, status 1)
+    argv2 = argv1 + ["--include-disabled"]
+    status_code2 = main(argv2)
+    assert status_code2 == 1
+    assert properties_file.exists()

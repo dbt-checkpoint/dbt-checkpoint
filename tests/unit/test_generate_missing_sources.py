@@ -130,3 +130,41 @@ def test_create_missing_sources(
     actual_yaml = yaml.safe_load(result_text)
     
     assert actual_yaml == expected_yaml
+
+@patch("dbt_checkpoint.generate_missing_sources.check_refs_sources")
+def test_create_missing_sources_no_missing_sources(
+    mock_check_refs_sources,
+    manifest_path_str,
+    tmpdir,
+):
+    # This simulates `check_refs_sources` finding NO missing sources.
+    mock_check_refs_sources.return_value = {
+        "status_code": 0,
+        "sources": {},
+    }
+    
+    # Prepare dummy files for the hook to run against
+    sql_file = tmpdir.join("file.sql")
+    sql_file.write("select 1")
+    
+    initial_schema_content = "version: 2\nsources:\n- name: src\n"
+    schema_file = tmpdir.join("schema.yml")
+    schema_file.write(initial_schema_content)
+
+    argv = [
+        str(sql_file),
+        "--schema-file",
+        str(schema_file),
+        "--manifest",
+        manifest_path_str,
+    ]
+
+    # Run the main function
+    actual_status_code = main(argv)
+
+    # Assert the status code is 0 (success, no changes made)
+    assert actual_status_code == 0
+
+    # Read the file content and assert it is unchanged
+    result_text = schema_file.read_text("utf-8")
+    assert result_text == initial_schema_content

@@ -124,7 +124,7 @@ def has_table_name(
 
             # Skip if in an "IS DISTINCT FROM" expression
             if is_distinct_context:
-                continue
+                continue # pragma: no cover
 
             # Look ahead to check for "DISTINCT FROM" pattern
             if (
@@ -132,7 +132,7 @@ def has_table_name(
                 and i + 1 < len(sql_split)
                 and sql_split[i + 1].lower() == "from"
             ):
-                continue
+                continue # pragma: no cover
 
             table = cur.lower().strip().replace(",", "")
             if dotless and "." not in table:

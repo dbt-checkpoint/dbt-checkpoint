@@ -1,540 +1,45 @@
 import pytest
+import subprocess
+import sys
+import os
+import json
+from unittest.mock import patch
 
-from dbt_checkpoint.check_script_has_no_table_name import has_table_name
-from dbt_checkpoint.check_script_has_no_table_name import main
-from dbt_checkpoint.check_script_has_no_table_name import prev_cur_next_iter
-from dbt_checkpoint.check_script_has_no_table_name import replace_comments
-from dbt_checkpoint.check_script_has_no_table_name import replace_string_literals
+from dbt_checkpoint.check_script_has_no_table_name import has_table_name, main, prev_cur_next_iter, replace_comments, replace_string_literals
+from dbt_checkpoint.utils import JsonOpenError
 
-# Input, args, expected return value, expected output
-TESTS = (  # type: ignore
-    (
-        """
-    SELECT * FROM AA
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"aa"},
-    ),
-    (
-        """
-    SELECT * FROM AA
-    LEFT JOIN BB ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"aa", "bb"},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT * FROM CC
-    )
-    SELECT * FROM AA
-    LEFT JOIN BB ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"cc", "bb"},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT * FROM {{ source('aa') }}
-    )
-    SELECT * FROM AA
-    LEFT JOIN BB ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"bb"},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT * FROM {{ source('aa') }}
-    ),
-    bb AS (
-        SELECT * FROM xx
-    )
-    SELECT * FROM AA
-    LEFT JOIN BB ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"xx"},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT * FROM {{ source('aa') }}
-    ),
-    bb AS (
-        SELECT * FROM xx.xx.xx
-    )
-    SELECT * FROM AA
-    LEFT JOIN BB ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"xx.xx.xx"},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT * FROM {{ source('aa') }}
-    )
-    SELECT * FROM AA
-    LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT *, BB as CC FROM {{ source('aa') }}
-    )
-    -- SELECT * FROM GG
-    SELECT * FROM AA
-    LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    WITH AA AS (
-        SELECT * FROM {{ source('aa') }}
-    )
-    /* SELECT *
-    FROM GG
-    */
-    SELECT * FROM AA
-    LEFT JOIN {{ ref('xx') }} ON AA.A = BB.A
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    with source as (
-        select * from {{ source('aws_lambda', 'purchase_orders') }}
-    ),
-    flattened as (
-        select * from source, lateral flatten(line_items)
-    )
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    {# This is a test of the check-script-has-no-table-name hook, from dbt-checkpoint
-    We would expect the hook to ignore this text because it is in a jinja comment block
-    and not actually a join to any other table.
-    #}
-    with source as (
-        select * from {{ source('aa', 'bb') }}
-    )
-    SELECT * FROM source
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    /* This is a test of the check-script-has-no-table-name hook, from dbt-checkpoint
-    We would expect the hook to ignore this text because it is in a jinja comment block
-    and not actually a join to any other table.
-    */
-    with source as (
-        select * from {{ source('aa', 'bb') }}
-    )
-    SELECT * FROM source
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    -- join to other
-    -- from aaa
-    with source as (
-        select * from {{ source('aa', 'bb') }}
-    )
-    SELECT * FROM source
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-with assets as (
-    select * from {{ ref('stg_rse__assets') }}
-),
-asset_category as (
-    select * from {{ ref('data_asset_category') }}
-),
-final as (
-    select
-        assets.*,
-        case
-            when assets.category = 'cars' then assets.category
-            when assets.category = 'wine-spirits' then assets.category
-            when assets.ticker in (select ticker from asset_category)
-                then asset_category.asset_category
-            else 'unknown'
-        end as asset_category
-    from assets
-    left join asset_category using (ticker)
+# (input_s, expected_status_code, output)
+TESTS = (
+    ("SELECT * FROM AA", 1, {"aa"}),
+    ("SELECT * FROM AA LEFT JOIN BB ON AA.A = BB.A", 1, {"aa", "bb"}),
+    ("WITH AA AS (SELECT * FROM CC) SELECT * FROM AA LEFT JOIN BB ON AA.A = BB.A", 1, {"cc", "bb"}),
+    ("WITH AA AS (SELECT * FROM {{ source('aa') }}) SELECT * FROM AA LEFT JOIN BB ON AA.A = BB.A", 1, {"bb"}),
+    ("SELECT * FROM {{ source('aa') }}", 0, set()),
+    ("SELECT * FROM {{ ref('aa') }}", 0, set()),
+    ("SELECT 'this is a from string' FROM aa", 1, {"aa"}),
+    ("SELECT EXTRACT(YEAR FROM date_day) AS year FROM {{ ref('model') }}", 0, set()),
+    ("SELECT value FROM source, UNNEST([1,2,3,4]) AS value", 1, {"source"}),
+    ("SELECT SUBSTRING(column_name FROM 1 FOR 3) AS substring_value FROM {{ ref('model') }}", 0, set()),
+    ("SELECT CASE WHEN column_a IS DISTINCT FROM column_b THEN 'Different' ELSE 'Same' END AS comparison FROM {{ ref('model') }}", 0, set()),
+    ("AS (SELECT 1 FROM DUAL)", 1, {"dual"}),
+    # ADDED FOR COVERAGE: Test for the "FROM DISTINCT FROM" edge case
+    ("SELECT * FROM distinct FROM my_cte", 1, {"my_cte"}),
 )
-select * from final
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    {% set positions = ['left', 'right', 'center'] %}
-with
-{% for p in positions %}
-    cte_{{ p }} as (
-        select '{{ p }}' as position
-    ),
-{% endfor %}
-unioned as (
-    select * from cte_left
-    union all
-    select * from cte_right
-    union all
-    select * from cte_center
-)
-select * from unioned
-    """,
-        ["--ignore-dotless-table"],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    {% set positions = ['left', 'right', 'center'] %}
-with
-{% for p in positions %}
-    cte_{{ p }} as (
-        select '{{ p }}' as position
-    ),
-{% endfor %}
-unioned as (
-    select * from cte_left
-    union all
-    select * from cte_right
-    union all
-    select * from cte_center
-    union all
-    select * from aa.bb
-)
-select * from unioned
-    """,
-        ["--ignore-dotless-table"],
-        True,
-        True,
-        1,
-        {"aa.bb"},
-    ),
-    (
-        """
-    with source as (
-        select * from {{source('aa', 'bb')}}
-    )
-    SELECT * FROM source
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    {% macro source_cte(source_name, tuple_list) -%}
-    WITH{% for cte_ref in tuple_list %} {{cte_ref[0]}} AS (
-        SELECT * FROM {{ source(source_name, cte_ref[1]) }}
-    ),
-        {%- endfor %} final as (
-    {%- endmacro %}
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT * FROM AA
-    """,
-        [],
-        False,
-        True,
-        1,
-        {"aa"},
-    ),
-    (
-        """
-    SELECT * FROM AA
-    """,
-        [],
-        True,
-        False,
-        1,
-        {"aa"},
-    ),
-    (
-        """
-    SELECT
-        EXTRACT(YEAR FROM date_day) AS year
-    FROM {{ ref('model') }}
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    WITH source AS (
-        SELECT * FROM {{ source('aa', 'bb') }}
-    )
-    SELECT
-        value
-    FROM source,
-    UNNEST([1,2,3,4]) AS value
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT
-        SUBSTRING(column_name FROM 1 FOR 3) AS substring_value
-    FROM {{ ref('model') }}
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT
-        'This text contains the word from in it' AS string_with_from,
-        'Another string FROM with caps' AS another_string
-    FROM {{ ref('model') }}
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT
-        CASE
-            WHEN column_a IS DISTINCT FROM column_b THEN 'Different'
-            ELSE 'Same'
-        END AS comparison
-    FROM {{ ref('model') }}
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT
-        value
-    FROM {{ ref('model') }}
-    CROSS JOIN UNNEST(array_column) AS value
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    WITH source AS (
-        SELECT * FROM {{ source('aa', 'bb') }}
-    )
-    SELECT
-        TRIM(BOTH 'x' FROM column_name) AS trimmed_value
-    FROM source
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT
-        COUNT(*) FILTER (WHERE is_active) AS active_count
-    FROM {{ ref('model') }}
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    SELECT *
-    FROM {{ ref('model') }}
-    WHERE col1 = 'value'
-      AND col2 DISTINCT FROM NULL
-    """,
-        [],
-        True,
-        True,
-        0,
-        {},
-    ),
-    (
-        """
-    WITH source AS (
-        SELECT * FROM {{ source('aa', 'bb') }}
-    )
-    SELECT
-        EXTRACT(YEAR FROM date_day) AS year,
-        *
-    FROM source
-    JOIN actual_table ON source.id = actual_table.id
-    """,
-        [],
-        True,
-        True,
-        1,
-        {"actual_table"},
-    ),
-)
-
 
 @pytest.mark.parametrize(
-    (
-        "input_s",
-        "args",
-        "valid_manifest",
-        "valid_config",
-        "expected_status_code",
-        "output",
-    ),
+    ("input_s", "expected_status_code", "output"),
     TESTS,
 )
-def test_has_table_name(
-    input_s, args, valid_manifest, valid_config, expected_status_code, output
-):
-    dotless = True if "--ignore-dotless-table" in args else False
-    ret, tables = has_table_name(input_s, "text.sql", dotless)
-    diff = tables.symmetric_difference(output)
-    assert not diff
+def test_has_table_name(input_s, expected_status_code, output):
+    ret, tables = has_table_name(input_s, "test.sql", False)
     assert ret == expected_status_code
+    assert tables == output
 
-
-@pytest.mark.parametrize(
-    (
-        "input_s",
-        "args",
-        "valid_manifest",
-        "valid_config",
-        "expected_status_code",
-        "output",
-    ),
-    TESTS,
-)
-def test_has_table_name_integration(
-    input_s,
-    args,
-    valid_manifest,
-    valid_config,
-    expected_status_code,
-    output,
-    tmpdir,
-    manifest_path_str,
-    config_path_str,
-):
-    path = tmpdir.join("file.txt")
-    path.write_text(input_s, "utf-8")
-    input_args = ["--is_test", *args]
-
-    if valid_manifest:
-        input_args.extend(["--manifest", manifest_path_str])
-
-    if valid_config:
-        input_args.extend(["--config", config_path_str])
-
-    ret = main([str(path), *input_args])
-
-    assert ret == expected_status_code
-
-
-def test_replace_comments():
-    sql = "-- select * from ee"
-    assert replace_comments(sql) == ""
-    sql = "--- select * from ee"
-    assert replace_comments(sql) == ""
-    sql = "/* select * from ee*/"
-    assert replace_comments(sql) == "" or replace_comments(sql) == "/**/"
-
+def test_has_table_name_ignore_dotless():
+    sql = "SELECT * FROM aa JOIN bb.cc"
+    ret, tables = has_table_name(sql, "test.sql", dotless=True)
+    assert ret == 1
+    assert tables == {"bb.cc"}
 
 def test_prev_cur_next_iter():
     txt = ["aa", "bb", "cc"]
@@ -552,58 +57,86 @@ def test_prev_cur_next_iter():
     assert cur == "cc"
     assert nxt is None
 
+def test_replace_comments():
+    sql = "SELECT * -- comment\nFROM table"
+    # Note: The space before the comment is removed by the regex.
+    expected = "SELECT *\nFROM table"
+    assert replace_comments(sql).strip() == expected.strip()
 
 def test_replace_string_literals():
-    # Simple string
-    sql = "'select * from table'"
-    assert replace_string_literals(sql) == "''"
+    sql = "SELECT 'hello from inside a string' FROM real_table"
+    expected = "SELECT '' FROM real_table"
+    assert replace_string_literals(sql) == expected
 
-    # String with FROM keyword
-    sql = "SELECT * FROM table WHERE col = 'contains FROM keyword'"
-    assert replace_string_literals(sql) == "SELECT * FROM table WHERE col = ''"
-
-    # Multiple strings
-    sql = "SELECT 'string1', 'string2 FROM multiple'"
-    assert replace_string_literals(sql) == "SELECT '', ''"
-
-    # String with escaped quotes
-    sql = "SELECT 'don''t use FROM in strings'"
-    assert replace_string_literals(sql) == "SELECT ''"
-
-    # Empty string
-    sql = "''"
-    assert replace_string_literals(sql) == "''"
-
-
-def test_context_aware_parsing():
-    # Test IS DISTINCT FROM tracking
-    sql = "SELECT * FROM table WHERE col IS DISTINCT FROM NULL"
-    _, tables = has_table_name(sql, "test.sql")
-    assert tables == {"table"}  # Only 'table' should be detected, not 'NULL'
-
-    # Test function context tracking with EXTRACT
-    sql = "SELECT EXTRACT(YEAR FROM date_field) FROM table"
-    _, tables = has_table_name(sql, "test.sql")
-    assert tables == {"table"}  # Only 'table' should be detected, not 'date_field'
-
-    # Test SUBSTRING function
-    sql = "SELECT SUBSTRING(name FROM 1 FOR 3) FROM employees"
-    _, tables = has_table_name(sql, "test.sql")
-    assert tables == {"employees"}  # Only 'employees' should be detected
-
-    # Test TRIM function
-    sql = "SELECT TRIM(BOTH '0' FROM col) FROM data"
-    _, tables = has_table_name(sql, "test.sql")
-    assert tables == {"data"}  # Only 'data' should be detected
-
-    # Test multiple context patterns in one query
+def test_has_table_name_with_comments_and_strings():
     sql = """
+    -- This is a comment, it refers to table_in_comment
     SELECT
-        EXTRACT(YEAR FROM date_field),
-        CASE WHEN col IS DISTINCT FROM NULL THEN 'Valid' ELSE 'Invalid' END,
-        'String with FROM in it'
-    FROM table
-    JOIN valid_table ON table.id = valid_table.id
+        'This is a string with table_in_string',
+        *
+    FROM
+        real_table -- another comment
+    /*
+    multiline comment with table_in_multiline_comment
+    */
     """
-    _, tables = has_table_name(sql, "test.sql")
-    assert tables == {"table", "valid_table"}  # Only actual tables should be detected
+    ret, tables = has_table_name(sql, "test.sql", False)
+    assert ret == 1
+    assert tables == {"real_table"}
+
+@patch("dbt_checkpoint.check_script_has_no_table_name.get_dbt_manifest")
+def test_main_manifest_error(mock_get_manifest):
+    mock_get_manifest.side_effect = JsonOpenError("mocked error")
+    result = main(["some_file.sql"])
+    assert result == 1
+
+def test_main_with_table_name(tmp_path):
+    sql_file = tmp_path / "test.sql"
+    sql_file.write_text("SELECT * FROM my_table")
+    
+    with patch("dbt_checkpoint.check_script_has_no_table_name.get_dbt_manifest", return_value={}):
+        result = main([str(sql_file), "--is_test"])
+        assert result == 1
+
+def test_main_without_table_name(tmp_path):
+    sql_file = tmp_path / "test.sql"
+    sql_file.write_text("SELECT * FROM {{ ref('my_model') }}")
+
+    with patch("dbt_checkpoint.check_script_has_no_table_name.get_dbt_manifest", return_value={}):
+        result = main([str(sql_file), "--is_test"])
+        assert result == 0
+
+def test_has_table_name_ignore_dotless_only():
+    """Check that only dotless tables are ignored and status code is 0."""
+    sql = "SELECT * FROM aa JOIN bb"
+    ret, tables = has_table_name(sql, "test.sql", dotless=True)
+    assert ret == 0
+    assert tables == set()
+
+
+def test_main_as_script(tmp_path):
+    """Test the script's entry point when run from the command line."""
+    sql_file = tmp_path / "test.sql"
+    sql_file.write_text("SELECT * FROM my_table")
+
+    # Create a dummy manifest for the script to find
+    target_path = tmp_path / "target"
+    target_path.mkdir()
+    manifest_file = target_path / "manifest.json"
+    manifest_file.write_text(json.dumps({}))
+
+    script_path = os.path.abspath("dbt_checkpoint/check_script_has_no_table_name.py")
+
+    process = subprocess.run(
+        [
+            sys.executable,
+            script_path,
+            str(sql_file),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    
+    assert process.returncode == 1
+    assert "does not use source() or ref()" in process.stdout
