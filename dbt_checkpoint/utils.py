@@ -722,9 +722,18 @@ def add_related_sqls(
 ) -> None:
     yml_path_class = Path(yml_path)
     yml_path_parts = list(yml_path_class.parts)
-    # Remove the first 'project' component
-    yml_path_parts.pop(0)
-    dbt_patch_path = "/".join(yml_path_parts)
+    
+    # Normalize the incoming YML path: Strip the path components expected to be removed
+    # to match the simpler manifest path format (e.g., strip 'aa' from 'aa/bb/...')
+    start_index = 0
+    # 1. Strip known prefixes like 'project:'
+    if yml_path_parts and yml_path_parts[0] in ('project:', 'project'):
+        start_index = 1
+    # 2. If it's a multi-part path that isn't already prefixed, assume first part is the project dir to strip
+    elif len(yml_path_parts) > 1 and yml_path_parts[0] not in ['.', '..']:
+        start_index = 1
+        
+    dbt_patch_path = Path(*yml_path_parts[start_index:]).as_posix() # Normalized path for comparison
 
     for key, node in nodes.items():
         if (
@@ -733,8 +742,23 @@ def add_related_sqls(
         ):
             continue
 
-        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+        node_patch_path = node.get("patch_path", None)
+        
+        # Normalize the node's patch_path from manifest: strip dbt prefixes if present.
+        if node_patch_path:
+            node_path_parts = Path(node_patch_path).parts
+            if node_path_parts and node_path_parts[0] in ('project:', 'project'):
+                normalized_node_patch_path = Path(*node_path_parts[1:]).as_posix()
+            else:
+                normalized_node_patch_path = Path(node_patch_path).as_posix()
+        else:
+            continue
+
+        # Check if the normalized YML path (dbt_patch_path) is contained within 
+        # the node's normalized patch_path (normalized_node_patch_path)
+        if normalized_node_patch_path and dbt_patch_path in normalized_node_patch_path:
             if ".sql" in node.get("original_file_path", "").lower():
+                # Uses the newly stable _discover_sql_files
                 for related_sql_file in _discover_sql_files(node):
                     sql_as_string = related_sql_file.as_posix()
                     if "target/" not in sql_as_string.lower():
@@ -754,15 +778,23 @@ def add_related_ymls(
         ):
             continue
 
+        # Check if the node's path contains the input SQL path
         if node.get("path") and (node.get("path") in sql_path):
             patch_path = node.get("patch_path", None)
             if patch_path:
-                # Original patch_path has 'project\\path\to\yml.yml'
-                # Remove `project_name\\` from patch_path
-                patch_path = Path(patch_path)
-                clean_patch_path = patch_path.relative_to(
-                    *patch_path.parts[:1]
-                ).as_posix()
+                patch_path_obj = Path(patch_path)
+                
+                # Normalize the patch path: Remove the first path component if it's a dbt prefix.
+                path_parts = patch_path_obj.parts
+                if path_parts and path_parts[0] in ('project:', 'project'):
+                    clean_patch_path = Path(*path_parts[1:]).as_posix()
+                elif len(path_parts) > 1:
+                    # Strip first directory if it looks like a project root name (e.g. 'project_name/models/...')
+                    clean_patch_path = Path(*path_parts[1:]).as_posix()
+                else:
+                    clean_patch_path = patch_path_obj.as_posix()
+                    
+                # Uses the newly stable _discover_prop_files
                 for related_yml_file in _discover_prop_files(clean_patch_path):
                     yml_as_string = related_yml_file.as_posix()
                     if "target/" not in yml_as_string.lower():
@@ -770,11 +802,23 @@ def add_related_ymls(
 
 
 def _discover_sql_files(node):  # type: ignore
-    return Path().glob(f"**/{node.get('original_file_path')}")
+    """Checks for the explicit existence of the expected SQL file path."""
+    sql_path_str = node.get("original_file_path")
+    if sql_path_str:
+        sql_path = Path(sql_path_str)
+        # Check existence only at the expected relative path from CWD
+        if sql_path.exists():
+            return [sql_path]
+    return []
 
 
 def _discover_prop_files(model_path):  # type: ignore
-    return Path().glob(f"**/{model_path}")
+    """Checks for the explicit existence of the expected property file path."""
+    prop_path = Path(model_path)
+    # Check existence only at the expected relative path from CWD
+    if prop_path.exists():
+        return [prop_path]
+    return []
 
 
 def get_missing_file_paths(
