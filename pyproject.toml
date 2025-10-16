@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=64.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Core Metadata (Migrated from [metadata] in setup.cfg)
+name = "pre_commit_hooks"
+version = "2.0.7"
+description = "List of [pre-commit](https://pre-commit.com) hooks to ensure the quality of your [dbt](https://www.getdbt.com) projects."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Radek Tomšej", email = "radek@tomsej.cz" }
+]
+
+# Migrated from [options] in setup.cfg
+dependencies = [
+    "mixpanel",
+    "pyyaml",
+]
+
+# Static Python Requirement (Migrated from python_requires in setup.cfg)
+requires-python = ">=3.8.1"
+
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+# Dynamic Fields
+# We MUST keep entry-points as dynamic because they contain a large list
+# of console script definitions that are unwieldy in TOML and are better
+# kept in setup.cfg/setup.py format.
+dynamic = ["entry-points"]
+
+[project.urls]
+Homepage = "https://github.com/dbt-checkpoint/dbt-checkpoint"
+
+# Tool Settings: Tells setuptools to look at setup.cfg/setup.py for packages and entry points
+[tool.setuptools]
+# By keeping this empty/omitted, setuptools reads package discovery and entry points from setup.cfg
+# (Specifically from [options.packages.find] and [options.entry_points])
+# We rely on setup.cfg to define entry_points because they are long lists.
+
+[tool.setuptools.packages.find]
+exclude = ["tests*"]

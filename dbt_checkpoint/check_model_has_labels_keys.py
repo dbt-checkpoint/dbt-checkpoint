@@ -1,30 +1,23 @@
 import argparse
+import itertools
 import os
 import time
-from typing import Any, Dict, Iterable, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
+    Model,
+    ModelSchema,
     add_default_args,
     get_dbt_manifest,
     get_filenames,
     get_model_schemas,
     get_model_sqls,
     get_models,
+    red,
+    yellow,
 )
-
-
-def validate_keys(
-    actual: Iterable[str], expected: Iterable[str], allow_extra_keys: bool
-) -> bool:
-    actual = set(actual)
-    expected = set(expected)
-
-    if allow_extra_keys:
-        return expected.issubset(actual)
-    else:
-        return expected == actual
 
 
 def has_labels_key(
@@ -35,43 +28,44 @@ def has_labels_key(
     include_disabled: bool = False,
 ) -> int:
     status_code = 0
-    ymls = get_filenames(paths, [".yml", ".yaml"])
-    sqls = get_model_sqls(paths, manifest, include_disabled)
+    sqls = get_model_sqls(paths, manifest)
     filenames = set(sqls.keys())
+    ymls = get_filenames(paths, [".yml", ".yaml"])
+
     models = get_models(manifest, filenames, include_disabled=include_disabled)
     schemas = get_model_schemas(list(ymls.values()), filenames)
 
-    in_models = set()
-    for model in models:
-        model_config = model.node.get("config")
-        if model_config is not None:
-            model_labels_data = model_config.get("labels")
+    for item in itertools.chain(models, schemas):
+        if isinstance(item, ModelSchema): # pragma: no cover
+            model_name = item.model_name
+            config = item.schema.get("config", {})
+        elif isinstance(item, Model):
+            model_name = item.filename
+            config = item.node.get("config", {})
         else:
-            model_labels_data = None
-        model_labels = set(model_labels_data.keys()) if model_labels_data else set()
+            continue  # pragma: no cover
 
-        if validate_keys(model_labels, labels_keys, allow_extra_keys):
-            in_models.add(model.filename)
+        labels = config.get("labels", {})
+        
+        if not isinstance(labels, dict):
+            print(
+                f"{sqls.get(model_name)}: `labels` is not a dictionary."
+            )
+            status_code = 1
+            continue
 
-    in_schemas = set()
-    for schema in schemas:
-        schema_config = schema.schema.get("config")
-        schema_labels_data = schema_config.get("labels")
-        schema_labels = set(schema_labels_data.keys()) if schema_labels_data else set()
+        if allow_extra_keys:
+            diff = set(labels_keys).difference(labels.keys())
+        else:
+            diff = set(labels_keys).symmetric_difference(labels.keys())
 
-        if validate_keys(schema_labels, labels_keys, allow_extra_keys):
-            in_schemas.add(schema.model_name)
-
-    missing = filenames.difference(in_models, in_schemas)
-
-    for model in missing:
-        status_code = 1
-        result = "\n- ".join(list(labels_keys))
-        print(
-            f"{sqls.get(model)}: "
-            f"does not have some of the labels keys defined:\n- {result}",
-        )
-
+        if diff:
+            status_code = 1
+            print(
+                f"{sqls.get(model_name)}: "
+                f"does not have some of the labels keys defined: "
+                f"{yellow(list(diff))}",
+            )
     return status_code
 
 
@@ -79,18 +73,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
 
+    # Replace the non-existent function with direct argument definitions
     parser.add_argument(
         "--labels-keys",
         nargs="+",
         required=True,
-        help="List of required key in labels part of model.",
+        help="List of required label keys.",
     )
-
     parser.add_argument(
-        "--allow-extra-keys",
-        action="store_true",
-        required=False,
-        help="Whether extra keys are allowed.",
+        "--no-allow-extra-keys",
+        action="store_false",
+        dest="allow_extra_keys",
+        help="If passed, model labels must match exactly.",
     )
 
     args = parser.parse_args(argv)

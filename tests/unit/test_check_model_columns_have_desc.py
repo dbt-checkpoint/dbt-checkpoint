@@ -202,3 +202,47 @@ models:
         ],
     )
     assert result == 0
+
+
+def test_check_column_desc_seen_no_new_missing(tmpdir, manifest):
+    """
+    Tests the case where a model is seen twice: once with missing
+    descriptions in the manifest, and a second time in a schema file
+    where the columns listed *do* have descriptions. This should hit
+    the branch that clears the `missing` set for that model.
+    """
+    # 1. Add a model to the manifest with missing column descriptions
+    manifest["nodes"]["model.test.model_test_seen"] = {
+        "resource_type": "model",
+        "name": "model_test_seen",
+        "package_name": "test",
+        "path": "model_test_seen.sql",
+        "columns": {
+            "col_a": {},  # Missing description
+            "col_b": {},  # Missing description
+        },
+        "config": {"materialized": "table"},
+    }
+
+    # 2. Create a schema file where the defined columns are valid
+    schema_yml = """
+version: 2
+models:
+-   name: model_test_seen
+    columns:
+    -   name: col_c
+        description: A perfectly fine description.
+    """
+    yml_file = tmpdir.join("schema.yml")
+    yml_file.write(schema_yml)
+
+    # 3. Run the check
+    status_code, missing = check_column_desc(
+        paths=["model_test_seen.sql", str(yml_file)],
+        manifest=manifest,
+    )
+
+    # 4. Assert that the missing columns for this model were cleared
+    #    and the status code is 0 (success).
+    assert status_code == 0
+    assert not missing.get("model_test_seen")

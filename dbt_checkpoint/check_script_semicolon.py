@@ -9,12 +9,17 @@ from dbt_checkpoint.utils import JsonOpenError, add_default_args, get_dbt_manife
 
 def check_semicolon(file_obj: IO[bytes], replace: bool = False) -> int:
     # Test for newline at end of file
-    # Empty files will throw IOError here
+    # Empty files will throw OSError here
     status_code = 0
+
+    # 💡 FIX: Rely on try/except OSError around seek(-1) for size/empty check.
+    # This avoids unsupported method calls like .getbuffer() or .fileno().
     try:
         file_obj.seek(-1, os.SEEK_END)
     except OSError:
-        return status_code
+        # If seek fails, the file is empty (or unreadable), so we return 0.
+        return status_code 
+        
     last_character = file_obj.read(1)  # pragma: no mutate
 
     while last_character in {b"\n", b"\r"}:  # pragma: no mutate
