@@ -63,67 +63,67 @@ This way, we will automatically look for the required manifest/catalog inside yo
 
 ## dbt Cloud Authentication
 
-dbt-checkpoint now supports authentication with **dbt Cloud** in addition to dbt-core. To use dbt Cloud authentication, configure your `.dbt-checkpoint.yaml` file:
+dbt-checkpoint now supports **dbt Cloud CLI** in addition to dbt-core. The dbt Cloud CLI uses the `~/.dbt/dbt_cloud.yml` configuration file for authentication.
+
+### Setup
+
+**1. Download your dbt Cloud CLI configuration:**
+
+In dbt Cloud, go to your profile and download the `dbt_cloud.yml` file. Save it to:
+- Mac/Linux: `~/.dbt/dbt_cloud.yml`
+- Windows: `C:\Users\yourusername\.dbt\dbt_cloud.yml`
+
+The file should look like:
+```yaml
+version: "1"
+context:
+  active-project: "12345"
+  active-host: "cloud.getdbt.com"
+projects:
+  - project-name: "My Project"
+    project-id: "12345"
+    account-name: "My Account"
+    account-id: "123"
+    account-host: "cloud.getdbt.com"
+    token-name: "my-token"
+    token-value: "dbtc_xxxxxxxxxxxx"
+```
+
+**2. Enable dbt Cloud in dbt-checkpoint:**
+
+Create or update `.dbt-checkpoint.yaml` in your project root:
 
 ```yaml
 version: 1
 use-dbt-cloud: true
-dbt-cloud-host: cloud.getdbt.com  # Optional, defaults to cloud.getdbt.com
-dbt-cloud-account-id: 12345  # Optional if set via environment variable
-dbt-cloud-project-id: 67890  # Optional if set via environment variable
+dbt-project-dir: .  # Optional: specify if project is in subdirectory
+disable-tracking: false  # Optional
 ```
 
-### Authentication Methods
+**3. Use with pre-commit:**
 
-**Option 1: Environment Variables (Recommended)**
-
-Set these environment variables for secure authentication:
-
-```bash
-export DBT_CLOUD_API_TOKEN="your-api-token"
-export DBT_CLOUD_ACCOUNT_ID="your-account-id"
-export DBT_CLOUD_PROJECT_ID="your-project-id"
-export DBT_CLOUD_HOST="cloud.getdbt.com"  # Optional
-```
-
-**Option 2: Configuration File**
-
-Add credentials to `.dbt-checkpoint.yaml` (not recommended for production):
+Configure your `.pre-commit-config.yaml` as normal:
 
 ```yaml
-version: 1
-use-dbt-cloud: true
-dbt-cloud-api-token: your-api-token  # Not recommended - use env vars instead
-dbt-cloud-account-id: 12345
-dbt-cloud-project-id: 67890
+repos:
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: dbt-parse
+      - id: check-model-has-description
+      # ... other hooks
 ```
 
-### Getting Your API Token
+That's it! The dbt Cloud CLI will automatically authenticate using your `~/.dbt/dbt_cloud.yml` file.
 
-To authenticate with dbt Cloud, you'll need either:
-- **Personal Access Token (PAT)**: For individual user access - generate from your dbt Cloud account settings
-- **Service Token**: For automated/production workflows - generate from dbt Cloud account admin settings
+### How It Works
 
-> **Note**: User API tokens have been deprecated. Please use Personal Access Tokens or Service Tokens.
+When `use-dbt-cloud: true` is set, dbt-checkpoint uses the regular `dbt` command which automatically:
+1. Reads authentication from `~/.dbt/dbt_cloud.yml`
+2. Connects to your dbt Cloud project
+3. Runs commands in the Cloud environment
 
-### Example Configuration
-
-```yaml
-# .dbt-checkpoint.yaml
-version: 1
-use-dbt-cloud: true
-dbt-project-dir: analytics  # Optional: if project is in subdirectory
-disable-tracking: false
-```
-
-Then set your environment variables:
-
-```bash
-export DBT_CLOUD_API_TOKEN="dbtc_xxxxxxxxxxxx"
-export DBT_CLOUD_ACCOUNT_ID="12345"
-```
-
-All dbt command hooks (`dbt-parse`, `dbt-compile`, `dbt-run`, etc.) will automatically use Cloud authentication when `use-dbt-cloud: true` is set.
+No additional configuration or environment variables are needed - the dbt Cloud CLI handles everything automatically.
 
 ## General `exclude` and per-hook excluding
 
@@ -141,6 +141,7 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
+- [`check-column-type-blacklist`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-type-blacklist): Check columns do not use blacklisted types.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enforced.

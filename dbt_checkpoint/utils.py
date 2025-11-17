@@ -796,39 +796,28 @@ def extend_dbt_cloud_flags(
     cmd: List[str], config: Dict[str, Any]
 ) -> List[str]:
     """
-    Extend dbt command with Cloud-specific flags if configured.
+    Check if dbt Cloud is configured. The dbt Cloud CLI authenticates via
+    ~/.dbt/dbt_cloud.yml file, not command-line arguments.
+
+    This function currently serves as a placeholder for potential future
+    Cloud-specific flags or validation. The actual authentication is handled
+    automatically by the dbt Cloud CLI when it reads ~/.dbt/dbt_cloud.yml.
 
     Args:
-        cmd: The command list to extend
+        cmd: The command list (unchanged)
         config: Configuration dictionary from .dbt-checkpoint.yaml
 
     Returns:
-        Extended command list with Cloud flags
+        The command list (unchanged - dbt Cloud CLI uses config file)
     """
     use_cloud = config.get("use-dbt-cloud", False)
 
     if not use_cloud:
         return cmd
 
-    # Add dbt Cloud host if specified
-    cloud_host = config.get("dbt-cloud-host") or os.getenv("DBT_CLOUD_HOST")
-    if cloud_host:
-        cmd.extend(["--dbt-cloud-host", cloud_host])
-
-    # Add API token if specified (prefer env var for security)
-    api_token = os.getenv("DBT_CLOUD_API_TOKEN") or config.get("dbt-cloud-api-token")
-    if api_token:
-        cmd.extend(["--api-token", api_token])
-
-    # Add account ID if specified
-    account_id = config.get("dbt-cloud-account-id") or os.getenv("DBT_CLOUD_ACCOUNT_ID")
-    if account_id:
-        cmd.extend(["--account-id", str(account_id)])
-
-    # Add project ID if specified
-    project_id = config.get("dbt-cloud-project-id") or os.getenv("DBT_CLOUD_PROJECT_ID")
-    if project_id:
-        cmd.extend(["--project-id", str(project_id)])
+    # dbt Cloud CLI automatically reads authentication from ~/.dbt/dbt_cloud.yml
+    # No command-line flags needed for authentication
+    # Future: Could add validation here to check if dbt_cloud.yml exists
 
     return cmd
 

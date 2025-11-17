@@ -43,6 +43,12 @@
   entry: check-model-has-columns-with-types
   language: python
   types_or: [sql, yaml]
+- id: check-column-type-blacklist
+  name: Check columns do not use blacklisted types
+  description: Ensures that columns do not use specified blacklisted types (e.g., timestamp_ntz, timestamp_ltz).
+  entry: check-column-type-blacklist
+  language: python
+  types_or: [sql, yaml]
 - id: check-model-has-contract
   name: Check model has contract
   description: Check model has contract enforced = True
