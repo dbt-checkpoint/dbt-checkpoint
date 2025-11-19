@@ -76,6 +76,22 @@ TESTS = (
         True,
         0,
     ),
+    # Test type equivalence - string/text
+    (
+        ["aa/bb/catalog_cols.sql", "--columns", '[{"name": "col1", "type": "string"}]', "--is_test"],
+        True,
+        True,
+        True,
+        0,
+    ),
+    # Test type equivalence - text/varchar
+    (
+        ["aa/bb/catalog_cols.sql", "--columns", '[{"name": "col1", "type": "varchar"}]', "--is_test"],
+        True,
+        True,
+        True,
+        0,
+    ),
 )
 
 
@@ -161,3 +177,23 @@ def test_invalid_column_object(manifest_path_str, catalog_path_str, config_path_
     ]
     status_code = main(input_args)
     assert status_code == 1
+
+
+def test_type_equivalence_string_types(manifest_path_str, catalog_path_str, config_path_str):
+    """Test that string, text, and varchar are treated as equivalent"""
+    # Test that all these string types are treated as equivalent to TEXT (which is in catalog)
+    for type_name in ["string", "text", "varchar", "char"]:
+        input_args = [
+            "aa/bb/catalog_cols.sql",
+            "--columns",
+            f'[{{"name": "col1", "type": "{type_name}"}}]',
+            "--is_test",
+            "--manifest",
+            manifest_path_str,
+            "--catalog",
+            catalog_path_str,
+            "--config",
+            config_path_str,
+        ]
+        status_code = main(input_args)
+        assert status_code == 0, f"Type {type_name} should be treated as equivalent to TEXT"

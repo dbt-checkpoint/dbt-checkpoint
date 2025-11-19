@@ -17,28 +17,65 @@ from dbt_checkpoint.utils import (
     yellow,
 )
 
+# Type equivalence mapping - groups of types that should be treated as equivalent
+TYPE_EQUIVALENCE_GROUPS = [
+    # String types
+    {"STRING", "TEXT", "VARCHAR", "CHAR", "CHARACTER VARYING", "NVARCHAR", "NCHAR"},
+    # Integer types
+    {"INTEGER", "INT", "BIGINT", "SMALLINT", "TINYINT", "INT64", "INT8", "INT4", "INT2"},
+    # Decimal/Numeric types
+    {"DECIMAL", "NUMERIC", "NUMBER"},
+    # Float types
+    {"FLOAT", "DOUBLE", "REAL", "FLOAT64", "DOUBLE PRECISION"},
+    # Boolean types
+    {"BOOLEAN", "BOOL"},
+    # Timestamp types
+    {"TIMESTAMP_TZ", "TIMESTAMP"},
+    # Date types
+    {"DATE"},
+    # Time types
+    {"TIME"},
+]
+
+
+def normalize_type(type_str: str) -> str:
+    """
+    Normalize a type string to its canonical form for comparison.
+    Returns the first (canonical) type from the equivalence group, or the original type if no match.
+    """
+    type_upper = type_str.upper().strip()
+
+    for group in TYPE_EQUIVALENCE_GROUPS:
+        if type_upper in group:
+            # Return the first element (canonical type) from the group
+            return sorted(group)[0]
+
+    return type_upper
+
 
 def check_required_columns(
     catalog_columns: Dict[str, Any], required_columns: List[Dict[str, str]]
 ) -> Tuple[List[str], List[str]]:
     missing_columns = []
     wrong_type_columns = []
-    
+
     catalog_cols_lower = {col.lower(): col_info for col, col_info in catalog_columns.items()}
-    
+
     for req_col in required_columns:
         col_name = req_col["name"].lower()
-        col_type = req_col["type"].upper()
-        
+        expected_type = normalize_type(req_col["type"])
+
         if col_name not in catalog_cols_lower:
             missing_columns.append(f"{req_col['name']} ({req_col['type']})")
         else:
-            actual_type = catalog_cols_lower[col_name].get("type", "").upper()
-            if actual_type != col_type:
+            actual_type_raw = catalog_cols_lower[col_name].get("type", "")
+            actual_type = normalize_type(actual_type_raw)
+
+            if actual_type != expected_type:
                 wrong_type_columns.append(
-                    f"{req_col['name']} (expected: {req_col['type']}, actual: {actual_type})"
+                    f"{req_col['name']} (expected: {req_col['type']}, actual: {actual_type_raw})"
                 )
-    
+
     return missing_columns, wrong_type_columns
 
 
