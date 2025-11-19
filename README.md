@@ -123,6 +123,23 @@ Since the root-level `exclude` statement is handled by pre-commit, when those ho
 
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
+- [`check-macro-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-meta-keys): Check the macro has meta keys.
+
+**Exposure checks:**
+
+- [`check-exposure-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-exposure-has-meta-keys): Check the exposure has meta keys.
+
+**Seed checks:**
+
+- [`check-seed-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-seed-has-meta-keys): Check the seed has meta keys.
+
+**Snapshot checks:**
+
+- [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys.
+
+**Tests checks:**
+
+- [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys.
 
 **Modifiers:**
 
