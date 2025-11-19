@@ -63,6 +63,13 @@
   language: python
   types_or: [yaml, sql]
   require_serial: true # because we need to process YAML and SQL
+- id: check-model-meta-key-accepted-values
+  name: Check the model meta key has accepted values
+  description: Ensures that the model meta key has a value from the accepted values list.
+  entry: check-model-meta-key-accepted-values
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process YAML and SQL
 - id: check-model-has-labels-keys
   name: Check the model has keys in the labels part
   description: Ensures that the model has a list of valid labels keys.
