@@ -22,8 +22,16 @@ from dbt_checkpoint.utils import (
 
 
 def check_column_desc(
-    paths: Sequence[str], manifest: Dict[str, Any], include_disabled: bool = False
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    exclude_pattern: str = "",
+    include_disabled: bool = False,
 ) -> Tuple[int, Dict[str, Any]]:
+    # Discover related SQL files when yaml files are changed
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql", ".yml", ".yaml"], exclude_pattern=exclude_pattern
+    )
+    
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest, include_disabled)
@@ -88,7 +96,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     status_code, _ = check_column_desc(
-        paths=args.filenames, manifest=manifest, include_disabled=args.include_disabled
+        paths=args.filenames,
+        manifest=manifest,
+        exclude_pattern=args.exclude,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
