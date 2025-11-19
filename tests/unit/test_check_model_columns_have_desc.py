@@ -202,3 +202,27 @@ models:
         ],
     )
     assert result == 0
+
+
+def test_check_model_columns_have_desc_with_ignore_columns(manifest_path_str):
+    # Test without ignore pattern - should fail
+    result = main(
+        argv=[
+            "cols_with_underscore_no_desc.sql",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 1
+
+    # Test with ignore pattern - should pass
+    result = main(
+        argv=[
+            "cols_with_underscore_no_desc.sql",
+            "--manifest",
+            manifest_path_str,
+            "--ignore-columns",
+            "^_",
+        ],
+    )
+    assert result == 0

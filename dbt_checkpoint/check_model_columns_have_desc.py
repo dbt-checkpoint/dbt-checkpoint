@@ -1,6 +1,7 @@
 import argparse
 import itertools
 import os
+import re
 import time
 from typing import Any, Dict, Optional, Sequence, Set, Tuple
 
@@ -22,7 +23,10 @@ from dbt_checkpoint.utils import (
 
 
 def check_column_desc(
-    paths: Sequence[str], manifest: Dict[str, Any], include_disabled: bool = False
+    paths: Sequence[str],
+    manifest: Dict[str, Any],
+    ignore_columns: Optional[Sequence[str]] = None,
+    include_disabled: bool = False
 ) -> Tuple[int, Dict[str, Any]]:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
@@ -34,6 +38,11 @@ def check_column_desc(
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     missing: Dict[str, Set[str]] = {}
+
+    # Compile ignore patterns if provided
+    ignore_patterns = []
+    if ignore_columns:
+        ignore_patterns = [re.compile(pattern) for pattern in ignore_columns]
 
     for item in itertools.chain(models, schemas):
         missing_cols = set()  # pragma: no mutate
@@ -54,6 +63,14 @@ def check_column_desc(
             }
         else:
             continue
+
+        # Filter out ignored columns
+        if ignore_patterns and missing_cols:
+            missing_cols = {
+                col for col in missing_cols
+                if not any(pattern.match(col) for pattern in ignore_patterns)
+            }
+
         seen = missing.get(model_name)
         if seen:
             if not missing_cols:
@@ -77,6 +94,15 @@ def check_column_desc(
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
+    parser.add_argument(
+        "--ignore-columns",
+        nargs="*",
+        default=[],
+        help="""Regex patterns for columns to ignore.
+        Example: --ignore-columns "^_" to ignore columns starting with underscore.
+        Multiple patterns can be provided.
+        """,
+    )
 
     args = parser.parse_args(argv)
 
@@ -88,7 +114,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     status_code, _ = check_column_desc(
-        paths=args.filenames, manifest=manifest, include_disabled=args.include_disabled
+        paths=args.filenames,
+        manifest=manifest,
+        ignore_columns=args.ignore_columns,
+        include_disabled=args.include_disabled
     )
     end_time = time.time()
     script_args = vars(args)

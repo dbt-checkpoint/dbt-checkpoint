@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 import time
 from typing import Any, Dict, Optional, Sequence, Set, Tuple
 
@@ -33,6 +34,7 @@ def check_model_columns(
     manifest: Dict[str, Any],
     catalog: Dict[str, Any],
     exclude_pattern: str,
+    ignore_columns: Optional[Sequence[str]] = None,
     include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
@@ -48,6 +50,11 @@ def check_model_columns(
 
     catalog_nodes = catalog.get("nodes", {})
 
+    # Compile ignore patterns if provided
+    ignore_patterns = []
+    if ignore_columns:
+        ignore_patterns = [re.compile(pattern) for pattern in ignore_columns]
+
     for model in models:
         catalog_node = catalog_nodes.get(model.model_id, {})
         if catalog_node:
@@ -55,6 +62,18 @@ def check_model_columns(
                 catalog_columns=catalog_node.get("columns", {}),
                 model_columns=model.node.get("columns", {}),
             )
+
+            # Filter out ignored columns
+            if ignore_patterns:
+                model_only = {
+                    col for col in model_only
+                    if not any(pattern.match(col) for pattern in ignore_patterns)
+                }
+                catalog_only = {
+                    col for col in catalog_only
+                    if not any(pattern.match(col) for pattern in ignore_patterns)
+                }
+
             schema_path = model.node.get("patch_path", "schema")  # pragma: no mutate
             if not schema_path:
                 schema_path = "any .yml file"
@@ -93,6 +112,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
     add_catalog_args(parser)
+    parser.add_argument(
+        "--ignore-columns",
+        nargs="*",
+        default=[],
+        help="""Regex patterns for columns to ignore.
+        Example: --ignore-columns "^_" to ignore columns starting with underscore.
+        Multiple patterns can be provided.
+        """,
+    )
 
     args = parser.parse_args(argv)
 
@@ -114,6 +142,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         catalog=catalog,
         exclude_pattern=args.exclude,
+        ignore_columns=args.ignore_columns,
         include_disabled=args.include_disabled,
     )
     end_time = time.time()

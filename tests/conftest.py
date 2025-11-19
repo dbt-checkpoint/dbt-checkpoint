@@ -178,6 +178,19 @@ MANIFEST = {
             "path": "aa/bb/only_catalog_cols.sql",
             "root_path": "/path/to/aa",
         },
+        "model.test.cols_with_underscore": {
+            "database": "test",
+            "schema": "test",
+            "alias": "test",
+            "name": "cols_with_underscore",
+            "columns": {
+                "col1": {"name": "col1", "description": "test"},
+                "_audit_col": {"name": "_audit_col", "description": "test"},
+            },
+            "patch_path": "project://bb/cols_with_underscore.yml",
+            "path": "aa/bb/cols_with_underscore.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.with_column_description": {
             "columns": {
                 "test1": {"name": "test1", "description": "test"},
@@ -200,10 +213,19 @@ MANIFEST = {
             "columns": {
                 "test1": {"name": "test1"},
                 "test2": {"name": "test2"},
-                "patch_path": "project://bb/without_columns_description.yml",
-                "path": "aa/bb/without_columns_description.sql",
-                "root_path": "/path/to/aa",
-            }
+            },
+            "patch_path": "project://bb/without_columns_description.yml",
+            "path": "aa/bb/without_columns_description.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.cols_with_underscore_no_desc": {
+            "columns": {
+                "col1": {"name": "col1", "description": "test"},
+                "_audit_col": {"name": "_audit_col"},
+            },
+            "patch_path": "project://bb/cols_with_underscore_no_desc.yml",
+            "path": "aa/bb/cols_with_underscore_no_desc.sql",
+            "root_path": "/path/to/aa",
         },
         "model.same_col_desc_1": {
             "columns": {
@@ -473,6 +495,14 @@ CATALOG = {
             },
         },
         "model.test.only_model_cols": {"metadata": {}, "columns": {}},
+        "model.test.cols_with_underscore": {
+            "metadata": {},
+            "columns": {
+                "COL1": {"type": "TEXT", "index": 1, "name": "COL1"},
+                "_AUDIT_COL": {"type": "TEXT", "index": 2, "name": "_AUDIT_COL"},
+                "_UPDATED_AT": {"type": "TIMESTAMP", "index": 3, "name": "_UPDATED_AT"},
+            },
+        },
         "model.test.with_boolean_column_with_prefix": {
             "metadata": {},
             "columns": {

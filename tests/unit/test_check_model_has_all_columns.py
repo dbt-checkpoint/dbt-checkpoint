@@ -12,6 +12,10 @@ TESTS = (
     (["aa/bb/only_model_cols.sql", "--is_test"], True, True, True, 1),
     (["aa/bb/without_catalog.sql", "--is_test"], True, True, True, 1),
     (["aa/bb/catalog_cols.sql", "--is_test"], True, True, False, 0),
+    # Test with ignore-columns - should fail without ignore pattern
+    (["aa/bb/cols_with_underscore.sql", "--is_test"], True, True, True, 1),
+    # Test with ignore-columns - should pass with ignore pattern
+    (["aa/bb/cols_with_underscore.sql", "--is_test", "--ignore-columns", "^_"], True, True, True, 0),
 )
 
 
