@@ -38,41 +38,56 @@ def check_meta_key_accepted_values(
     
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames, include_disabled=include_disabled)
-    # if user added schema but did not rerun the model
-    schemas = get_model_schemas(list(ymls.values()), filenames)
+    # Get all schemas from yml files (not filtered by filenames)
+    # We'll filter later to only report errors for models in filenames
+    all_schemas = list(get_model_schemas(list(ymls.values()), filenames, all_schemas=True))
+    
+    # Create a mapping of model_name -> schema for quick lookup
+    schema_by_model: Dict[str, Any] = {}
+    for schema in all_schemas:
+        if schema.model_name in filenames:
+            schema_by_model[schema.model_name] = schema
     
     # Track invalid models with their reason (missing key vs invalid value)
     invalid_models: Dict[str, Dict[str, Any]] = {}
     
-    # Check models from manifest
-    for model in models:
-        meta = model.node.get("meta", {})
-        if meta_key not in meta:
-            invalid_models[model.filename] = {"reason": "missing", "meta": meta}
-        elif meta.get(meta_key) not in accepted_set:
-            invalid_models[model.filename] = {
-                "reason": "invalid_value",
-                "meta": meta,
-                "value": meta.get(meta_key),
-            }
-    
-    # Check schemas from yml files (may override manifest if yml is more recent)
-    for schema in schemas:
-        meta = schema.schema.get("meta", {})
-        if meta_key not in meta:
-            # Only add if not already tracked, or if previously tracked as invalid_value
-            if schema.model_name not in invalid_models:
-                invalid_models[schema.model_name] = {"reason": "missing", "meta": meta}
-            elif invalid_models[schema.model_name]["reason"] == "invalid_value":
-                # Keep the invalid_value reason, but update meta from yml
-                invalid_models[schema.model_name]["meta"] = meta
-        elif meta.get(meta_key) not in accepted_set:
-            # Always track invalid values, overriding missing if present
-            invalid_models[schema.model_name] = {
-                "reason": "invalid_value",
-                "meta": meta,
-                "value": meta.get(meta_key),
-            }
+    # Check each model we're validating
+    for model_name in filenames:
+        # Check yaml schema first (most up-to-date)
+        if model_name in schema_by_model:
+            schema = schema_by_model[model_name]
+            meta = schema.schema.get("meta", {})
+            if meta_key not in meta:
+                invalid_models[model_name] = {"reason": "missing", "meta": meta, "source": "yaml"}
+            elif meta.get(meta_key) not in accepted_set:
+                invalid_models[model_name] = {
+                    "reason": "invalid_value",
+                    "meta": meta,
+                    "value": meta.get(meta_key),
+                    "source": "yaml",
+                }
+            # If valid, don't add to invalid_models
+        else:
+            # No yaml schema found, check manifest
+            model_found = False
+            for model in models:
+                if model.filename == model_name:
+                    model_found = True
+                    meta = model.node.get("meta", {})
+                    if meta_key not in meta:
+                        invalid_models[model_name] = {"reason": "missing", "meta": meta, "source": "manifest"}
+                    elif meta.get(meta_key) not in accepted_set:
+                        invalid_models[model_name] = {
+                            "reason": "invalid_value",
+                            "meta": meta,
+                            "value": meta.get(meta_key),
+                            "source": "manifest",
+                        }
+                    break
+            
+            # If model not found in manifest either, it's missing
+            if not model_found:
+                invalid_models[model_name] = {"reason": "missing", "meta": {}, "source": "none"}
     
     # Find models that are invalid (missing key or invalid value)
     invalid = filenames.intersection(invalid_models.keys())
