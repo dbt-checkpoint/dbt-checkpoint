@@ -41,47 +41,54 @@ def check_meta_key_accepted_values(
     # if user added schema but did not rerun the model
     schemas = get_model_schemas(list(ymls.values()), filenames)
     
+    # Track invalid models with their reason (missing key vs invalid value)
+    invalid_models: Dict[str, Dict[str, Any]] = {}
+    
     # Check models from manifest
-    invalid_models: Set[str] = set()
     for model in models:
         meta = model.node.get("meta", {})
         if meta_key not in meta:
-            invalid_models.add(model.filename)
+            invalid_models[model.filename] = {"reason": "missing", "meta": meta}
         elif meta.get(meta_key) not in accepted_set:
-            invalid_models.add(model.filename)
+            invalid_models[model.filename] = {
+                "reason": "invalid_value",
+                "meta": meta,
+                "value": meta.get(meta_key),
+            }
     
-    # Check schemas from yml files
+    # Check schemas from yml files (may override manifest if yml is more recent)
     for schema in schemas:
         meta = schema.schema.get("meta", {})
         if meta_key not in meta:
-            invalid_models.add(schema.model_name)
+            # Only add if not already tracked, or if previously tracked as invalid_value
+            if schema.model_name not in invalid_models:
+                invalid_models[schema.model_name] = {"reason": "missing", "meta": meta}
+            elif invalid_models[schema.model_name]["reason"] == "invalid_value":
+                # Keep the invalid_value reason, but update meta from yml
+                invalid_models[schema.model_name]["meta"] = meta
         elif meta.get(meta_key) not in accepted_set:
-            invalid_models.add(schema.model_name)
+            # Always track invalid values, overriding missing if present
+            invalid_models[schema.model_name] = {
+                "reason": "invalid_value",
+                "meta": meta,
+                "value": meta.get(meta_key),
+            }
     
     # Find models that are invalid (missing key or invalid value)
-    invalid = filenames.intersection(invalid_models)
+    invalid = filenames.intersection(invalid_models.keys())
     
     for model in invalid:
         status_code = 1
-        meta = {}
-        # Try to get meta from model or schema
-        for m in models:
-            if m.filename == model:
-                meta = m.node.get("meta", {})
-                break
-        if not meta:
-            for s in schemas:
-                if s.model_name == model:
-                    meta = s.schema.get("meta", {})
-                    break
+        model_info = invalid_models[model]
+        reason = model_info["reason"]
         
-        if meta_key not in meta:
+        if reason == "missing":
             print(
                 f"{red(sqls.get(model))}: "
                 f"meta key '{meta_key}' is missing. Accepted values: {', '.join(accepted_values)}",
             )
-        else:
-            actual_value = meta.get(meta_key)
+        else:  # invalid_value
+            actual_value = model_info["value"]
             print(
                 f"{red(sqls.get(model))}: "
                 f"meta key '{meta_key}' has value '{actual_value}' which is not in accepted values: {', '.join(accepted_values)}",
