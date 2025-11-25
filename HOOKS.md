@@ -380,7 +380,7 @@ It checks the generated manifest for the required constraint. Only models with m
 
 ### `check-model-has-generic-constraints`
 
-Checks that model's yaml has specific constraints defined, eg:
+Checks that model's yaml has generic constraints defined, eg:
 
 ```
   - name: products
@@ -389,8 +389,7 @@ Checks that model's yaml has specific constraints defined, eg:
         enforced: true
     constraints:
       - type: foreign_key
-        columns:
-          - "product_id"
+        ...
 ```
 
 #### Arguments
@@ -413,7 +412,7 @@ repos:
 
 #### When to use it
 
-When you want to force developers to define generic model constraints, e.g. check if all mart models have a primary_key constraint.
+When you want to force developers to define generic model constraints, e.g. to check if all mart models have a primary_key constraint.
 
 #### How it works
 
