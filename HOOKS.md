@@ -372,7 +372,51 @@ When you want to force developers to define model constraints.
 
 #### How it works
 
-It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" support constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
+
+---
+
+
+### `check-model-has-generic-constraints`
+
+Checks that model's yaml has specific constraints defined, eg:
+
+```
+  - name: products
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: foreign_key
+        columns:
+          - "product_id"
+```
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--constraints`: JSON string escaped by single quotes
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/xasm83/dbt-checkpoint
+  rev: v1.0.0
+  hooks:
+  - id: check-model-has-contract
+  - id: check-model-has-constraints
+    args: ["--constraints", "primary_key", "unique", "--"]
+```
+
+#### When to use it
+
+When you want to force developers to define generic model constraints, e.g. check if all mart models have a primary_key constraint.
+
+#### How it works
+
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" support constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
 
 ---
 
