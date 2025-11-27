@@ -67,9 +67,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         type=str,
         help="Set a list of constraint types to validate (e.g.: primary_key unique)",
     )
-
+    print(argv)
     args = parser.parse_args(argv)
-    print(args.constraints)
 
     try:
         manifest = get_dbt_manifest(args)
