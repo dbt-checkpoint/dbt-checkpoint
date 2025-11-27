@@ -22,10 +22,11 @@ def is_incremental_or_table(model: Model) -> bool:
     return materialized == "table" or materialized == "incremental"
 
 
-def extract_constraint_types(model_constraints:Sequence[str]) -> Set[str]:
-    return {constraint.get("type") for constraint in model_constraints}
+def extract_constraint_types(model_constraints: Sequence[Dict[str, Any]]) -> Set[str]:
+    return set(constraint.get("type", None) for constraint in model_constraints)
 
-def missing_generic_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> Set[str]:
+
+def missing_generic_constraints(constraints: Sequence[str], model: Model) -> Set[str]:
     model_constraints = model.node.get("constraints", [])
     generic_constraints = extract_constraint_types(model_constraints)
     return set(constraints) - generic_constraints
