@@ -1,37 +1,43 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Optional, Sequence, Set
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Sequence
+from typing import Set
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
-from dbt_checkpoint.utils import (
-    JsonOpenError,
-    add_default_args,
-    get_dbt_manifest,
-    get_missing_file_paths,
-    get_model_sqls,
-    get_models,
-    Model,
-)
+from dbt_checkpoint.utils import add_default_args
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_sqls
+from dbt_checkpoint.utils import get_models
+from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import Model
 
-def is_incremental_or_table(model:Model) -> bool:
+
+def is_incremental_or_table(model: Model) -> bool:
     materialized = model.node.get("config").get("materialized")
-    return (materialized == "table" or materialized == "incremental")
+    return materialized == "table" or materialized == "incremental"
 
-def extract_constraint_types(model_constraints:Sequence[str]) -> Set[str]:
-    return {constraint.get("type") for constraint in model_constraints}
 
-def missing_generic_constraints(constraints:Sequence[Dict[str, Any]], model:Model) -> Set[str]:
+def extract_constraint_types(model_constraints: Sequence[Dict[str, Any]]) -> Set[str]:
+    return set(constraint.get("type", None) for constraint in model_constraints)
+
+
+def missing_generic_constraints(constraints: Sequence[str], model: Model) -> Set[str]:
     model_constraints = model.node.get("constraints", [])
     generic_constraints = extract_constraint_types(model_constraints)
     return set(constraints) - generic_constraints
+
 
 def check_generic_constraints(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     constraints: Sequence[str],
     exclude_pattern: str,
-    include_disabled: bool = False
+    include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
@@ -49,7 +55,7 @@ def check_generic_constraints(
             print(
                 f"{model.model_id}: "
                 "Doesn't have necessary generic constraints defined, it's missing:",
-                f"{missing_constraints}"
+                f"{missing_constraints}",
             )
     return status_code
 
@@ -67,9 +73,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         type=str,
         help="Set a list of constraint types to validate (e.g.: primary_key unique)",
     )
-
-    args = parser.parse_args(argv)
-    print(args.constraints)
+    try:
+        args = parser.parse_args(argv)
+    except Exception as e:
+        print(f"Error parsing arguments: ({e})")
+        return 1
 
     try:
         manifest = get_dbt_manifest(args)
