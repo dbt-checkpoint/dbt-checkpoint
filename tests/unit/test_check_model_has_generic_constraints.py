@@ -10,7 +10,11 @@ TESTS = (  # type: ignore
     (["aa/bb/with_no_constraints.sql", "--constraints", *CONSTRAINTS], True, 1),
     (["aa/bb/with_constraints.sql", "--constraints", *CONSTRAINTS], True, 0),
     (["aa/bb/with_constraints.sql", "--constraints", "custom_constraint"], True, 1),
-    (["aa/bb/with_constraints_no_columns.sql", "--constraints", "primary_key"], True, 0),
+    (
+        ["aa/bb/with_constraints_no_columns.sql", "--constraints", "primary_key"],
+        True,
+        0,
+    ),
     (["aa/bb/with_constraints_no_match.sql", "--constraints", *CONSTRAINTS], True, 1),
 )
 
