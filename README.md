@@ -286,19 +286,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v2
 
-      - id: Get file changes
-        uses: trilom/file-changes-action@v1.2.4
-        with:
-          output: " "
+      - name: Get all changed files
+        id: get_changed_files
+        run: |
+          files=$(git diff --name-only origin/main...HEAD || true)
+          echo "changed_files=$files" >> $GITHUB_OUTPUT
 
       - name: Run dbt checkpoint
         uses: dbt-checkpoint/action@v0.1
         with:
-          extra_args: --files ${{ steps.get_file_changes.outputs.files}}
+          extra_args: --files ${{ steps.get_changed_files.outputs.files }}
           dbt_version: 1.6.3
           dbt_adapter: dbt-snowflake
 ```
