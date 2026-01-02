@@ -1,3 +1,15 @@
+# 2.0.7 - 2025-05-08
+
+**Fixes:**
+* fix: Perform a final filter to only file paths in the output by @dbenzion in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/274
+* Fix false positives in SQL table name detection by @janposlusny in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/291
+
+## New Contributors
+* @dbenzion made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/274
+* @janposlusny made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/291
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.6...v2.0.7
+
 # 2.0.6 - 2024-11-13
 
 **Fixes:**

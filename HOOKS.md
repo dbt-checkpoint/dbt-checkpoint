@@ -2,16 +2,15 @@
 
 :bulb: Click on hook name to view the details.
 
-[`check-column-name-contract`]: https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract
-
 **Model checks:**
 
 - [`check-column-desc-are-same`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-desc-are-same): Check column descriptions are the same.
 - [`check-column-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-column-name-contract): Check column name abides to contract.
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
+- [`check-model-columns-have-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-meta-keys): Check the model columns have keys in the meta part.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
-- [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
+- [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
 - [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
@@ -21,7 +20,7 @@
 - [`check-model-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests-by-group): Check the model has a number of tests from a group of tests.
 - [`check-model-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-tests): Check the model has a number of tests.
 - [`check-model-name-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-name-contract): Check model name abides to contract.
-- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and childs.
+- [`check-model-parents-and-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-and-childs): Check the model has a specific number (max/min) of parents or/and children.
 - [`check-model-parents-database`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-database): Check the parent model has a specific database.
 - [`check-model-parents-name-prefix`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-name-prefix): Check the parent model names have a specific prefix.
 - [`check-model-parents-schema`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-parents-schema): Check the parent model has a specific schema.
@@ -31,7 +30,7 @@
 **Script checks:**
 
 - [`check-script-semicolon`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-semicolon): Check the script does not contain a semicolon.
-- [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has not table name (is not using `source()` or `ref()` macro for all tables).
+- [`check-script-has-no-table-name`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-has-no-table-name): Check the script has no table name (is not using `source()` or `ref()` macro for all tables).
 - [`check-script-ref-and-source`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-script-ref-and-source): Check the script has only existing refs and sources.
 
 **Source checks:**
@@ -48,29 +47,29 @@
 - [`check-source-has-tests`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests): Check the source has a number of tests.
 - [`check-source-has-tests-by-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-tests-by-group): Check the source has a number of tests from a group of tests.
 - [`check-source-tags`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-tags): Check the source has valid tags.
-- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of childs.
+- [`check-source-childs`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-childs): Check the source has a specific number (max/min) of children.
 
 **Macro checks:**
 
 - [`check-macro-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-description): Check the macro has description.
 - [`check-macro-arguments-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-arguments-have-desc): Check the macro arguments have description.
-- [`check-macro-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-meta-keys): Check the macro has meta keys
+- [`check-macro-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-macro-has-meta-keys): Check the macro has meta keys.
 
 **Exposure checks:**
 
-- [`check-exposure-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-exposure-has-meta-keys): Check the exposure has meta keys
+- [`check-exposure-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-exposure-has-meta-keys): Check the exposure has meta keys.
 
 **Seed checks:**
 
-- [`check-seed-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-seed-has-meta-keys): Check the seed has meta keys
+- [`check-seed-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-seed-has-meta-keys): Check the seed has meta keys.
 
 **Snapshot checks:**
 
-- [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys
+- [`check-snapshot-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-snapshot-has-meta-keys): Check the snapshot has meta keys.
 
-**Tests checks:**
+**Test checks:**
 
-- [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys
+- [`check-test-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-test-has-meta-keys): Check singular tests have meta keys.
 
 **Modifiers:**
 
@@ -90,10 +89,14 @@
 - [`dbt-run`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-run): Run `dbt run` command.
 - [`dbt-test`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#dbt-test): Run `dbt test` command.
 
+**dbt checks:**
+
+- [`check-database-casing-consistency`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-database-casing-consistency): Compare manifest and catalog to ensure DB and Schemas have the same casing.
+
 ---
 
 :warning: Since v1.1.0, we've implemented a file discovery logic that "fills in" the missing files so that if the yml file is changed we find the corresponding sql file, to make sure we do the proper check.
-With this implementation, certain Hooks now can receive `"--exclude", "pattern"` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit
+With this implementation, certain hooks now can receive `"--exclude", "pattern"` in it's args, which overrides the `exclude:pattern` YML configuration of pre-commit.
 
 For these hooks:
 ```
@@ -118,7 +121,7 @@ Use `--exclude` in their args, as follows:
 ```
 - id: check-model-has-tests
   description: "Ensures that the model has a number of tests"
-  args: ["--test-cnt", "1", "--exclude", "models/demo", "--"]
+  args: ["--test-cnt", "1", "--exclude", "models/my_model.sql", "--"]
 ```
 
 For the rest of hooks, file exclusion should be done using [precommit's `exclude:` configuration](https://pre-commit.com/#config-exclude):
@@ -136,7 +139,7 @@ For the rest of hooks, file exclusion should be done using [precommit's `exclude
 
 
 
-:exclamation:**If you have an idea for a new hook or you found a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new)**:exclamation:
+:exclamation:**If you have a suggestion for a new hook or find a bug, [let us know](https://github.com/dbt-checkpoint/dbt-checkpoint/issues/new).**:exclamation:
 
 ## Available Hooks
 
@@ -146,16 +149,16 @@ Check the models have the same descriptions for the same column names.
 
 #### Arguments
 
-`--ignore`: columns for which do not check whether have a different description.
+`--ignore`: Columns that should not be checked for having a different description.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-column-desc-are-same
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-column-desc-are-same
 ```
 
 #### When to use it
@@ -188,19 +191,19 @@ Check that column name abides to a contract, as described in [this blog post](ht
 
 #### Arguments
 
-`--pattern`: Regex pattern to match column names.
-`--dtypes`: Data types.
+`--pattern`: Regex pattern to match column names.<br/>
+`--dtypes`: Data types.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-column-name-contract
-   args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp, "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-column-name-contract
+        args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp, "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -234,16 +237,16 @@ Ensures that the model has columns with descriptions in the properties file (usu
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-columns-have-desc
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-columns-have-desc
 ```
 
 #### When to use it
@@ -274,15 +277,17 @@ If you `run` your model and then you delete column description from a properties
 
 ---
 
-### `check-model-has-all-columns`
+### `check-model-columns-have-meta-keys`
 
-Ensures that all columns in the database are also specified in the properties file. (usually `schema.yml`).
+Ensures that the columns of a model have a list of valid meta keys. (usually `schema.yml`).
+
+By default, it does not allow the columns to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
 
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
-`--exclude`: Regex pattern to exclude files.
+`--meta-keys`: list of the required keys in the meta part of the model.<br/>
+`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
@@ -291,7 +296,58 @@ repos:
 - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
  rev: v1.0.0
  hooks:
- - id: check-model-has-all-columns
+ - id: check-model-columns-have-meta-keys
+   args: ['--meta-keys', 'foo', 'bar', "--"]
+```
+
+:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+
+#### When to use it
+
+If every column of a model needs to have certain meta keys.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a model.
+- Modified `yml` files are scanned for a model.
+- If any column of a model (from a manifest or `yml` files) does not have specified meta keys, the hook fails.
+- The meta keys must be in either the yml file **or** the manifest.
+
+#### Known limitations
+
+If you `run` your model and then you delete meta keys from a properties file, the hook success since the meta keys is still present in `manifest.json`.
+
+---
+
+### `check-model-has-all-columns`
+
+Ensures that all columns in the database are also specified in the properties file. (usually `schema.yml`).
+
+#### Arguments
+
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```yaml
+repos:
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-all-columns
 ```
 
 #### When to use it
@@ -331,17 +387,17 @@ Checks that model's yaml has:
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-contract
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-contract
 ```
 
 #### When to use it
@@ -350,15 +406,15 @@ When you want to force developers to define model contracts.
 
 #### How it works
 
-It checks the generated manifest for the contract configuration
+It checks the generated manifest for the contract configuration.
 
 ---
 
 ### `check-model-has-constraints`
 
-Checks that model's yaml has specific constraints defined, eg:
+Checks that model's yaml has specific constraints defined, e.g.:
 
-```
+```yaml
   - name: products
     config:
       contract:
@@ -371,20 +427,20 @@ Checks that model's yaml has specific constraints defined, eg:
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--constraints`: JSON string escaped by single quotes
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--constraints`: JSON string escaped by single quotes.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/xasm83/dbt-checkpoint
-  rev: v1.0.0
-  hooks:
-  - id: check-model-has-contract
-  - id: check-model-has-constraints
-    args: ["--constraints", '[{"type": "primary_key", "columns": ["product_id"]}]', "--"]
+  - repo: https://github.com/xasm83/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-contract
+      - id: check-model-has-constraints
+        args: ["--constraints", '[{"type": "primary_key", "columns": ["product_id"]}]', "--"]
 ```
 
 #### When to use it
@@ -393,7 +449,7 @@ When you want to force developers to define model constraints.
 
 #### How it works
 
-It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parameter, i.e. the actual constraint could have more parameters configured in dbt.
 
 ---
 
@@ -403,17 +459,17 @@ Ensures that the model has a description in the properties file (usually `schema
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-description
 ```
 
 #### When to use it
@@ -452,19 +508,19 @@ By default, it does not allow the model to have any other meta keys other than t
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the model.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the model.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-meta-keys
+        args: ["--meta-keys", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -505,19 +561,19 @@ By default, it does not allow the model to have any other labels keys other than
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--labels-keys`: list of the required keys in the labels part of the model.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--labels-keys`: List of the required keys in the labels part of the model.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-labels-keys
-   args: ['--labels-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-labels-keys
+        args: ["--labels-keys", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -556,16 +612,16 @@ Ensures that the model has a properties file (schema file).
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-properties-file
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-properties-file
 ```
 
 #### When to use it
@@ -600,19 +656,19 @@ Ensures that the model has a number of tests of a certain name (e.g. data, uniqu
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests e.g. --test unique=1 not_null=2 (do not put spaces before or after the = sign).<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests-by-name
-   args: ["--tests", "unique=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-tests-by-name
+        args: ["--tests", "unique=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -645,19 +701,19 @@ Ensures that the model has a number of tests of a certain type (data, schema).
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--tests`: key-value pairs of test types. Key is the type of test (data or schema) and value is required e.g. --test data=1 schema=2 (do not put spaces before or after the = sign).<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests-by-type
-   args: ["--tests", "schema=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-tests-by-type
+        args: ["--tests", "schema=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -690,20 +746,20 @@ Ensures that the model has a number of tests from a group of tests.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tests`: list of test names.<br/>
-`--test_cnt`: number of tests required across test group.<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--tests`: List of test names.<br/>
+`--test_cnt`: Number of tests required across test group.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests-by-group
-   args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+    - id: check-model-has-tests-by-group
+      args: [ "--tests", "unique", "unique_where", "--test-cnt", "1", "--" ]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -736,19 +792,19 @@ Ensures that the model has a number of tests.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--test-cnt`: Minimum number of tests required.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-has-tests
-   args: ["--test-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-tests
+        args: ["--test-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -786,17 +842,17 @@ Check that model name abides to a contract (similar to [`check-column-name-contr
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-name-contract
-   args: [--pattern, "(base_|stg_).*"]
-   files: models/staging/
- - id: check-model-name-contract
-   args: [--pattern, "(dim_|fct_).*"]
-   files: models/marts/
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-name-contract
+        args: [--pattern, "(base_|stg_).*"]
+        files: models/staging/
+      - id: check-model-name-contract
+        args: [--pattern, "(dim_|fct_).*"]
+        files: models/marts/
 ```
 
 #### When to use it
@@ -823,11 +879,11 @@ You want to make sure your model names follow a naming convention (e.g., staging
 
 ### `check-model-parents-and-childs`
 
-Ensures the model has a specific number (max/min) of parents or/and childs.
+Ensures the model has a specific number (max/min) of parents or/and children.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--min-parent-cnt`: Minimal number of parent sources and models.
 `--max-parent-cnt`: Maximal number of parent sources and models.
 `--min-child-cnt`: Minimal number of child models.
@@ -835,13 +891,13 @@ Ensures the model has a specific number (max/min) of parents or/and childs.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-and-childs
-   args: ["--min-parent-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-and-childs
+        args: ["--min-parent-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -864,7 +920,7 @@ You want to find orphaned models (empty file, hard-coded reference, etc.). Or yo
 - Hook takes all changed `SQL` files.
 - The model name is obtained from the `SQL` file name.
 - The manifest is scanned for a parent and child models.
-- If any model does not have a number of required parents/childs, the hook fails.
+- If any model does not have a number of required parents/children, the hook fails.
 
 ---
 
@@ -874,20 +930,20 @@ Ensures the parent models or sources are from certain database.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: list of allowed databases.
-`--blacklist`: list of disabled databases.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: List of allowed databases.<br/>
+`--blacklist`: List of disabled databases.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-database
-   args: ["--blacklist", "SRC", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-database
+        args: ["--blacklist", "SRC", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -920,21 +976,21 @@ Ensures the parent model names have a certain prefix.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: list of allowed prefixes.
-`--blacklist`: list of non-allowed prefixes.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: List of allowed prefixes.<br/>
+`--blacklist`: List of non-allowed prefixes.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-name-prefix
-   exclude: ^models/stage/
-   args: ["--whitelist", "stage_", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-name-prefix
+        exclude: ^models/stage/
+        args: ["--whitelist", "stage_", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -967,19 +1023,19 @@ Ensures the parent models or sources are from certain schema.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--whitelist`: list of allowed schemas.
-`--blacklist`: list of disabled schemas.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--whitelist`: List of allowed schemas.<br/>
+`--blacklist`: List of disabled schemas.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-parents-schema
-   args: ["--blacklist", "stage", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-parents-schema
+        args: ["--blacklist", "stage", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1012,19 +1068,19 @@ Ensures that the model has only valid tags from the provided list.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--tags`: A list of tags that models can have.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--tags`: A list of tags that models can have.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-tags
-   args: ["--tags", "foo", "bar", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-tags
+        args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1053,21 +1109,21 @@ Make sure you did not typo in tags.
 
 ### `check-model-materialization-by-childs`
 
-Checks the model materialization by a given threshold of child models. All models with less child models then the treshold should be materialized as views (or ephemerals), all the rest as tables or incrementals.
+Checks the model materialization based on a given threshold of child models. All models with fewer child models than the threshold should be materialized as views (or ephemerals), while the rest should be materialized as tables or incrementals.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--threshold-childs`: An integer threshold of the number of child models.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-materialization-by-childs
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-materialization-by-childs
 ```
 
 #### When to use it
@@ -1089,21 +1145,21 @@ Ensures that the script contains only existing sources or macros.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-script-ref-and-source
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-script-ref-and-source
 ```
 
 #### When to use it
 
-Make sure you have only valid ref and sources in your script and you do not want to wait for `dbt run` to find them. This hook also finds all missing ref and sources, not find first missing only.
+Make sure you have only valid refs and sources in your script, and you do not want to wait for `dbt run` to find them. This hook also finds all missing ref and sources, not find first missing only.
 
 #### Requirements
 
@@ -1120,12 +1176,12 @@ Ensure that the script does not have a semicolon at the end of the file.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-script-semicolon
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-script-semicolon
 ```
 
 #### When to use it
@@ -1161,16 +1217,16 @@ Ensures that the script is using only source or ref macro to specify the table n
 
 #### Arguments
 
-`--ignore-dotless-table`: consider all tables without dot in name as CTE
+`--ignore-dotless-table`: Consider all tables without a dot in their name as CTEs.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-script-has-no-table-name
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-script-has-no-table-name
 ```
 
 #### When to use it
@@ -1199,12 +1255,12 @@ Ensures that the source has columns with descriptions in the properties file (us
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-columns-have-desc
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-columns-have-desc
 ```
 
 #### When to use it
@@ -1234,17 +1290,17 @@ Ensures that all columns in the database are also specified in the properties fi
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-all-columns
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-all-columns
 ```
 
 #### When to use it
@@ -1279,12 +1335,12 @@ Ensures that the source table has a description in the properties file (usually 
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-table-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-table-has-description
 ```
 
 #### When to use it
@@ -1314,13 +1370,13 @@ Ensures that the source has freshness options in the properties file (usually `s
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-freshness
-   args: ["--freshness", "error_after", "warn_after", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-freshness
+        args: ["--freshness", "error_after", "warn_after", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1352,12 +1408,12 @@ Ensures that the source has a loader option in the properties file (usually `sch
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-loader
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-loader
 ```
 
 #### When to use it
@@ -1387,17 +1443,17 @@ Ensures that the source has a list of valid meta keys. (usually `schema.yml`).
 
 #### Arguments
 
-`--meta-keys`: list of the required keys in the meta part of the model.
+`--meta-keys`: List of the required keys in the meta part of the model.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1429,17 +1485,17 @@ Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
 
 #### Arguments
 
-`--labels-keys`: list of the required keys in the labels part of the model.
+`--labels-keys`: List of the required keys in the labels part of the model.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-labels-keys
-   args: ['--labels-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-labels-keys
+        args: ['--labels-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1471,17 +1527,17 @@ Ensures that the source has a number of tests of a certain name (e.g. data, uniq
 
 #### Arguments
 
-`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests eg. --test unique=1 not_null=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test names. Key is the name of test and value is required minimal number of tests e.g. --test unique=1 not_null=2 (do not put spaces before or after the = sign).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests-by-name
-   args: ["--tests", "unique=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests-by-name
+        args: ["--tests", "unique=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1513,17 +1569,17 @@ Ensures that the source has a number of tests of a certain type (data, schema).
 
 #### Arguments
 
-`--tests`: key-value pairs of test types. Key is a type of test (data or schema) and value is required eg. --test data=1 schema=2 (do not put spaces before or after the = sign).
+`--tests`: key-value pairs of test types. Key is a type of test (data or schema) and value is required e.g. --test data=1 schema=2 (do not put spaces before or after the = sign).
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests-by-type
-   args: ["--tests", "schema=1", "data=1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests-by-type
+        args: ["--tests", "schema=1", "data=1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1559,13 +1615,13 @@ Ensures that the source has a number of tests.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests
-   args: ["--test-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests
+        args: ["--test-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1597,18 +1653,18 @@ Ensures that the source has a number of tests from a group of tests.
 
 #### Arguments
 
-`--tests`: list of test names.
-`--test_cnt`: number of tests required across test group.
+`--tests`: List of test names.<br/>
+`--test_cnt`: Number of tests required across test group.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-tests-by-group
-   args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-has-tests-by-group
+        args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1644,13 +1700,13 @@ Ensures that the source has only valid tags from the provided list.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-tags
-   args: ["--tags", "foo", "bar", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-tags
+        args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1678,23 +1734,23 @@ Make sure you did not typo in tags.
 
 ### `check-source-childs`
 
-Ensures the source has a specific number (max/min) of childs.
+Ensures the source has a specific number (max/min) of children.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--min-child-cnt`: Minimal number of child models.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--min-child-cnt`: Minimal number of child models.<br/>
 `--max-child-cnt`: Maximal number of child models.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-childs
-   args: ["--min-child-cnt", "2", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-source-childs
+        args: ["--min-child-cnt", "2", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1717,7 +1773,7 @@ You want to find orphaned sources without any dependencies. Or you want to make 
 - Hook takes all changed `yml`.
 - All sources from yml file are parsed.
 - The manifest is scanned for child models.
-- If any source does not have a number of required childs, the hook fails.
+- If any source does not have a number of required children, the hook fails.
 
 ---
 
@@ -1727,17 +1783,17 @@ Ensures that the macro has a description in the properties file (usually `macro.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-macro-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-macro-has-description
 ```
 
 #### When to use it
@@ -1774,7 +1830,7 @@ Ensures that the macro has arguments with descriptions in the properties file (u
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
 
 #### Example
 
@@ -1820,18 +1876,18 @@ If any source is missing this hook tries to create it.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.</br>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.</br>
 `--schema-file`: Location of schema.yml file. Where new source tables should be created.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: generate-missing-sources
-   args: ["--schema-file", "models/schema.yml", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: generate-missing-sources
+        args: ["--schema-file", "models/schema.yml", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1878,17 +1934,17 @@ Unify column descriptions across all models.
 
 #### Arguments
 
-`--ignore`: Columns for which do not check whether have a different description.
+`--ignore`: Columns that should not be checked for having a different description.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: unify-column-description
-   args: ["--ignore", "foo", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: unify-column-description
+        args: ["--ignore", "foo", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1925,16 +1981,16 @@ Replace table names with `source` or `ref` macros in the script.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: replace-script-table-names
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: replace-script-table-names
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1965,23 +2021,23 @@ You are running and debugging your `SQL` in the editor. This editor does not kno
 
 ### `generate-model-properties-file`
 
-Generate model properties file if does not exist.
+Generate model properties file if it does not exist.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**.<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
 `--properties-file`: Location of file where new model properties should be generated. Suffix has to be `yml` or `yaml`. It can also include {database}, {schema}, {name} and {alias} variables. E.g. /models/{schema}/{name}.yml for model `foo.bar` will create properties file in /models/foo/bar.yml. If path already exists, properties are appended.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: generate-model-properties-file
-   args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: generate-model-properties-file
+        args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2019,17 +2075,17 @@ Remove the semicolon at the end of the script.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: remove-script-semicolon
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: remove-script-semicolon
 ```
 
 #### When to use it
 
-You are too lazy or forgetful to delete one character at the end of the script.
+If you are too lazy or forgetful to delete one character at the end of the script.
 
 #### Requirements
 
@@ -2053,12 +2109,12 @@ Run the` dbt clean` command. Deletes all folders specified in the clean-targets.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-clean
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-clean
 ```
 
 ---
@@ -2077,24 +2133,24 @@ Run the` dbt compile` command. Generates executable SQL from source model, test,
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-compile
-   args: ["--model-prefix", "+", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-compile
+        args: ["--model-prefix", "+", "--"]
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-compile
-   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-compile
+        args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2107,12 +2163,12 @@ Run `dbt deps` command. Pulls the most recent version of the dependencies listed
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-deps
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-deps
 ```
 
 ---
@@ -2123,12 +2179,12 @@ Run `dbt docs generate` command. The command is responsible for generating your 
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-docs-generate
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-docs-generate
 ```
 
 ---
@@ -2140,27 +2196,27 @@ Run the` dbt parse` command. When running dbt >= 1.5, generates `manifest.json` 
 #### Arguments
 
 `--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
-`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-parse
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-parse
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-parse
-   args: ["--cmd-flags", "++profiles-dir", ".", "++project-dir", ".", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-parse
+        args: ["--cmd-flags", "++profiles-dir", ".", "++project-dir", ".", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2181,24 +2237,24 @@ Run `dbt run` command. Executes compiled SQL model files.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-run
-   args: ["--model-prefix", "+", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-run
+        args: ["--model-prefix", "+", "--"]
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-run
-   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-run
+        args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2214,29 +2270,29 @@ Run `dbt test` command. Runs tests on data in deployed models.
 `--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
 `--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
 `--model-prefix`: Prefix dbt selector, for selecting parents.</br>
-`--model-postfix`: Postfix dbt selector, for selecting children.
+`--model-postfix`: Postfix dbt selector, for selecting children.<br/>
 `--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-test
-   args: ["--model-prefix", "+", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-test
+        args: ["--model-prefix", "+", "--"]
 ```
 
 or
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: dbt-test
-   args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: dbt-test
+        args: ["--models", "state:modified", "--cmd-flags", "++defer", "++state", "path/to/artifacts", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2245,25 +2301,25 @@ repos:
 
 ### `check-macro-has-meta-keys`
 
-Ensures that the macro has a list of valid meta keys. (usually `schema.yml`).
+Ensures that the macro has a list of valid meta keys (usually `schema.yml`).
 
 By default, it does not allow the macro to have any other meta keys other than the ones required. An optional argument can be used to allow for extra keys.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the macro.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the macro.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-macro-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-macro-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2302,19 +2358,19 @@ By default, it does not allow the seed to have any other meta keys other than th
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the seed.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the seed.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-seed-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-seed-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2353,19 +2409,19 @@ By default, it does not allow the snapshot to have any other meta keys other tha
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the snapshot.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the snapshot.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-snapshot-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-snapshot-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2404,19 +2460,19 @@ By default, it does not allow the test to have any other meta keys other than th
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--meta-keys`: list of the required keys in the meta part of the test.<br/>
-`--allow-extra-keys`: whether extra keys are allowed. **Default: `False`**.
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--meta-keys`: List of the required keys in the meta part of the test.<br/>
+`--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
 #### Example
 
-```
+```yaml
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-test-has-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.2.1
+    hooks:
+      - id: check-test-has-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2449,12 +2505,12 @@ If you `run` your test and then you delete meta keys from a properties file, the
 
 ### `check-database-casing-consistency`
 
-compare Manifest and Catalog to ensure DB and Schemas have the same casing.
+Compare manifest and catalog to ensure DB and Schemas have the same casing.
 
 #### Arguments
 
-`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--catalog`: location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--catalog`: Location of `catalog.json` file. Usually `target/catalog.json`. dbt uses this file to render information like column types and table statistics into the docs site. In dbt-checkpoint is used for column operations. **Default: `target/catalog.json`**<br/>
 
 #### Example
 
@@ -2468,7 +2524,7 @@ repos:
 
 #### When to use it
 
-If you want to make sure your dbt project (Manifest) and database (Catalog) are db.schema consistent
+If you want to make sure your dbt project (Manifest) and database (Catalog) are "db.schema" consistent
 
 #### How it works
 
