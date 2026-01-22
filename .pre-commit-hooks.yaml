@@ -141,7 +141,7 @@
   language: python
   types_or: [sql, yaml]
 - id: check-script-has-no-table-name
-  name: Check the script has not table name
+  name: Check the script has no table name
   description: Ensures that the script is using only source or ref macro to specify the table name.
   entry: check-script-has-no-table-name
   language: python
