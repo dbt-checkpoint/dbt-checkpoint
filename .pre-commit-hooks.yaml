@@ -50,8 +50,14 @@
   language: python
   types_or: [yaml]
 - id: check-model-has-constraints
-  name: Check model has constraints
+  name: Check model has specific constraints
   description: Check model has constraints for specific columns
+  entry: check-model-has-constraints
+  language: python
+  types_or: [yaml]
+- id: check-model-has-generic-constraints
+  name: Check model has generic constraints
+  description: Check model has constraints for any columns
   entry: check-model-has-constraints
   language: python
   types_or: [yaml]

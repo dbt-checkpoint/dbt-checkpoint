@@ -9,8 +9,9 @@
 - [`check-model-columns-have-desc`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-desc): Check the model columns have description.
 - [`check-model-columns-have-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-columns-have-meta-keys): Check the model columns have keys in the meta part.
 - [`check-model-has-all-columns`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-all-columns): Check the model has all columns in the properties file.
-- [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
 - [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
+- [`check-model-has-generic-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-generic-constraints): Check the model has generic constraints defined.
+- [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
 - [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
@@ -452,7 +453,50 @@ When you want to force developers to define model constraints.
 
 #### How it works
 
-It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" suport constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parameter, i.e. the actual constraint could have more parameters configured in dbt.
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" support constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, ie the actual constraint could have more parameters configured in dbt.
+
+---
+
+
+### `check-model-has-generic-constraints`
+
+Checks that model's yaml has generic constraints defined, eg:
+
+```
+  - name: products
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: foreign_key
+        ...
+```
+
+#### Arguments
+
+`--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--constraints`: JSON string escaped by single quotes
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```
+repos:
+- repo: https://github.com/xasm83/dbt-checkpoint
+  rev: v1.0.0
+  hooks:
+  - id: check-model-has-contract
+  - id: check-model-has-constraints
+    args: ["--constraints", "primary_key", "unique", "--"]
+```
+
+#### When to use it
+
+When you want to force developers to define generic model constraints, e.g. to check if all mart models have a primary_key constraint.
+
+#### How it works
+
+It checks the generated manifest for the required constraint. Only models with materialization "incremental" or "table" support constraints. Enforced model contract is required as well. It checks only the keys defined in the '--constraints' parmeter, i.e. the actual constraint could have more parameters configured in dbt.
 
 ---
 
