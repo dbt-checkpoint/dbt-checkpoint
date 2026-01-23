@@ -200,10 +200,87 @@ MANIFEST = {
             "columns": {
                 "test1": {"name": "test1"},
                 "test2": {"name": "test2"},
-                "patch_path": "project://bb/without_columns_description.yml",
-                "path": "aa/bb/without_columns_description.sql",
-                "root_path": "/path/to/aa",
-            }
+            },
+            "patch_path": "project://bb/without_columns_description.yml",
+            "path": "aa/bb/without_columns_description.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_no_columns": {
+            "patch_path": "project://bb/with_no_columns.yml",
+            "path": "aa/bb/with_no_columns.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_column_meta": {
+            "columns": {
+                "test1": {"name": "test1", "meta": {"foo": "foo", "bar": "bar"}},
+                "test2": {"name": "test2", "meta": {"foo": "foo", "bar": "bar"}},
+            },
+            "patch_path": "project://bb/with_column_meta.yml",
+            "path": "aa/bb/with_column_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_column_meta_and_extra": {
+            "columns": {
+                "test1": {
+                    "name": "test1",
+                    "meta": {"foo": "foo", "bar": "bar", "baz": "baz"},
+                },
+                "test2": {"name": "test2", "meta": {"foo": "foo", "bar": "bar"}},
+            },
+            "patch_path": "project://bb/with_column_meta_and_extra.yml",
+            "path": "aa/bb/with_column_meta_and_extra.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.in_schema_without_and_manifest_with_columns_meta": {
+            "columns": {
+                "test1": {"name": "test1", "meta": {"foo": "foo", "bar": "bar"}},
+                "test2": {"name": "test2", "meta": {"foo": "foo", "bar": "bar"}},
+            },
+            "patch_path": "project://bb/in_schema_without"
+            "_and_manifest_with_columns_meta.yml",
+            "path": "aa/bb/in_schema_without_and_manifest_with_columns_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.in_schema_with_and_manifest_without_columns_meta": {
+            "columns": {
+                "test1": {"name": "test1"},
+                "test2": {"name": "test2"},
+            },
+            "patch_path": "project://bb/in_schema_with_and_"
+            "manifest_without_columns_meta.yml",
+            "path": "aa/bb/in_schema_with_and_manifest_without_columns_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.in_schema_with_and_manifest_without"
+        "_columns_meta_extra_column_in_manifest": {
+            "columns": {
+                "test1": {"name": "test1"},
+                "test2": {"name": "test2"},
+                "test3": {"name": "test3"},
+            },
+            "patch_path": "project://bb/in_schema_with_and_manifest_without"
+            "_columns_meta_extra_column_in_manifest.yml",
+            "path": "aa/bb/in_schema_with_and_manifest_without"
+            "_columns_meta_extra_column_in_manifest.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.with_some_column_meta": {
+            "columns": {
+                "test1": {"name": "test1", "meta": {"foo": "foo", "bar": "bar"}},
+                "test2": {"name": "test2"},
+            },
+            "patch_path": "project://bb/with_some_column_meta.yml",
+            "path": "aa/bb/with_some_column_meta.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.without_columns_meta": {
+            "columns": {
+                "test1": {"name": "test1"},
+                "test2": {"name": "test2"},
+            },
+            "patch_path": "project://bb/without_columns_meta.yml",
+            "path": "aa/bb/without_columns_meta.sql",
+            "root_path": "/path/to/aa",
         },
         "model.same_col_desc_1": {
             "columns": {
@@ -347,6 +424,33 @@ MANIFEST = {
                 "materialized": "snapshot",
             },
         },
+        "model.test.with_boolean_column_with_prefix": {
+            "name": "with_boolean_column_with_prefix",
+            "patch_path": "project://bb/with_boolean_column_with_prefix.yml",
+            "path": "aa/bb/with_boolean_column_with_prefix.sql",
+        },
+        "model.test.with_boolean_column_with_prefix_version.v1": {
+            "name": "with_boolean_column_with_prefix_version",
+            "patch_path": "project://bb/with_boolean_column_with_prefix_version.yml",
+            "path": "aa/bb/with_boolean_column_with_prefix_version_v1.sql",
+            "version": 1,
+            "latest_version": 1,
+        },
+        "model.test.with_boolean_column_without_prefix": {
+            "name": "with_boolean_column_without_prefix",
+            "patch_path": "project://bb/with_boolean_column_without_prefix.yml",
+            "path": "aa/bb/with_boolean_column_without_prefix.sql",
+        },
+        "model.test.without_boolean_column_with_prefix": {
+            "name": "without_boolean_column_with_prefix",
+            "patch_path": "project://bb/without_boolean_column_with_prefix.yml",
+            "path": "aa/bb/without_boolean_column_with_prefix.sql",
+        },
+        "model.test.without_boolean_column_without_prefix": {
+            "name": "without_boolean_column_without_prefix",
+            "patch_path": "project://bb/without_boolean_column_without_prefix.yml",
+            "path": "aa/bb/without_boolean_column_without_prefix.sql",
+        },
     },
     "sources": {
         "source.source1.table1": {
@@ -474,6 +578,14 @@ CATALOG = {
         },
         "model.test.only_model_cols": {"metadata": {}, "columns": {}},
         "model.test.with_boolean_column_with_prefix": {
+            "metadata": {},
+            "columns": {
+                "is_boolean": {"type": "boolean", "name": "is_boolean"},
+                "COL2": {"type": "TEXT", "name": "COL2"},
+                "IS_ALSO_BOOLEAN": {"type": "BOOLEAN", "name": "IS_ALSO_BOOLEAN"},
+            },
+        },
+        "model.test.with_boolean_column_with_prefix_version.v1": {
             "metadata": {},
             "columns": {
                 "is_boolean": {"type": "boolean", "name": "is_boolean"},

@@ -37,6 +37,12 @@
   entry: check-model-has-all-columns
   language: python
   types_or: [sql, yaml]
+- id: check-model-has-columns-with-types
+  name: Check the model has columns with given types
+  description: Ensures that model has mandatory audit columns like _loaded_at, _updated_at etc with correct types.
+  entry: check-model-has-columns-with-types
+  language: python
+  types_or: [sql, yaml]
 - id: check-model-has-contract
   name: Check model has contract
   description: Check model has contract enforced = True
@@ -66,6 +72,13 @@
   name: Check the model has keys in the meta part
   description: Ensures that the model has a list of valid meta keys.
   entry: check-model-has-meta-keys
+  language: python
+  types_or: [yaml, sql]
+  require_serial: true # because we need to process YAML and SQL
+- id: check-model-columns-have-meta-keys
+  name: Check the model columns have keys in the meta part
+  description: Ensures that the model columns have lists of valid meta keys.
+  entry: check-model-columns-have-meta-keys
   language: python
   types_or: [yaml, sql]
   require_serial: true # because we need to process YAML and SQL
@@ -140,7 +153,7 @@
   language: python
   types_or: [sql, yaml]
 - id: check-script-has-no-table-name
-  name: Check the script has not table name
+  name: Check the script has no table name
   description: Ensures that the script is using only source or ref macro to specify the table name.
   entry: check-script-has-no-table-name
   language: python
@@ -173,6 +186,12 @@
   name: Check source has all columns in properties file
   description: Ensures that all columns in the database are specified in the properties file.
   entry: check-source-has-all-columns
+  language: python
+  types_or: [yaml]
+- id: check-source-has-description
+  name: Check the source has description
+  description: Ensures that the source has description.
+  entry: check-source-has-description
   language: python
   types_or: [yaml]
 - id: check-source-table-has-description
@@ -354,6 +373,12 @@
   entry: check-test-has-meta-keys
   language: python
   types_or: [sql]
+- id: check-test-tags
+  name: Check the test has valid tags
+  description: Ensures that the test has only valid tags from the provided list.
+  entry: check-test-tags
+  language: python
+  types_or: [sql, yaml]
 - id: check-database-casing-consistency
   name: Check databases and schemas casing are consistent
   description: Check databases and schemas casing are consistent
