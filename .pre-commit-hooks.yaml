@@ -176,6 +176,12 @@
   entry: check-source-has-all-columns
   language: python
   types_or: [yaml]
+- id: check-source-has-description
+  name: Check the source has description
+  description: Ensures that the source has description.
+  entry: check-source-has-description
+  language: python
+  types_or: [yaml]
 - id: check-source-table-has-description
   name: Check the source table has description
   description: Ensures that the source table has description in properties file.
