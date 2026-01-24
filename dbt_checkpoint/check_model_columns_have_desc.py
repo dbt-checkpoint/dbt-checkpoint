@@ -97,7 +97,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     status_code, _ = check_column_desc(
         paths=args.filenames,
         manifest=manifest,
-        exclude_pattern=args.exclude_pattern,
+        exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )
     end_time = time.time()
