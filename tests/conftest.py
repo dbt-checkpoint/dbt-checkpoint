@@ -347,6 +347,34 @@ MANIFEST = {
                 "materialized": "snapshot",
             },
         },
+        "model.test.with_boolean_column_without_prefix": {
+            "path": "aa/bb/with_boolean_column_without_prefix.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.without_boolean_column_with_prefix": {
+            "path": "aa/bb/without_boolean_column_with_prefix.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.with_float_column": {
+            "path": "aa/bb/with_float_column.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.with_array_column": {
+            "path": "aa/bb/with_array_column.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.with_struct_column": {
+            "path": "aa/bb/with_struct_column.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.manifest_only_model": {
+            "path": "aa/bb/manifest_only_model.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.test.column_with_edge_case_types": {
+            "path": "aa/bb/column_with_edge_case_types.sql",
+            "root_path": "/path/to/aa",
+        },
     },
     "sources": {
         "source.source1.table1": {
@@ -501,6 +529,31 @@ CATALOG = {
             "columns": {
                 "COL1": {"type": "TEXT", "name": "COL1"},
                 "COL2": {"type": "TEXT", "name": "COL2"},
+            },
+        },
+        "model.test.with_float_column": {
+            "metadata": {},
+            "columns": {
+                "total_amount": {"type": "FLOAT64", "name": "total_amount"}
+            },
+        },
+        "model.test.with_array_column": {
+            "metadata": {},
+            "columns": {
+                "user_ids": {"type": "ARRAY<STRING>", "name": "user_ids"}
+            },
+        },
+        "model.test.with_struct_column": {
+            "metadata": {},
+            "columns": {
+                "user_details": {"type": "STRUCT<id STRING, email STRING>", "name": "user_details"}
+            },
+        },
+        "model.test.column_with_edge_case_types": {
+            "metadata": {},
+            "columns": {
+                "col_no_type": {"name": "col_no_type"},
+                "col_unrecognized_type": {"name": "col_unrecognized_type", "type": "(internal)"},
             },
         },
     },

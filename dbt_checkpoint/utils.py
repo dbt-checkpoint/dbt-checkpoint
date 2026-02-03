@@ -354,22 +354,29 @@ def get_source_schemas(
     for yml_file in yml_files:
         schema = checkpoint_safe_load(yml_file.open())
         for source in schema.get("sources", []):
+            # This checks if the whole source is disabled
             if not include_disabled and not source.get("config", {}).get(
                 "enabled", True
             ):
                 continue
             source_name = source.get("name")
-            tables = source.pop("tables", [])
+            # Use .get() instead of .pop()
+            tables = source.get("tables", [])
+            source_schema_base = {k: v for k, v in source.items() if k != "tables"}
             for table in tables:
+                # Add the required check for each individual table
+                if not include_disabled and not table.get("config", {}).get(
+                    "enabled", True
+                ):
+                    continue
                 table_name = table.get("name")
                 yield SourceSchema(
                     source_name=source_name,
                     table_name=table_name,
                     filename=yml_file.stem,
-                    source_schema=source,
+                    source_schema=source_schema_base,
                     table_schema=table,
                 )
-
 
 def get_exposures(
     yml_files: Sequence[Path],
@@ -606,27 +613,50 @@ def add_meta_keys_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def check_yml_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
+def check_dbt_schema_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
+    """
+    Checks the version of a dbt schema yml file.
+    dbt requires `version: 2`.
+    """
     if "version" not in yaml_dct:
-        raise_invalid_property_yml_version(
-            file_path,
-            "the yml property file {} is missing a version tag".format(file_path),
+        raise CompilationException(
+            f"The dbt schema file at {file_path} is missing a version tag."
         )
 
-    version = yaml_dct["version"]
-    # if it's not an integer, the version is malformed, or not
-    # set. Either way, only 'version: 2' is supported.
-    if not isinstance(version, int):
-        raise_invalid_property_yml_version(
-            file_path,
-            "its 'version:' tag must be an integer (e.g. version: 2)."
-            " {} is not an integer".format(version),
+    version = yaml_dct.get("version")
+    if not isinstance(version, int) or version != 2:
+        raise CompilationException(
+            f"The dbt schema file at {file_path} must have `version: 2`, "
+            f"but found `version: {version}`."
         )
-    if version != 1:
-        raise_invalid_property_yml_version(
-            file_path,
-            "its 'version:' tag is set to {}.  Only 1 is supported".format(version),
+
+
+def _validate_checkpoint_config_version(file_path: str, yaml_dct: Dict[str, Any]) -> None:
+    """
+    Validates the version of the .dbt-checkpoint.yaml config file.
+    This tool requires `version: 1`.
+    """
+    version = yaml_dct.get("version")
+    if not isinstance(version, int) or version != 1:
+        raise CompilationException(
+            f"The .dbt-checkpoint.yaml file at {file_path} must have `version: 1`, "
+            f"but found `version: {version}`."
         )
+
+# Update the call inside get_config_file to use the renamed function
+def get_config_file(config_file_path: str) -> Dict[str, Any]:
+    try:
+        path = Path(config_file_path)
+        if not path.exists():
+            alt_path = path.with_suffix(".yml" if path.suffix == ".yaml" else ".yaml")
+            if alt_path.exists():
+                path = alt_path
+        config = checkpoint_safe_load(path.open())
+        # Call the renamed and corrected function
+        _validate_checkpoint_config_version(config_file_path, config)
+    except FileNotFoundError:
+        config = {}
+    return config
 
 
 def raise_invalid_property_yml_version(path: str, issue: str) -> None:
@@ -692,9 +722,18 @@ def add_related_sqls(
 ) -> None:
     yml_path_class = Path(yml_path)
     yml_path_parts = list(yml_path_class.parts)
-    # Remove the first 'project' component
-    yml_path_parts.pop(0)
-    dbt_patch_path = "/".join(yml_path_parts)
+    
+    # Normalize the incoming YML path: Strip the path components expected to be removed
+    # to match the simpler manifest path format (e.g., strip 'aa' from 'aa/bb/...')
+    start_index = 0
+    # 1. Strip known prefixes like 'project:'
+    if yml_path_parts and yml_path_parts[0] in ('project:', 'project'):
+        start_index = 1
+    # 2. If it's a multi-part path that isn't already prefixed, assume first part is the project dir to strip
+    elif len(yml_path_parts) > 1 and yml_path_parts[0] not in ['.', '..']:
+        start_index = 1
+        
+    dbt_patch_path = Path(*yml_path_parts[start_index:]).as_posix() # Normalized path for comparison
 
     for key, node in nodes.items():
         if (
@@ -703,8 +742,23 @@ def add_related_sqls(
         ):
             continue
 
-        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+        node_patch_path = node.get("patch_path", None)
+        
+        # Normalize the node's patch_path from manifest: strip dbt prefixes if present.
+        if node_patch_path:
+            node_path_parts = Path(node_patch_path).parts
+            if node_path_parts and node_path_parts[0] in ('project:', 'project'):
+                normalized_node_patch_path = Path(*node_path_parts[1:]).as_posix()
+            else:
+                normalized_node_patch_path = Path(node_patch_path).as_posix()
+        else:
+            continue
+
+        # Check if the normalized YML path (dbt_patch_path) is contained within 
+        # the node's normalized patch_path (normalized_node_patch_path)
+        if normalized_node_patch_path and dbt_patch_path in normalized_node_patch_path:
             if ".sql" in node.get("original_file_path", "").lower():
+                # Uses the newly stable _discover_sql_files
                 for related_sql_file in _discover_sql_files(node):
                     sql_as_string = related_sql_file.as_posix()
                     if "target/" not in sql_as_string.lower():
@@ -724,15 +778,23 @@ def add_related_ymls(
         ):
             continue
 
+        # Check if the node's path contains the input SQL path
         if node.get("path") and (node.get("path") in sql_path):
             patch_path = node.get("patch_path", None)
             if patch_path:
-                # Original patch_path has 'project\\path\to\yml.yml'
-                # Remove `project_name\\` from patch_path
-                patch_path = Path(patch_path)
-                clean_patch_path = patch_path.relative_to(
-                    *patch_path.parts[:1]
-                ).as_posix()
+                patch_path_obj = Path(patch_path)
+                
+                # Normalize the patch path: Remove the first path component if it's a dbt prefix.
+                path_parts = patch_path_obj.parts
+                if path_parts and path_parts[0] in ('project:', 'project'):
+                    clean_patch_path = Path(*path_parts[1:]).as_posix()
+                elif len(path_parts) > 1:
+                    # Strip first directory if it looks like a project root name (e.g. 'project_name/models/...')
+                    clean_patch_path = Path(*path_parts[1:]).as_posix()
+                else:
+                    clean_patch_path = patch_path_obj.as_posix()
+                    
+                # Uses the newly stable _discover_prop_files
                 for related_yml_file in _discover_prop_files(clean_patch_path):
                     yml_as_string = related_yml_file.as_posix()
                     if "target/" not in yml_as_string.lower():
@@ -740,11 +802,23 @@ def add_related_ymls(
 
 
 def _discover_sql_files(node):  # type: ignore
-    return Path().glob(f"**/{node.get('original_file_path')}")
+    """Checks for the explicit existence of the expected SQL file path."""
+    sql_path_str = node.get("original_file_path")
+    if sql_path_str:
+        sql_path = Path(sql_path_str)
+        # Check existence only at the expected relative path from CWD
+        if sql_path.exists():
+            return [sql_path]
+    return []
 
 
 def _discover_prop_files(model_path):  # type: ignore
-    return Path().glob(f"**/{model_path}")
+    """Checks for the explicit existence of the expected property file path."""
+    prop_path = Path(model_path)
+    # Check existence only at the expected relative path from CWD
+    if prop_path.exists():
+        return [prop_path]
+    return []
 
 
 def get_missing_file_paths(

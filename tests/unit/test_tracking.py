@@ -76,3 +76,17 @@ class TestDbtCheckpointTracking:
         transformed_properties = dbtCheckpointTracking._remove_ext_in_hook_name({})
 
         assert transformed_properties == {}
+
+    def test_property_transformations_with_failed_status_code(self, config_path_str):
+        script_args = {"config": config_path_str}
+        tracker = dbtCheckpointTracking(script_args)
+
+        event_properties = tracker._property_transformations(
+            {"user_id": "abc123"}, {"status": 1, "hook_name": "hook.py"}
+        )
+
+        assert event_properties == {
+            "status": "Fail",
+            "hook_name": "hook",
+            "user_id": "abc123",
+        }

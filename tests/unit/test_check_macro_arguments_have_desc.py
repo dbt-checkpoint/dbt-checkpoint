@@ -134,3 +134,62 @@ macros:
         ],
     )
     assert result == 0
+
+
+from unittest.mock import patch
+from dbt_checkpoint.utils import JsonOpenError
+
+
+def test_check_macro_arguments_have_desc_json_error(capsys):
+    """Test the hook's behavior with a malformed manifest."""
+    with patch(
+        "dbt_checkpoint.check_macro_arguments_have_desc.get_dbt_manifest"
+    ) as mock_get_manifest:
+        mock_get_manifest.side_effect = JsonOpenError("Mocked error")
+
+        status_code = main(argv=["some_file.sql", "--is_test"])
+
+    assert status_code == 1
+    captured = capsys.readouterr()
+    assert "Unable to load manifest file (Mocked error)" in captured.out
+
+
+def test_check_argument_desc_seen_no_new_missing(tmpdir, manifest):
+    """
+    Tests the case where a macro is seen twice: once with missing
+    descriptions in the manifest, and a second time in a schema file
+    where the arguments listed *do* have descriptions.
+    """
+    # 1. Add a macro to the manifest with missing argument descriptions
+    manifest["macros"]["macro.test.macro_test_seen"] = {
+        "resource_type": "macro",
+        "name": "macro_test_seen",
+        "package_name": "test",
+        "path": "macros/macro_test_seen.sql",
+        "arguments": [
+            {"name": "arg_1"},  # Missing description
+            {"name": "arg_2"},  # Missing description
+        ],
+    }
+
+    # 2. Create a schema file where the defined arguments are valid
+    schema_yml = """
+version: 2
+macros:
+-   name: macro_test_seen
+    arguments:
+    -   name: arg_3
+        description: A perfectly fine description.
+    """
+    yml_file = tmpdir.join("schema.yml")
+    yml_file.write(schema_yml)
+
+    # 3. Run the check
+    hook_properties = check_argument_desc(
+        paths=["macros/macro_test_seen.sql", str(yml_file)],
+        manifest=manifest,
+    )
+
+    # 4. Assert that the missing args for this macro were cleared
+    assert hook_properties["status_code"] == 0
+    assert not hook_properties["missing"].get("macro_test_seen")
