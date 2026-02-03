@@ -27,6 +27,10 @@ def has_freshness(
     for schema in schemas:
         source = schema.source_schema
         table = schema.table_schema
+        if 'config' in source:
+            source=source["config"]
+        if 'config' in table:
+            table=table["config"]
         merged = {**source.get("freshness", {}), **table.get("freshness", {})}
         # if filter is present, remove it because it's not a dictionary like
         # warn_after or error_after

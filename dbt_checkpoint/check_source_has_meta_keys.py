@@ -29,8 +29,14 @@ def has_meta_key(
     schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
-        schema_meta = set(schema.source_schema.get("meta", {}).keys())
-        table_meta = set(schema.table_schema.get("meta", {}).keys())
+        if "config" in schema.source_schema:
+            schema_meta = set(schema.source_schema["config"].get("meta", {}).keys())
+        else:
+            schema_meta = set(schema.source_schema.get("meta", {}).keys())
+        if "config" in schema.table_schema:
+            table_meta = set(schema.table_schema["config"].get("meta", {}).keys())
+        else:
+            table_meta = set(schema.table_schema.get("meta", {}).keys())
         if allow_extra_keys:
             diff = not set(meta_keys).issubset(set(schema_meta | table_meta))
         else:
