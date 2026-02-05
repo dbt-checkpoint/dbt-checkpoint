@@ -456,16 +456,91 @@ def get_filenames(
     return result
 
 
+def get_use_dbt_cloud_cli() -> bool:
+    """
+    Get and truthify the USE_DBT_CLOUD_CLI environment variable.
+    Returns True if set to 'true', '1', or 'yes' (case-insensitive).
+    """
+    return os.environ.get("USE_DBT_CLOUD_CLI", "").lower() in ("true", "1", "yes")
+
+
+def get_dbt_cli_type() -> str:
+    """
+    Determine the installed dbt CLI type by checking version output.
+    Returns 'cloud' if dbt Cloud CLI is detected, 'core' for dbt Core, or raises error if not installed.
+    """
+    try:
+        result = subprocess.run(
+            ["dbt", "--version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        if result.returncode != 0:
+            raise RuntimeError("dbt is not installed or not in PATH.")
+
+        version_output = result.stdout + result.stderr
+        if "dbt Cloud CLI" in version_output:
+            return "cloud"
+        elif "Core" in version_output or "dbt-core" in version_output:
+            return "core"
+        else:
+            # Fallback - if we got here, dbt is installed but we can't determine type
+            return "core"
+    except FileNotFoundError:
+        raise RuntimeError("dbt is not installed or not in PATH.")
+
+
+def validate_dbt_cli_type(use_dbt_cloud: bool) -> None:
+    """
+    Validate that the correct dbt CLI type is installed.
+    If USE_DBT_CLOUD_CLI is set, verify dbt Cloud CLI is installed.
+    """
+    cli_type = get_dbt_cli_type()
+
+    if use_dbt_cloud and cli_type != "cloud":
+        raise RuntimeError(
+            "USE_DBT_CLOUD_CLI is set but dbt Cloud CLI is not installed. "
+            f"Detected dbt CLI type: {cli_type}. "
+            "Please install dbt Cloud CLI or unset USE_DBT_CLOUD_CLI."
+        )
+
+
 def run_dbt_cmd(cmd: Sequence[Any]) -> int:
     status_code = 0
-    print(f"Executing cmd: `{' '.join(cmd)}`")
+    original_dir = None
+    cmd_list = list(cmd)
+
+    # Check if using dbt Cloud CLI and handle --project-dir
+    use_dbt_cloud = get_use_dbt_cloud_cli()
+
+    # Validate dbt CLI type on first command execution
+    validate_dbt_cli_type(use_dbt_cloud)
+
+    if use_dbt_cloud and "--project-dir" in cmd_list:
+        project_dir_idx = cmd_list.index("--project-dir")
+        project_dir = cmd_list[project_dir_idx + 1]
+
+        # Remove --project-dir and its value from command
+        cmd_list.pop(project_dir_idx)  # Remove --project-dir
+        cmd_list.pop(project_dir_idx)  # Remove the directory value
+
+        # Change to project directory
+        original_dir = os.getcwd()
+        os.chdir(project_dir)
+
     try:
-        output = cmd_output(*list(filter(None, cmd)), expected_code=0)
+        print(f"Executing cmd: `{' '.join(cmd_list)}`")
+        output = cmd_output(*list(filter(None, cmd_list)), expected_code=0)
         print(output)
     except CalledProcessError as e:
         print(e.args[3])  # pragma: no mutate
         status_code = 1
-        return status_code
+    finally:
+        # Restore original directory if we changed it
+        if original_dir:
+            os.chdir(original_dir)
+
     return status_code
 
 
@@ -787,7 +862,8 @@ def yellow(string: Optional[Any]) -> str:
 def extend_dbt_project_dir_flag(
     cmd: List[str], cmd_flags: List[str], dbt_project_dir: str = ""
 ) -> List[str]:
-    if dbt_project_dir and not "--project-dir" in cmd_flags:  # noqa
+    use_dbt_cloud = get_use_dbt_cloud_cli()
+    if dbt_project_dir and not "--project-dir" in cmd_flags and not use_dbt_cloud:
         cmd.extend(["--project-dir", dbt_project_dir])
     return cmd
 
