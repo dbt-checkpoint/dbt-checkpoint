@@ -95,7 +95,6 @@ Create or update `.dbt-checkpoint.yaml` in your project root:
 
 ```yaml
 version: 1
-use-dbt-cloud: true
 dbt-project-dir: .  # Optional: specify if project is in subdirectory
 disable-tracking: false  # Optional
 ```
@@ -118,7 +117,7 @@ That's it! The dbt Cloud CLI will automatically authenticate using your `~/.dbt/
 
 ### How It Works
 
-When `use-dbt-cloud: true` is set, dbt-checkpoint uses the regular `dbt` command which automatically:
+When `USE_DBT_CLOUD_CLI=true` is set, dbt-checkpoint uses the regular `dbt` command which automatically:
 1. Reads authentication from `~/.dbt/dbt_cloud.yml`
 2. Connects to your dbt Cloud project
 3. Runs commands in the Cloud environment
@@ -258,7 +257,7 @@ repos:
 
 **For dbt-core**: You need a [profiles.yml](https://docs.getdbt.com/dbt-cli/configure-your-profile) file with your credentials. **To provide passwords and secrets use Github Secrets** (see example below).
 
-**For dbt Cloud**: Set up your `.dbt-checkpoint.yaml` with `use-dbt-cloud: true` and provide authentication via environment variables (see [dbt Cloud Authentication](#dbt-cloud-authentication) section).
+**For dbt Cloud**: Set up your `.dbt-checkpoint.yaml` with `USE_DBT_CLOUD_CLI=true` and provide authentication via environment variables (see [dbt Cloud Authentication](#dbt-cloud-authentication) section).
 
 Say you want to check that a model contains at least two tests, you would use this configuration:
 

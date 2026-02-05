@@ -886,7 +886,7 @@ def extend_dbt_cloud_flags(
     Returns:
         The command list (unchanged - dbt Cloud CLI uses config file)
     """
-    use_cloud = config.get("use-dbt-cloud", False)
+    use_cloud = get_use_dbt_cloud_cli()
 
     if not use_cloud:
         return cmd
