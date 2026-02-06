@@ -10,6 +10,10 @@ TESTS = (
     (["aa/bb/without_tags.sql", "--is_test", "--tags", "foo", "bar"], True, True, 0),
     (["aa/bb/without_tags.sql", "--is_test", "--tags", "foo", "bar"], False, True, 1),
     (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar"], True, False, 0),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "waldo", "--has-any-tag"], True, True, 1),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar", "waldo", "--has-any-tags"], True, True, 0),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar", "waldo", "--has-all-tags"], True, True, 1),
+    (["aa/bb/with_tags.sql", "--is_test", "--tags", "foo", "bar", "--has-all-tags"], True, True, 0),       
 )
 
 
