@@ -30,41 +30,41 @@ def test_dbt_test_error():
 @pytest.mark.parametrize(
     "files,global_flags,cmd_flags,models,expected",
     [
-        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "test", "-m", "cc"]),
+        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "test", "--select", "cc"]),
         (
             ["/aa/bb/cc.txt"],
             ["++debug", "++no-write-json"],
             None,
             None,
-            ["dbt", "--debug", "--no-write-json", "test", "-m", "cc"],
+            ["dbt", "--debug", "--no-write-json", "test", "--select", "cc"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
             ["+t", "prod"],
             None,
-            ["dbt", "test", "-m", "cc", "-t", "prod"],
+            ["dbt", "test", "--select", "cc", "-t", "prod"],
         ),
         (
             ["/aa/bb/cc.txt"],
             "",
             ["+t", "prod"],
             None,
-            ["dbt", "test", "-m", "cc", "-t", "prod"],
+            ["dbt", "test", "--select", "cc", "-t", "prod"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
             None,
             [],
-            ["dbt", "test", "-m", "cc"],
+            ["dbt", "test", "--select", "cc"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
             None,
             ["state:modified"],
-            ["dbt", "test", "-m", "state:modified"],
+            ["dbt", "test", "--select", "state:modified"],
         ),
     ],
 )
