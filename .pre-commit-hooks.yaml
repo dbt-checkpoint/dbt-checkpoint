@@ -278,7 +278,8 @@
   description: The command is responsible for generating your project's documentation website.
   entry: dbt-docs-generate
   language: python
-  pass_filenames: false
+  require_serial: true
+  types_or: [sql]
 - id: dbt-parse
   name: dbt parse
   description: Generates manifest.json from source model, test, and analysis files.

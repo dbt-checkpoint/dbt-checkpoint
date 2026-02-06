@@ -2259,14 +2259,23 @@ repos:
 
 Run `dbt docs generate` command. The command is responsible for generating your project's documentation website.
 
+#### Arguments
+
+`--global-flags`: Global dbt flags applicable to all subcommands. Instead of dash `-` please use `+`.</br>
+`--cmd-flags`: Command-specific dbt flags. Instead of dash `-` please use `+`.</br>
+`--model-prefix`: Prefix dbt selector, for selecting parents.</br>
+`--model-postfix`: Postfix dbt selector, for selecting children.</br>
+`--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
+
 #### Example
 
 ```yaml
 repos:
-  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
-    hooks:
-      - id: dbt-docs-generate
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+  rev: v1.0.0
+  hooks:
+  - id: dbt-docs-generate
+    args: ["--models", "state:modified", "--cmd-flags", "++no-compile", "--"]
 ```
 
 ---
