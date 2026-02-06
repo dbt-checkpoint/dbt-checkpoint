@@ -16,16 +16,25 @@
  </a>
 </p>
 
-## Brought to you by your friends at Datacoves
+## Brought to you by Datacoves
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="images/datacoves-dark.png">
   <img alt="Datacoves" src="images/datacoves-light.png" width="150">
 </picture>
 
-The Datacoves platform helps enterprises overcome their data delivery challenges quickly using dbt and Airflow, implementing best practices from the start without the need for multiple vendors or costly consultants.
+dbt-checkpoint enforces quality standards before code gets committed. Datacoves takes it further: a managed DataOps platform for dbt and Airflow where governance and best practices are built into every layer.
 
-Hosted VS Code, dbt-core, SqlFluff, and Airflow, find out more at [Datacoves.com](https://datacoves.com/product).
+- **Private cloud or SaaS** – your data, your choice
+- **Managed dbt + Airflow** – production-ready from day one
+- **In-browser VS Code** – onboard developers in minutes
+- **Bring your own tools** – integrates with your existing stack, no lock-in
+- **AI-assisted development** – connect your organization's approved LLM (Anthropic, OpenAI, Azure, Gemini, and more)
+- **Built-in governance** – CI/CD, guardrails, and best practices included
+
+dbt-checkpoint catches mistakes at commit. Datacoves prevents them from happening in the first place.
+
+[Explore the platform →](https://datacoves.com)
 
 <br>
 
