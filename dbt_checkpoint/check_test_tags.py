@@ -1,84 +1,79 @@
 import argparse
 import os
 import time
-from typing import Any, Dict, Iterable, Optional, Sequence
+from itertools import groupby
+from typing import Any, Dict, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
+    ParseDict,
+    Test,
     add_default_args,
-    add_meta_keys_args,
     get_dbt_manifest,
-    get_filenames,
     get_missing_file_paths,
-    get_model_schemas,
     get_model_sqls,
     get_models,
+    get_parent_childs,
 )
 
 
-def validate_keys(
-    actual: Iterable[str], expected: Iterable[str], allow_extra_keys: bool
-) -> bool:
-    actual = set(actual)
-    expected = set(expected)
-
-    if allow_extra_keys:
-        return expected.issubset(actual)
-    else:
-        return expected == actual
-
-
-def has_meta_key(
+def validate_tags(
     paths: Sequence[str],
     manifest: Dict[str, Any],
-    meta_keys: Sequence[str],
-    allow_extra_keys: bool,
-    exclude_pattern: str = "",
+    tags: Sequence[str],
+    exclude_pattern: str,
     include_disabled: bool = False,
 ) -> int:
-    # Discover related SQL files when yaml files are changed
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql", ".yml", ".yaml"], exclude_pattern=exclude_pattern
     )
-    
+    valid_tags = set(tags)
     status_code = 0
-    ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
+
     # get manifest nodes that pre-commit found as changed
     models = get_models(manifest, filenames, include_disabled=include_disabled)
-    # if user added schema but did not rerun the model
-    schemas = get_model_schemas(list(ymls.values()), filenames)
-    # convert to sets
-    in_models = {
-        model.filename
-        for model in models
-        if validate_keys(model.node.get("meta", {}).keys(), meta_keys, allow_extra_keys)
-    }
-    in_schemas = {
-        schema.model_name
-        for schema in schemas
-        if validate_keys(
-            schema.schema.get("meta", {}).keys(), meta_keys, allow_extra_keys
-        )
-    }
-    missing = filenames.difference(in_models, in_schemas)
 
-    for model in missing:
-        status_code = 1
-        result = "\n- ".join(list(meta_keys))  # pragma: no mutate
-        print(
-            f"{sqls.get(model)}: "
-            f"does not have some of the meta keys defined:\n- {result}",
+    for model in models:
+        childs = list(
+            get_parent_childs(
+                manifest=manifest,
+                obj=model,
+                manifest_node="child_map",
+                node_types=["test"],
+            )
         )
+
+        for test in (test for test in childs if isinstance(test, Test)):
+            test_tags = set(test.node.get("tags", []))
+            
+            if not test_tags.issubset(valid_tags) or not test_tags:
+                status_code = 1
+                list_diff = list(test_tags.difference(valid_tags))
+                print(
+                    f"{test.test_id} has wrong tags: {list_diff}"
+                )
+                
     return status_code
+
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
-    add_meta_keys_args(parser)
+
+    parser.add_argument(
+        "--tags",
+        nargs="+",
+        required=True,
+        help="A list of tags that models can have." 
+            " The list of tags has to be provided as space separated values."
+            " eg. --tags foo bar"
+
+    )
+
     args = parser.parse_args(argv)
 
     try:
@@ -88,15 +83,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = has_meta_key(
+
+    status_code = validate_tags(
         paths=args.filenames,
         manifest=manifest,
-        meta_keys=args.meta_keys,
-        allow_extra_keys=args.allow_extra_keys,
+        tags=args.tags,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )
+
     end_time = time.time()
+    
     script_args = vars(args)
 
     tracker = dbtCheckpointTracking(script_args=script_args)
@@ -105,7 +102,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check model has meta keys",
+            "description": "Check model has tests by name",
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),
