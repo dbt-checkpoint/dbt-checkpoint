@@ -15,14 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         name:
-          - "ubuntu-py37"
           - "ubuntu-py38"
           - "ubuntu-py39"
+          - "ubuntu-py310"
+          - "ubuntu-py311"
+          - "ubuntu-py312"
         include:
-          - name: "ubuntu-py37"
-            python: "3.7"
-            os: ubuntu-latest
-            tox_env: "py37"
           - name: "ubuntu-py38"
             python: "3.8"
             os: ubuntu-latest
@@ -31,11 +29,23 @@ jobs:
             python: "3.9"
             os: ubuntu-latest
             tox_env: "py39"
+          - name: "ubuntu-py310"
+            python: "3.10"
+            os: ubuntu-latest
+            tox_env: "py310"
+          - name: "ubuntu-py311"
+            python: "3.11"
+            os: ubuntu-latest
+            tox_env: "py311"
+          - name: "ubuntu-py312"
+            python: "3.12"
+            os: ubuntu-latest
+            tox_env: "py312"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
@@ -47,7 +57,7 @@ jobs:
       - name: Test build with coverage
         run: "tox -e cov-report"
       - name: Send coverage report to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
 
@@ -56,8 +66,8 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.8"
 
@@ -81,8 +91,8 @@ jobs:
     runs-on: "${{ matrix.os }}"
 
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.8"
       - name: "Install in dev mode"

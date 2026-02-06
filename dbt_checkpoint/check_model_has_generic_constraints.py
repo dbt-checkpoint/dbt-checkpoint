@@ -1,57 +1,83 @@
 import argparse
 import os
-import re
 import time
 from typing import Any
 from typing import Dict
 from typing import Optional
 from typing import Sequence
+from typing import Set
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import add_default_args
 from dbt_checkpoint.utils import get_dbt_manifest
-from dbt_checkpoint.utils import get_filenames
 from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_sqls
 from dbt_checkpoint.utils import get_models
 from dbt_checkpoint.utils import JsonOpenError
+from dbt_checkpoint.utils import Model
 
 
-def check_model_name_contract(
+def is_incremental_or_table(model: Model) -> bool:
+    materialized = model.node.get("config").get("materialized")
+    return materialized == "table" or materialized == "incremental"
+
+
+def extract_constraint_types(model_constraints: Sequence[Dict[str, Any]]) -> Set[str]:
+    return set(constraint.get("type", None) for constraint in model_constraints)
+
+
+def missing_generic_constraints(constraints: Sequence[str], model: Model) -> Set[str]:
+    model_constraints = model.node.get("constraints", [])
+    generic_constraints = extract_constraint_types(model_constraints)
+    return set(constraints) - generic_constraints
+
+
+def check_generic_constraints(
     paths: Sequence[str],
-    pattern: str,
     manifest: Dict[str, Any],
+    constraints: Sequence[str],
     exclude_pattern: str,
     include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
         paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
     )
-    status_code = 0
-    sqls = get_filenames(paths, [".sql"])
+
+    sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
     models = get_models(manifest, filenames, include_disabled=include_disabled)
+    status_code = 0
 
-    for model in models:
-        model_name = model.filename
-        if re.match(pattern, model_name) is None:
+    for model in (model for model in models if is_incremental_or_table(model)):
+        missing_constraints = missing_generic_constraints(constraints, model)
+        if missing_constraints:
             status_code = 1
-            print(f"{model_name}: model does not match regex pattern {pattern}.")
-
+            print(
+                f"{model.model_id}: "
+                "Doesn't have necessary generic constraints defined, it's missing:",
+                f"{missing_constraints}",
+            )
     return status_code
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+
     parser = argparse.ArgumentParser()
     add_default_args(parser)
 
     parser.add_argument(
-        "--pattern",
-        type=str,
+        "--constraints",
+        metavar="<constraint>",
         required=True,
-        help="Regex pattern to match model names.",
+        nargs="+",
+        type=str,
+        help="Set a list of constraint types to validate (e.g.: primary_key unique)",
     )
-
-    args = parser.parse_args(argv)
+    try:
+        args = parser.parse_args(argv)
+    except Exception as e:
+        print(f"Error parsing arguments: ({e})")
+        return 1
 
     try:
         manifest = get_dbt_manifest(args)
@@ -60,10 +86,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = check_model_name_contract(
+    status_code = check_generic_constraints(
         paths=args.filenames,
-        pattern=args.pattern,
         manifest=manifest,
+        constraints=args.constraints,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )
@@ -76,7 +102,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check model name contract",
+            "description": "Check model has generic constraints",
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

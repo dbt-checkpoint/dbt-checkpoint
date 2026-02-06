@@ -1,11 +1,13 @@
 import argparse
 import os
 import time
+from itertools import groupby
 from typing import Any, Dict, Optional, Sequence
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
+    ParseDict,
     Test,
     add_default_args,
     get_dbt_manifest,
@@ -16,17 +18,17 @@ from dbt_checkpoint.utils import (
 )
 
 
-def check_test_cnt(
+def validate_tags(
     paths: Sequence[str],
     manifest: Dict[str, Any],
-    test_cnt: int,
+    tags: Sequence[str],
     exclude_pattern: str,
     include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
-        paths, manifest, extensions=[".sql"], exclude_pattern=exclude_pattern
+        paths, manifest, extensions=[".sql", ".yml", ".yaml"], exclude_pattern=exclude_pattern
     )
-
+    valid_tags = set(tags)
     status_code = 0
     sqls = get_model_sqls(paths, manifest, include_disabled)
     filenames = set(sqls.keys())
@@ -43,15 +45,19 @@ def check_test_cnt(
                 node_types=["test"],
             )
         )
-        tests = [test for test in childs if isinstance(test, Test)]
-        model_test_cnt = len(tests)
-        if model_test_cnt < test_cnt:
-            status_code = 1
-            print(
-                f"{model.filename}: "
-                f"has only {model_test_cnt} tests, but {test_cnt} are required.",
-            )
+
+        for test in (test for test in childs if isinstance(test, Test)):
+            test_tags = set(test.node.get("tags", []))
+            
+            if not test_tags.issubset(valid_tags) or not test_tags:
+                status_code = 1
+                list_diff = list(test_tags.difference(valid_tags))
+                print(
+                    f"{test.test_id} has wrong tags: {list_diff}"
+                )
+                
     return status_code
+
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -59,10 +65,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     add_default_args(parser)
 
     parser.add_argument(
-        "--test-cnt",
-        type=int,
-        default=1,
-        help="Minimum number of tests required.",
+        "--tags",
+        nargs="+",
+        required=True,
+        help="A list of tags that models can have." 
+            " The list of tags has to be provided as space separated values."
+            " eg. --tags foo bar"
+
     )
 
     args = parser.parse_args(argv)
@@ -74,14 +83,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    status_code = check_test_cnt(
+
+    status_code = validate_tags(
         paths=args.filenames,
         manifest=manifest,
-        test_cnt=args.test_cnt,
+        tags=args.tags,
         exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )
+
     end_time = time.time()
+    
     script_args = vars(args)
 
     tracker = dbtCheckpointTracking(script_args=script_args)
@@ -90,7 +102,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         event_properties={
             "hook_name": os.path.basename(__file__),
-            "description": "Check model has tests",
+            "description": "Check model has tests by name",
             "status": status_code,
             "execution_time": end_time - start_time,
             "is_pytest": script_args.get("is_test"),

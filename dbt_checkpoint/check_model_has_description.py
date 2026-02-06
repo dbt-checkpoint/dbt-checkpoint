@@ -24,7 +24,7 @@ def has_description(
     include_disabled: bool = False,
 ) -> Dict[str, Any]:
     paths = get_missing_file_paths(  # type: ignore
-        paths, manifest, extensions=[".yml", ".yaml"], exclude_pattern=exclude_pattern
+        paths, manifest, exclude_pattern=exclude_pattern
     )
 
     status_code = 0

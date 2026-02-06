@@ -1,10 +1,20 @@
 import argparse
 import json
+import os
 import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Sequence, Set, Text, Union
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import Text
+from typing import Union
+
 
 from yaml import safe_load
 
@@ -121,6 +131,11 @@ def paths_to_dbt_models(
     return [prefix + Path(path).stem + postfix for path in paths]
 
 
+def checkpoint_safe_load(stream):
+    # FIXME: temporary fix for YAML incompatibility of safe_load with empty files
+    return safe_load(stream) or {}
+
+
 def get_json(json_filename: str) -> Dict[str, Any]:
     try:
         file_content = Path(json_filename).read_text(encoding="utf-8")
@@ -136,7 +151,7 @@ def get_config_file(config_file_path: str) -> Dict[str, Any]:
             alt_path = path.with_suffix(".yml" if path.suffix == ".yaml" else ".yaml")
             if alt_path.exists():
                 path = alt_path
-        config = safe_load(path.open())
+        config = checkpoint_safe_load(path.open())
         check_yml_version(config_file_path, config)
     except FileNotFoundError:
         config = {}
@@ -163,9 +178,19 @@ def get_models(
         if not include_disabled and not node.get("config", {}).get("enabled", True):
             continue
         split_key = key.split(".")
-        filename = split_key[-1]
-        if filename in filenames and split_key[0] == "model":
-            yield Model(key, node.get("name"), filename, node)  # pragma: no mutate
+        # Versions are supported since dbt-core 1.5
+        if node.get("version") and split_key[-1] == f"v{node.get('version')}":
+            # dbt versioned filenames can be either `model_name` or `model_name_v{version}`
+            filename_candidates = [
+                f"{split_key[-2]}",
+                f"{split_key[-2]}_v{node.get('version')}",
+            ]
+        else:
+            filename_candidates = [split_key[-1]]
+        if split_key[0] == "model":
+            for fn in filename_candidates:
+                if fn in filenames:
+                    yield Model(key, node.get("name"), fn, node)  # pragma: no mutate
 
 
 def get_ephemeral(
@@ -301,7 +326,7 @@ def get_model_schemas(
 ) -> Generator[ModelSchema, None, None]:
     for yml_file in yml_files:
         with open(yml_file, "r") as file:
-            schema = safe_load(file)
+            schema = checkpoint_safe_load(file)
             for model in schema.get("models", []):
                 if isinstance(model, dict) and model.get("name"):
                     model_name = model.get("name", "")  # pragma: no mutate
@@ -318,7 +343,7 @@ def get_macro_schemas(
     yml_files: Sequence[Path], filenames: Set[str], all_schemas: bool = False
 ) -> Generator[MacroSchema, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = checkpoint_safe_load(yml_file.open())
         for macro in schema.get("macros", []):
             if isinstance(macro, dict) and macro.get("name"):
                 macro_name = macro.get("name", "")  # pragma: no mutate
@@ -335,7 +360,7 @@ def get_source_schemas(
     yml_files: Sequence[Path], include_disabled: bool = False
 ) -> Generator[SourceSchema, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = checkpoint_safe_load(yml_file.open())
         for source in schema.get("sources", []):
             if not include_disabled and not source.get("config", {}).get(
                 "enabled", True
@@ -358,7 +383,7 @@ def get_exposures(
     yml_files: Sequence[Path],
 ) -> Generator[GenericDbtObject, None, None]:
     for yml_file in yml_files:
-        schema = safe_load(yml_file.open())
+        schema = checkpoint_safe_load(yml_file.open())
         for exposure in schema.get("exposures", []):
             exposure_name = exposure.get("name")
             yield GenericDbtObject(
@@ -450,6 +475,15 @@ def run_dbt_cmd(cmd: Sequence[Any]) -> int:
         status_code = 1
         return status_code
     return status_code
+
+
+def get_manifest_node_from_file_path(
+    manifest: Dict[str, Any], file_path: str
+) -> Dict[str, Any]:
+    for node in manifest.get("nodes", {}).values():
+        if node.get("original_file_path", "") in file_path:
+            return node
+    return {}
 
 
 def add_filenames_args(parser: argparse.ArgumentParser) -> None:
@@ -639,6 +673,25 @@ class ParseDict(argparse.Action):
         setattr(namespace, self.dest, result)
 
 
+class ParseJson(argparse.Action):
+    """Parse a JSON string into a dictionary"""
+
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: Text,
+        option_string: Optional[str] = None,
+    ) -> None:
+        """Perform the parsing"""
+        result = {}
+
+        if values:
+            result = json.loads(values)
+
+        setattr(namespace, self.dest, result)
+
+
 def add_related_sqls(
     yml_path: str,
     nodes: Dict[Any, Any],
@@ -727,7 +780,8 @@ def get_missing_file_paths(
             for filename in paths_with_missing
             if not exclude_re.search(filename)
         ]
-    return paths_with_missing
+    file_paths_with_missing = [p for p in paths_with_missing if not os.path.isdir(p)]
+    return file_paths_with_missing
 
 
 def red(string: Optional[Any]) -> str:
@@ -782,9 +836,9 @@ def get_dbt_catalog(args):  # type: ignore
 def validate_meta_keys(
     obj: GenericDbtObject,
     meta_keys: Sequence[str],
-    meta_set: Set,
+    meta_set: Set[str],
     allow_extra_keys: bool,
-):
+) -> int:
     meta = set(obj.schema.get("meta", {}).keys())
     if allow_extra_keys:
         diff = not meta_set.issubset(meta)
@@ -798,3 +852,7 @@ def validate_meta_keys(
         )
         return 1
     return 0
+
+
+def strings_differ_in_case(str1: str, str2: str) -> bool:
+    return str1.lower() == str2.lower() and str1 != str2

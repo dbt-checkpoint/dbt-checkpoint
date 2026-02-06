@@ -10,6 +10,7 @@ from dbt_checkpoint.utils import (
     add_meta_keys_args,
     get_dbt_manifest,
     get_filenames,
+    get_missing_file_paths,
     get_model_schemas,
     get_model_sqls,
     get_models,
@@ -33,8 +34,14 @@ def has_meta_key(
     manifest: Dict[str, Any],
     meta_keys: Sequence[str],
     allow_extra_keys: bool,
+    exclude_pattern: str = "",
     include_disabled: bool = False,
 ) -> int:
+    # Discover related SQL files when yaml files are changed
+    paths = get_missing_file_paths(
+        paths, manifest, extensions=[".sql", ".yml", ".yaml"], exclude_pattern=exclude_pattern
+    )
+    
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
     sqls = get_model_sqls(paths, manifest, include_disabled)
@@ -86,6 +93,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest=manifest,
         meta_keys=args.meta_keys,
         allow_extra_keys=args.allow_extra_keys,
+        exclude_pattern=args.exclude,
         include_disabled=args.include_disabled,
     )
     end_time = time.time()
