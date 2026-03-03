@@ -633,7 +633,7 @@ If every model needs to have certain labels keys.
 
 | Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
-|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
 <sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
@@ -2699,4 +2699,3 @@ If you want to make sure your dbt project (Manifest) and database (Catalog) are 
 It compares models and sources databases and schemas in `manifest vs catalog`. If a db/schema in one of them presents a different casing, the hook fails.
 
 ## File Descovery Hooks
-
