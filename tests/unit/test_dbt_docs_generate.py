@@ -31,41 +31,42 @@ def test_dbt_docs_generate_error():
 @pytest.mark.parametrize(
     "files,global_flags,cmd_flags,models,expected",
     [
-        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "docs", "generate", "-m", "cc"]),
+        ([], None, None, None, ["dbt", "docs", "generate"]),
+        (["/aa/bb/cc.txt"], None, None, None, ["dbt", "docs", "generate", "--select", "cc"]),
         (
             ["/aa/bb/cc.txt"],
             ["++debug", "++no-write-json"],
             None,
             None,
-            ["dbt", "--debug", "--no-write-json", "docs", "generate", "-m", "cc"],
+            ["dbt", "--debug", "--no-write-json", "docs", "generate", "--select", "cc"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
             ["+t", "prod"],
             None,
-            ["dbt", "docs", "generate", "-m", "cc", "-t", "prod"],
+            ["dbt", "docs", "generate", "--select", "cc", "-t", "prod"],
         ),
         (
             ["/aa/bb/cc.txt"],
             "",
             ["+t", "prod"],
             None,
-            ["dbt", "docs", "generate", "-m", "cc", "-t", "prod"],
+            ["dbt", "docs", "generate", "--select", "cc", "-t", "prod"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
             None,
             [],
-            ["dbt", "docs", "generate", "-m", "cc"],
+            ["dbt", "docs", "generate", "--select", "cc"],
         ),
         (
             ["/aa/bb/cc.txt"],
             None,
             None,
             ["state:modified"],
-            ["dbt", "docs", "generate", "-m", "state:modified"],
+            ["dbt", "docs", "generate", "--select", "state:modified"],
         ),
     ],
 )
