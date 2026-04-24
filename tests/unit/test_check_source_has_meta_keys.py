@@ -120,6 +120,119 @@ sources:
         False,
         0,
     ),
+    # After dbt Core v1.10, meta attribute is nested under config:
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    config:
+        meta:
+            foo: test
+            bar: test
+    tables:
+    -   name: test
+    """,
+        True,
+        True,
+        0,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    config:
+        meta:
+            foo: test
+            bar: test
+    tables:
+    -   name: test
+    """,
+        False,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    config:
+        meta:
+            foo: test
+    tables:
+    -   name: test
+        config:
+            meta:
+                bar: test
+    """,
+        True,
+        True,
+        0,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    tables:
+    -   name: test
+        config:
+            meta:
+                bar: test
+                foo: test
+    """,
+        True,
+        True,
+        0,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    tables:
+    -   name: test
+        config:
+            meta:
+                bar: test
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    config:
+        meta:
+            bar: test
+    tables:
+    -   name: test
+    """,
+        True,
+        True,
+        1,
+    ),
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    config:
+        meta:
+            foo: test
+            bar: test
+    tables:
+    -   name: test
+    """,
+        True,
+        False,
+        0,
+    ),
 )
 
 
