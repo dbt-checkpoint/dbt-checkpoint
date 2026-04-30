@@ -32,7 +32,10 @@ def prepare_cmd(
     else:
         dbt_models = paths_to_dbt_models(paths, prefix, postfix)
     dbt_project_dir = config.get("dbt-project-dir")
-    cmd = ["dbt", *global_flags, "docs", "generate", "-m", *dbt_models, *cmd_flags]
+    if dbt_models:
+        cmd = ["dbt", *global_flags, "docs", "generate", "--select", *dbt_models, *cmd_flags]
+    else:
+        cmd = ["dbt", *global_flags, "docs", "generate", *cmd_flags]
     return extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
 
 

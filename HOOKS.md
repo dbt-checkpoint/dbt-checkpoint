@@ -2292,6 +2292,8 @@ Run `dbt docs generate` command. The command is responsible for generating your 
 `--model-postfix`: Postfix dbt selector, for selecting children.</br>
 `--models`: dbt-checkpoint is by default running changed files. If you need to override that, e.g. in case of Slim CI (`state:modified`), you can use this option.
 
+> **Note:** When no filenames are passed (e.g. `pass_filenames: false`), the hook falls back to a full-project `dbt docs generate` without `--select`. This is useful when downstream hooks like `check-source-has-all-columns` need a complete `catalog.json`.
+
 #### Example
 
 ```yaml
