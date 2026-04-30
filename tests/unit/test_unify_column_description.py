@@ -348,6 +348,56 @@ models:
     """,
         ["--ignore", "test1"],
     ),
+    # column description can contain unicode characters
+    (
+        """
+version: 2
+models:
+-   name: same_col_desc_1
+    columns:
+    -   name: test1
+        description: têst
+    -   name: test2
+        description: tèst
+-   name: same_col_desc_2
+    columns:
+    -   name: test1
+        description: têst
+    -   name: test2
+        description: tèst
+-   name: same_col_desc_3
+    columns:
+    -   name: test1
+        description: test1
+    -   name: test2
+        description: test2
+    """,
+        True,
+        True,
+        1,
+        """version: 2
+models:
+- name: same_col_desc_1
+  columns:
+  - name: test1
+    description: têst
+  - name: test2
+    description: tèst
+- name: same_col_desc_2
+  columns:
+  - name: test1
+    description: têst
+  - name: test2
+    description: tèst
+- name: same_col_desc_3
+  columns:
+  - name: test1
+    description: têst
+  - name: test2
+    description: tèst
+""",
+        [],
+    ),
 )
 
 
@@ -391,7 +441,6 @@ def test_replace_column_description(
     result = yml_file.read_text("utf-8")
     assert status_code == expected_status_code
     assert expected_result == result
-
 
 def test_replace_column_description_split(tmpdir, manifest_path_str):
     schema_yml1 = """
