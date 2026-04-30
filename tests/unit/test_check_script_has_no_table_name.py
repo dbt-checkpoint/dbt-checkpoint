@@ -398,6 +398,48 @@ select * from unioned
     ),
     (
         """
+    SELECT *
+    FROM {{ ref('my_table') }} as main
+    JOIN {{ ref('helper_table') }} as helper
+      ON main.id = helper.id
+    WHERE main.status IS NOT DISTINCT FROM helper.status
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT
+        CASE
+            WHEN column_a IS NOT DISTINCT FROM column_b THEN 'Same'
+            ELSE 'Different'
+        END AS comparison
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    SELECT *
+    FROM {{ ref('model') }}
+    WHERE col_a IS DISTINCT FROM col_b
+      AND col_c IS NOT DISTINCT FROM col_d
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
     SELECT
         value
     FROM {{ ref('model') }}
@@ -580,6 +622,20 @@ def test_context_aware_parsing():
     sql = "SELECT * FROM table WHERE col IS DISTINCT FROM NULL"
     _, tables = has_table_name(sql, "test.sql")
     assert tables == {"table"}  # Only 'table' should be detected, not 'NULL'
+
+    # Test IS NOT DISTINCT FROM tracking (issue #339)
+    sql = "SELECT * FROM table WHERE col IS NOT DISTINCT FROM other_col"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"table"}  # Only 'table', not 'other_col'
+
+    # Test IS NOT DISTINCT FROM across two tables (the #339 repro shape)
+    sql = """
+    SELECT * FROM source_a
+    JOIN source_b ON source_a.id = source_b.id
+    WHERE source_a.status IS NOT DISTINCT FROM source_b.status
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"source_a", "source_b"}  # Not 'source_b.status'
 
     # Test function context tracking with EXTRACT
     sql = "SELECT EXTRACT(YEAR FROM date_field) FROM table"

@@ -84,7 +84,7 @@ def has_table_name(
     is_distinct_context = False
 
     for i, (prev, cur, nxt) in enumerate(prev_cur_next_iter(sql_split)):
-        # Track "IS DISTINCT FROM" expressions
+        # Track "IS DISTINCT FROM" and "IS NOT DISTINCT FROM" expressions
         if (
             prev
             and prev.lower() == "is"
@@ -92,6 +92,17 @@ def has_table_name(
             and cur.lower() == "distinct"
             and nxt
             and nxt.lower() == "from"
+        ):
+            is_distinct_context = True
+        elif (
+            prev
+            and prev.lower() == "not"
+            and cur
+            and cur.lower() == "distinct"
+            and nxt
+            and nxt.lower() == "from"
+            and i >= 2
+            and sql_split[i - 2].lower() == "is"
         ):
             is_distinct_context = True
         elif is_distinct_context and prev and prev.lower() == "from":
