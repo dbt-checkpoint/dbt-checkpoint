@@ -466,6 +466,40 @@ select * from unioned
         1,
         {"actual_table"},
     ),
+    (
+        """
+    WITH raw AS (
+        SELECT * FROM {{ ref('source_model') }}
+    )
+    SELECT
+        raw.id,
+        f.value::number AS item
+    FROM raw
+    INNER JOIN
+        LATERAL FLATTEN(input => raw.payload:items) AS f
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    WITH source AS (
+        SELECT * FROM {{ source('aws_lambda', 'purchase_orders') }}
+    )
+    SELECT *
+    FROM source
+    CROSS JOIN LATERAL FLATTEN(input => source.line_items) AS f
+    JOIN actual_table ON actual_table.id = f.value:id
+    """,
+        [],
+        True,
+        True,
+        1,
+        {"actual_table"},
+    ),
 )
 
 
@@ -607,3 +641,31 @@ def test_context_aware_parsing():
     """
     _, tables = has_table_name(sql, "test.sql")
     assert tables == {"table", "valid_table"}  # Only actual tables should be detected
+
+    # Test JOIN LATERAL flatten (Snowflake/Postgres/BigQuery/Databricks)
+    sql = """
+    SELECT f.value
+    FROM {{ ref('model') }} model
+    INNER JOIN LATERAL FLATTEN(input => model.payload) AS f
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()  # 'lateral' should not be flagged
+
+    # Test , LATERAL flatten form (existing behaviour, locked in)
+    sql = """
+    SELECT f.value
+    FROM {{ ref('model') }} model,
+         LATERAL FLATTEN(input => model.payload) AS f
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    # Real hardcoded ref after LATERAL is still detected
+    sql = """
+    SELECT *
+    FROM {{ ref('model') }} model
+    CROSS JOIN LATERAL FLATTEN(input => model.payload) AS f
+    JOIN actual_table ON actual_table.id = f.value:id
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"actual_table"}
