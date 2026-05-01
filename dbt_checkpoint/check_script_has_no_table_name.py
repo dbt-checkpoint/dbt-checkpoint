@@ -22,7 +22,7 @@ REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
 
 # Add these new constants with type annotations
 COMMON_SQL_FUNCTIONS: List[str] = ["extract", "substring", "trim", "unnest", "filter"]
-ALLOWED_FROM_CONTEXTS: List[str] = ["distinct", "position", "unnest"]
+ALLOWED_FROM_CONTEXTS: List[str] = ["distinct", "position", "unnest", "lateral"]
 REGEX_STRING_LITERALS = r"'(?:[^']|'')*'"
 
 
