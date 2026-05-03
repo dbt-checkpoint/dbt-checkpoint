@@ -16,12 +16,25 @@ from dbt_checkpoint.utils import (
 
 REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
 REGEX_SPLIT = r"[\s]+"
-IGNORE_WORDS = ["", "(", "{{", "{", "null"]  # pragma: no mutate
+IGNORE_WORDS = ["", "(", "{{", "{", "null", "''"]  # pragma: no mutate
 REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
 REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
 
 # Add these new constants with type annotations
-COMMON_SQL_FUNCTIONS: List[str] = ["extract", "substring", "trim", "unnest", "filter"]
+# `table` and `json_table` are SQL/2016 table-valued functions
+# (SQL Server, Oracle, DB2, MySQL 8+, MariaDB) — `JOIN TABLE(my_fn())`
+# and `JOIN JSON_TABLE(payload, '$.items[*]' COLUMNS (...))`. Listing them
+# here as functions (rather than ALLOWED_FROM_CONTEXTS) keeps `FROM table`
+# without parens still flagged as a real table reference.
+COMMON_SQL_FUNCTIONS: List[str] = [
+    "extract",
+    "substring",
+    "trim",
+    "unnest",
+    "filter",
+    "table",
+    "json_table",
+]
 ALLOWED_FROM_CONTEXTS: List[str] = ["distinct", "position", "unnest", "lateral"]
 REGEX_STRING_LITERALS = r"'(?:[^']|'')*'"
 

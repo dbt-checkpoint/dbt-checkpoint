@@ -542,6 +542,60 @@ select * from unioned
         1,
         {"actual_table"},
     ),
+    # issue #346: TABLE() table-valued function (SQL Server / Oracle / DB2)
+    (
+        """
+    SELECT *
+    FROM {{ ref('events') }}
+    JOIN TABLE(my_function()) AS t ON t.id = events.id
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    # issue #346: JSON_TABLE (SQL/2016, MySQL 8+, SQL Server 2022+, Oracle)
+    (
+        """
+    SELECT j.id, j.name
+    FROM {{ ref('docs') }}
+    CROSS JOIN JSON_TABLE(payload, '$.items[*]' COLUMNS (id INT, name VARCHAR(50))) AS j
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    # issue #346: TABLE() must not mask a real bare `actual_table` join
+    (
+        """
+    SELECT *
+    FROM {{ ref('events') }}
+    JOIN TABLE(my_function()) AS t ON t.id = events.id
+    JOIN actual_table ON actual_table.id = events.actual_id
+    """,
+        [],
+        True,
+        True,
+        1,
+        {"actual_table"},
+    ),
+    # Phantom-table from string literal: `from '...'` collapses to `from ''`
+    # which previously got added as a table name (the empty-quote token was
+    # not in IGNORE_WORDS).
+    (
+        """
+    SELECT 'from somewhere' AS note, *
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
 )
 
 
@@ -725,3 +779,48 @@ def test_context_aware_parsing():
     """
     _, tables = has_table_name(sql, "test.sql")
     assert tables == {"actual_table"}
+
+    # issue #346: TABLE() table-valued function (SQL Server / Oracle / DB2)
+    sql = """
+    SELECT *
+    FROM {{ ref('events') }}
+    JOIN TABLE(my_function()) AS t ON t.id = events.id
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()  # 'table' should not be flagged
+
+    # issue #346: JSON_TABLE (SQL/2016, MySQL 8+, SQL Server 2022+, Oracle)
+    sql = """
+    SELECT j.id
+    FROM {{ ref('docs') }}
+    CROSS JOIN JSON_TABLE(payload, '$.items[*]' COLUMNS (id INT)) AS j
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()  # 'json_table' should not be flagged
+
+    # Bare `FROM table` (no parens) is still flagged — TABLE in
+    # COMMON_SQL_FUNCTIONS only triggers when followed by `(`, so a real
+    # (quoted-keyword) table named `table` is not silently masked.
+    sql = "SELECT * FROM table"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"table"}
+
+    # Real hardcoded join after a TABLE() call is still detected.
+    sql = """
+    SELECT *
+    FROM {{ ref('events') }}
+    JOIN TABLE(my_function()) AS t ON t.id = events.id
+    JOIN actual_table ON actual_table.id = events.actual_id
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"actual_table"}
+
+    # Phantom-table from string literal: `from '...'` collapses to `from ''`,
+    # which used to get added as a table because the empty-quote token wasn't
+    # in IGNORE_WORDS.
+    sql = """
+    SELECT 'from somewhere' AS note, *
+    FROM {{ ref('model') }}
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
