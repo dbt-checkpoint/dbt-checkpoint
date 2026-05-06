@@ -21,7 +21,24 @@ REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
 REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
 
 # Add these new constants with type annotations
-COMMON_SQL_FUNCTIONS: List[str] = ["extract", "substring", "trim", "unnest", "filter"]
+COMMON_SQL_FUNCTIONS: List[str] = [
+    "extract",
+    "substring",
+    "trim",
+    "unnest",
+    "filter",
+    # Postgres: set-returning / table-valued functions used directly in FROM
+    "generate_series",
+    "jsonb_array_elements",
+    "jsonb_each",
+    "json_array_elements",
+    "regexp_split_to_table",
+    # DuckDB: file-reader functions used in FROM
+    "read_csv",
+    "read_parquet",
+    # BigQuery: federated query function used in FROM
+    "external_query",
+]
 ALLOWED_FROM_CONTEXTS: List[str] = ["distinct", "position", "unnest", "lateral"]
 REGEX_STRING_LITERALS = r"'(?:[^']|'')*'"
 

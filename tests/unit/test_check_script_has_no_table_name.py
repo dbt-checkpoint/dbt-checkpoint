@@ -542,6 +542,88 @@ select * from unioned
         1,
         {"actual_table"},
     ),
+    # Postgres GENERATE_SERIES used directly in FROM is not a hardcoded table.
+    (
+        "SELECT * FROM GENERATE_SERIES(1, 100) AS s",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    # Postgres JSONB set-returning functions in FROM should not be flagged.
+    (
+        "SELECT * FROM JSONB_ARRAY_ELEMENTS('[1,2,3]'::jsonb) AS j",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    (
+        "SELECT * FROM JSONB_EACH('{\"a\":1}'::jsonb)",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    (
+        "SELECT * FROM JSON_ARRAY_ELEMENTS('[1,2]'::json)",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    # Postgres REGEXP_SPLIT_TO_TABLE used in FROM.
+    (
+        "SELECT * FROM REGEXP_SPLIT_TO_TABLE('a,b,c', ',')",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    # DuckDB file readers used in FROM.
+    (
+        "SELECT * FROM READ_CSV('data.csv')",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    (
+        "SELECT * FROM READ_PARQUET('data.parquet')",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    # BigQuery EXTERNAL_QUERY used in FROM.
+    (
+        "SELECT * FROM EXTERNAL_QUERY('proj.connection', 'SELECT 1')",
+        [],
+        True,
+        True,
+        0,
+        set(),
+    ),
+    # Mixed case: ref() plus GENERATE_SERIES, plus a hardcoded table.
+    # Only the hardcoded table should be flagged.
+    (
+        """SELECT *
+        FROM {{ ref('events') }} e
+        CROSS JOIN GENERATE_SERIES(1, 24) AS hour_of_day
+        JOIN raw.customers c ON c.id = e.customer_id""",
+        [],
+        True,
+        True,
+        1,
+        {"raw.customers"},
+    ),
 )
 
 
@@ -725,3 +807,48 @@ def test_context_aware_parsing():
     """
     _, tables = has_table_name(sql, "test.sql")
     assert tables == {"actual_table"}
+
+    # Postgres set-returning / table-valued functions used in FROM
+    sql = "SELECT * FROM GENERATE_SERIES(1, 100) AS s"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    sql = "SELECT * FROM JSONB_ARRAY_ELEMENTS('[1,2,3]'::jsonb) AS j"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    sql = "SELECT * FROM JSONB_EACH('{\"a\":1}'::jsonb)"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    sql = "SELECT * FROM JSON_ARRAY_ELEMENTS('[1,2]'::json)"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    sql = "SELECT * FROM REGEXP_SPLIT_TO_TABLE('a,b,c', ',')"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    # DuckDB file-reader functions used in FROM
+    sql = "SELECT * FROM READ_CSV('data.csv')"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    sql = "SELECT * FROM READ_PARQUET('data.parquet')"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    # BigQuery EXTERNAL_QUERY used in FROM
+    sql = "SELECT * FROM EXTERNAL_QUERY('proj.connection', 'SELECT 1')"
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    # Mixing table-valued functions with a real hardcoded ref still flags it
+    sql = """
+    SELECT *
+    FROM {{ ref('events') }} e
+    CROSS JOIN GENERATE_SERIES(1, 24) AS hour_of_day
+    JOIN raw.customers c ON c.id = e.customer_id
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"raw.customers"}
