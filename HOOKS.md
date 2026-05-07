@@ -1309,7 +1309,7 @@ To make sure that you have only refs and sources in your `SQL` files.
 
 | Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
-|                       :x: Not needed                        |                       :x: Not needed                       |
+|                   :white_check_mark: Yes                    |                       :x: Not needed                       |
 
 <sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
