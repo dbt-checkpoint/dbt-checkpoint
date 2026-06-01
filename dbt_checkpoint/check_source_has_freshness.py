@@ -27,7 +27,14 @@ def has_freshness(
     for schema in schemas:
         source = schema.source_schema
         table = schema.table_schema
-        merged = {**(source.get("freshness") or {}), **(table.get("freshness") or {})}
+        source_config = source.get("config") or {}
+        table_config = table.get("config") or {}
+        merged = {
+            **(source_config.get("freshness") or {}),
+            **(source.get("freshness") or {}),
+            **(table_config.get("freshness") or {}),
+            **(table.get("freshness") or {}),
+        }
         # if filter is present, remove it because it's not a dictionary like
         # warn_after or error_after
         if "filter" in merged.keys():
@@ -37,7 +44,12 @@ def has_freshness(
             for key, value in merged.items()
             if set(value.keys()) == {"count", "period"}
         }
-        loaded = table.get("loaded_at_field") or source.get("loaded_at_field")
+        loaded = (
+            table.get("loaded_at_field")
+            or table_config.get("loaded_at_field")
+            or source.get("loaded_at_field")
+            or source_config.get("loaded_at_field")
+        )
         if not loaded:
             status_code = 1
             print(
