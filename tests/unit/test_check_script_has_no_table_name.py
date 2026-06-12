@@ -725,3 +725,33 @@ def test_context_aware_parsing():
     """
     _, tables = has_table_name(sql, "test.sql")
     assert tables == {"actual_table"}
+
+
+def test_table_generator_not_flagged():
+    """Test that FROM TABLE(...) is not flagged as a table reference (Snowflake syntax)."""
+    # TABLE(GENERATOR(...)) for generating rows
+    sql = """
+    SELECT SEQ4() AS id
+    FROM TABLE(GENERATOR(ROWCOUNT => 100))
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    # TABLE(RESULT_SCAN(...)) for querying previous results
+    sql = """
+    SELECT * FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == set()
+
+    # TABLE(GENERATOR(...)) alongside a real hardcoded table
+    sql = """
+    WITH numbers AS (
+        SELECT SEQ4() AS n
+        FROM TABLE(GENERATOR(ROWCOUNT => 1000))
+    )
+    SELECT * FROM numbers
+    JOIN real_table ON real_table.id = numbers.n
+    """
+    _, tables = has_table_name(sql, "test.sql")
+    assert tables == {"real_table"}

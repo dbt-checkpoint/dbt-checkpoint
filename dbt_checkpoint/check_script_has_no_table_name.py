@@ -133,6 +133,10 @@ def has_table_name(
             if cur.lower() in ALLOWED_FROM_CONTEXTS:
                 continue
 
+            # Skip TABLE(...) function calls (e.g. Snowflake GENERATOR, RESULT_SCAN)
+            if cur.lower() == "table" and nxt and nxt.startswith("("):
+                continue
+
             # Skip if in an "IS DISTINCT FROM" expression
             if is_distinct_context:
                 continue
