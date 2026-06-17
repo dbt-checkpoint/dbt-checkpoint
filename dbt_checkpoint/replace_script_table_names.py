@@ -82,7 +82,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     start_time = time.time()
     for filename in args.filenames:
         file = Path(filename)
-        sql = file.read_text()
+        sql = file.read_text(encoding="utf-8")
         status_code_file, tables = has_table_name(sql, filename)
         if status_code_file:
             status_code = status_code_file

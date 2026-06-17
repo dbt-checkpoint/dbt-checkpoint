@@ -85,6 +85,36 @@ def test_check_model_meta_keys(
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_model_meta_keys_in_config(extension, tmpdir, manifest_path_str):
+    """dbt 1.9+: meta nested inside config: block in the schema YAML should be accepted."""
+    schema_yml = """
+version: 2
+
+models:
+-   name: in_schema_meta
+    config:
+        meta:
+            foo: test
+            bar: test
+-   name: xxx
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_meta.sql",
+            str(yml_file),
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 0
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
 def test_check_model_meta_keys_in_changed(extension, tmpdir, manifest_path_str):
     schema_yml = """
 version: 2

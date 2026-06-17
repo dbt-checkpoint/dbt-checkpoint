@@ -23,8 +23,12 @@ def validate_tags(
     schemas = get_source_schemas(ymls, include_disabled=include_disabled)
 
     for schema in schemas:
-        schema_tags = set(schema.source_schema.get("tags", []))
-        table_tags = set(schema.table_schema.get("tags", []))
+        schema_tags = set(schema.source_schema.get("tags", [])) | set(
+            schema.source_schema.get("config", {}).get("tags", [])
+        )
+        table_tags = set(schema.table_schema.get("tags", [])) | set(
+            schema.table_schema.get("config", {}).get("tags", [])
+        )
         source_tags = schema_tags.union(table_tags)
         valid_tags = set(tags)
         if not source_tags.issubset(valid_tags):

@@ -170,6 +170,20 @@ def test_replace_script_table_names(
     assert result == output
 
 
+def test_replace_script_table_names_utf8_preserved(
+    manifest_path_str, config_path_str, tmpdir
+):
+    """Non-ASCII characters (e.g. umlauts) must survive a read-replace-write cycle."""
+    sql = "-- Ä Ö Ü ä ö ü ß\nSELECT * FROM {{ ref('replaced_model') }}\n"
+    path = tmpdir.join("model.sql")
+    path.write_text(sql, "utf-8")
+    ret = main(
+        [str(path), "--is_test", "--manifest", manifest_path_str, "--config", config_path_str]
+    )
+    assert ret == 0
+    assert path.read_text(encoding="utf-8") == sql
+
+
 def test_get_source_from_name(manifest):
     result = get_source_from_name(
         manifest, {"prod.source1.src3", "dev.source1.src3", "dev2.source1.src3"}

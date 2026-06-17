@@ -164,6 +164,40 @@ sources:
         False,
         0,
     ),
+    # dbt 1.9+: tags inside config: at source level
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    config:
+        tags:
+        -   foo
+        -   bar
+    tables:
+    -   name: test
+    """,
+        True,
+        True,
+        0,
+    ),
+    # dbt 1.9+: tags inside config: at table level
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    tables:
+    -   name: test
+        config:
+            tags:
+            -   foo
+            -   bar
+    """,
+        True,
+        True,
+        0,
+    ),
 )
 
 
