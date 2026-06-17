@@ -206,6 +206,36 @@ sources:
 )
 
 
+def test_check_source_has_freshness_subset(tmpdir, manifest_path_str, config_path_str):
+    """Requiring only error_after should pass when source defines both warn_after and error_after."""
+    input_schema = """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness:
+        warn_after:
+            count: 1
+            period: day
+        error_after:
+            count: 2
+            period: day
+    tables:
+    -   name: with_description
+    """
+    input_args = [
+        "--freshness",
+        "error_after",
+        "--manifest",
+        manifest_path_str,
+        "--config",
+        config_path_str,
+        "--is_test",
+    ]
+    yml_file = tmpdir.join("schema.yml")
+    yml_file.write(input_schema)
+    assert main(argv=[str(yml_file), *input_args]) == 0
+
+
 @pytest.mark.parametrize(
     ("input_schema", "valid_manifest", "valid_config", "expected_status_code"), TESTS
 )

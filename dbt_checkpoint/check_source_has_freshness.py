@@ -56,7 +56,7 @@ def has_freshness(
                 f"{red(f'{schema.source_name}.{schema.table_name}')}: "
                 f"is missing `loaded_at_field` which is required for freshness."
             )
-        if not (freshness == required_freshness):
+        if not required_freshness.issubset(freshness):
             status_code = 1
             missing_params = required_freshness.difference(freshness)
             result = "\n- ".join(list(missing_params))  # pragma: no mutate
