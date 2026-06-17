@@ -60,7 +60,12 @@ def has_meta_key(
         schema.model_name
         for schema in schemas
         if validate_keys(
-            schema.schema.get("meta", {}).keys(), meta_keys, allow_extra_keys
+            {
+                *schema.schema.get("meta", {}).keys(),
+                *schema.schema.get("config", {}).get("meta", {}).keys(),
+            },
+            meta_keys,
+            allow_extra_keys,
         )
     }
     missing = filenames.difference(in_models, in_schemas)
