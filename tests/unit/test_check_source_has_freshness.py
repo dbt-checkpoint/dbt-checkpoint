@@ -161,6 +161,48 @@ sources:
         False,
         0,
     ),
+    # freshness and loaded_at_field inside config: at table level (dbt 1.9+ preferred form)
+    (
+        """
+sources:
+-   name: test
+    tables:
+    -   name: with_description
+        config:
+            loaded_at_field: aa
+            freshness:
+                warn_after:
+                    count: 12
+                    period: hour
+                error_after:
+                    count: 24
+                    period: hour
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness and loaded_at_field inside config: at source level (dbt 1.9+ preferred form)
+    (
+        """
+sources:
+-   name: test
+    config:
+        loaded_at_field: aa
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+            error_after:
+                count: 24
+                period: hour
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        0,
+    ),
 )
 
 
