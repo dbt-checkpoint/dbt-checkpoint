@@ -12,6 +12,7 @@
 - [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-generic-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-generic-constraints): Check the model has generic constraints defined.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
+- [`check-model-has-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-group): Check the model has a group defined.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
 - [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
@@ -411,6 +412,60 @@ When you want to force developers to define model contracts.
 #### How it works
 
 It checks the generated manifest for the contract configuration.
+
+---
+
+### `check-model-has-group`
+
+Ensures that the model has a [group](https://docs.getdbt.com/docs/build/groups) defined, supporting dbt's model governance feature.
+
+#### Arguments
+
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--groups`: Optional list of allowed group names. If provided, models must belong to one of these groups.<br/>
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```yaml
+repos:
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-group
+```
+
+With allowed groups:
+
+```yaml
+repos:
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
+    hooks:
+      - id: check-model-has-group
+        args: ["--groups", "analytics", "finance", "engineering", "--"]
+```
+
+#### When to use it
+
+When you want to enforce that every model has an owner/team via dbt's [groups and access](https://docs.getdbt.com/docs/collaborate/govern/model-access) governance feature.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                      :white_check_mark: Yes                 |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
+
+#### How it works
+
+- Hook takes all changed `yml` and `SQL` files.
+- The model name is obtained from the `SQL` file name.
+- The manifest is scanned for a model's `group` in both `config.group` and the top-level `group` field.
+- If the model does not have a group defined, the hook fails.
+- If `--groups` is provided and the model's group is not in the allowed list, the hook fails.
 
 ---
 
