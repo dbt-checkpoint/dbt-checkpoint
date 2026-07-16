@@ -12,6 +12,7 @@
 - [`check-model-has-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-constraints): Check the model has constraints defined.
 - [`check-model-has-generic-constraints`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-generic-constraints): Check the model has generic constraints defined.
 - [`check-model-has-contract`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-contract): Check the model has contract enabled.
+- [`check-model-has-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-group): Check the model has a group assigned.
 - [`check-model-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-description): Check the model has description.
 - [`check-model-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-meta-keys): Check the model has keys in the meta part.
 - [`check-model-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-model-has-labels-keys): Check the model has keys in the labels part.
@@ -41,6 +42,7 @@
 - [`check-source-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-description): Check the source has description.
 - [`check-source-table-has-description`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-table-has-description): Check the source table has description.
 - [`check-source-has-freshness`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-freshness): Check the source has the freshness.
+- [`check-source-has-group`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-group): Check the source has a group assigned.
 - [`check-source-has-loader`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-loader): Check the source has loader option.
 - [`check-source-has-meta-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-meta-keys): Check the source has keys in the meta part.
 - [`check-source-has-labels-keys`](https://github.com/dbt-checkpoint/dbt-checkpoint/blob/main/HOOKS.md#check-source-has-labels-keys): Check the source has keys in the labels part.
@@ -411,6 +413,44 @@ When you want to force developers to define model contracts.
 #### How it works
 
 It checks the generated manifest for the contract configuration.
+
+---
+
+### `check-model-has-group`
+
+Checks that the model has a `group` property assigned (either directly or via `+group` in `dbt_project.yml`).
+
+#### Arguments
+
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--exclude`: Regex pattern to exclude files.
+
+#### Example
+
+```yaml
+repos:
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.1.0
+    hooks:
+      - id: check-model-has-group
+```
+
+#### When to use it
+
+When you want to ensure every model is assigned to a team group for ownership tracking, access control, or alerting.
+
+#### How it works
+
+It checks the generated manifest for the `group` property on each model node.
+
+#### Requirements
+
+| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                      :white_check_mark:                     |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 ---
 
@@ -1506,6 +1546,35 @@ You want to make sure that all freshness is correctly set.
 - Hook takes all changed `yml`.
 - All sources from yml file are parsed.
 - If the source does not have freshness correctly set, the hook fails.
+
+---
+
+### `check-source-has-group`
+
+Ensures that the source has a group assigned in the properties file (usually `schema.yml`). Checks both the top-level `group` property and `config.meta.group` as a fallback.
+
+#### Example
+
+```yaml
+repos:
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.1.0
+    hooks:
+      - id: check-source-has-group
+```
+
+#### When to use it
+
+You want to make sure that every source is assigned to a team group for ownership tracking and alerting.
+
+#### Requirements
+
+| Source exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Source exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :--------------------------------------------------------: |
+|                       :x: Not needed                        |                       :x: Not needed                       |
+
+<sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
+<sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
 
 ---
 

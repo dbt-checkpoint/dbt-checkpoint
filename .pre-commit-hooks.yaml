@@ -386,3 +386,17 @@
   entry: check-database-casing-consistency
   language: python
   always_run: true
+
+- id: check-model-has-group
+  name: Check model has group
+  description: Ensures that the model has a group assigned.
+  entry: check-model-has-group
+  language: python
+  types_or: [yaml, sql]
+
+- id: check-source-has-group
+  name: Check the source has a group assigned
+  description: Ensures that the source has a group assigned.
+  entry: check-source-has-group
+  language: python
+  types_or: [yaml]
