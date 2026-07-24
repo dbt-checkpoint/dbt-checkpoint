@@ -387,6 +387,13 @@ MANIFEST = {
             "root_path": "/path/to/aa",
             "config": {"materialized": "table"},
         },
+        "model.with_invalid_group": {
+            "patch_path": "project://bb/with_invalid_group.yml",
+            "path": "aa/bb/with_invalid_group.sql",
+            "root_path": "/path/to/aa",
+            "group": "wrong_team",
+            "config": {"group": "wrong_team", "materialized": "table"},
+        },
         "model.with_no_constraints": {
             "patch_path": "project://bb/with_no_constraints.yml",
             "path": "aa/bb/with_no_constraints.sql",

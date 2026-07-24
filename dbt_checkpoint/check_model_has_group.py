@@ -18,6 +18,7 @@ def check_group(
     paths: Sequence[str],
     manifest: Dict[str, Any],
     exclude_pattern: str,
+    groups: Optional[Sequence[str]] = None,
     include_disabled: bool = False,
 ) -> int:
     paths = get_missing_file_paths(
@@ -39,6 +40,12 @@ def check_group(
                 f"{model.model_name}: "
                 "does not have a group assigned.",
             )
+        elif groups and group not in groups:
+            status_code = 1
+            print(
+                f"{model.model_name}: "
+                f"has group '{group}' which is not in allowed groups: {groups}.",
+            )
     return status_code
 
 
@@ -47,6 +54,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         description="Check that models have a group assigned.",
     )
     add_default_args(parser)
+    parser.add_argument(
+        "--groups",
+        nargs="+",
+        required=False,
+        default=None,
+        help="Optional list of allowed group names.",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -60,6 +74,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         paths=args.filenames,
         manifest=manifest,
         exclude_pattern=args.exclude,
+        groups=args.groups,
         include_disabled=args.include_disabled,
     )
     end_time = time.time()

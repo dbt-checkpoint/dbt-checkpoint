@@ -14,7 +14,11 @@ from dbt_checkpoint.utils import (
 )
 
 
-def has_group(paths: Sequence[str], include_disabled: bool = False) -> Dict[str, Any]:
+def has_group(
+    paths: Sequence[str],
+    groups: Optional[Sequence[str]] = None,
+    include_disabled: bool = False,
+) -> Dict[str, Any]:
     status_code = 0
     ymls = [Path(path) for path in paths]
 
@@ -37,6 +41,12 @@ def has_group(paths: Sequence[str], include_disabled: bool = False) -> Dict[str,
                 f"{red(f'{schema.source_name}.{schema.table_name}')}: "
                 f"does not have a group assigned.",
             )
+        elif groups and group not in groups:
+            status_code = 1
+            print(
+                f"{red(f'{schema.source_name}.{schema.table_name}')}: "
+                f"has group '{group}' which is not in allowed groups: {groups}.",
+            )
     return {"status_code": status_code}
 
 
@@ -45,6 +55,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         description="Check that sources have a group assigned.",
     )
     add_default_args(parser)
+    parser.add_argument(
+        "--groups",
+        nargs="+",
+        required=False,
+        default=None,
+        help="Optional list of allowed group names.",
+    )
 
     args = parser.parse_args(argv)
 
@@ -56,7 +73,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     start_time = time.time()
     hook_properties = has_group(
-        paths=args.filenames, include_disabled=args.include_disabled
+        paths=args.filenames,
+        groups=args.groups,
+        include_disabled=args.include_disabled,
     )
     end_time = time.time()
     script_args = vars(args)
