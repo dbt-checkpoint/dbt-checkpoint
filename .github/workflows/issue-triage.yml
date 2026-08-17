@@ -29,6 +29,11 @@ permissions:
 jobs:
   triage:
     name: Triage (first pass)
+    # Keeps this workflow inert in forks, which get a copy of this file and run it
+    # on issues opened against the fork itself. Without the guard the triage job
+    # runs there, fails for want of CLAUDE_CODE_OAUTH_TOKEN, and the `comment` job
+    # still posts its fallback message on someone else's issue.
+    if: github.repository == 'dbt-checkpoint/dbt-checkpoint'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -163,7 +168,9 @@ jobs:
   comment:
     name: Post triage comment
     needs: triage
-    if: always()
+    # `always()` means this job runs even when `triage` is skipped, so it needs the
+    # same repository guard rather than inheriting it via `needs`.
+    if: always() && github.repository == 'dbt-checkpoint/dbt-checkpoint'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

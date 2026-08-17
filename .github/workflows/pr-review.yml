@@ -26,7 +26,13 @@ permissions:
 jobs:
   review:
     name: Review (findings)
+    # The repository check keeps this workflow inert in forks. Forks get a copy of
+    # this file and run it on their OWN pull requests, where the head-repo check
+    # below passes (head and github.repository are both the fork) — so without this
+    # guard the review job runs there, fails for want of CLAUDE_CODE_OAUTH_TOKEN,
+    # and the `comment` job still posts its fallback message on someone else's PR.
     if: >-
+      github.repository == 'dbt-checkpoint/dbt-checkpoint' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
@@ -107,8 +113,11 @@ jobs:
   comment:
     name: Post review comment
     needs: review
+    # `always()` means this job runs even when `review` is skipped, so it needs the
+    # same repository guard rather than inheriting it via `needs`.
     if: >-
       always() &&
+      github.repository == 'dbt-checkpoint/dbt-checkpoint' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
