@@ -15,7 +15,6 @@ from typing import Set
 from typing import Text
 from typing import Union
 
-
 from yaml import safe_load
 
 DEFAULT_MANIFEST_PATH = "target/manifest.json"
@@ -704,6 +703,10 @@ def add_related_sqls(
     yml_path_parts.pop(0)
     dbt_patch_path = "/".join(yml_path_parts)
 
+    prefix = ""
+    if dbt_patch_path and yml_path.endswith(dbt_patch_path):
+        prefix = yml_path[: -len(dbt_patch_path)]
+
     for key, node in nodes.items():
         if (
             not include_ephemeral
@@ -713,10 +716,8 @@ def add_related_sqls(
 
         if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
             if ".sql" in node.get("original_file_path", "").lower():
-                for related_sql_file in _discover_sql_files(node):
-                    sql_as_string = related_sql_file.as_posix()
-                    if "target/" not in sql_as_string.lower():
-                        paths_with_missing.add(sql_as_string)
+                for related_sql_file in _discover_sql_files(node, prefix):
+                    paths_with_missing.add(related_sql_file.as_posix())
 
 
 def add_related_ymls(
@@ -733,6 +734,12 @@ def add_related_ymls(
             continue
 
         if node.get("path") and (node.get("path") in sql_path):
+            node_path = node.get("path")
+            prefix = ""
+            idx = sql_path.find(node_path)
+            if idx > 0:
+                prefix = sql_path[:idx]
+
             patch_path = node.get("patch_path", None)
             if patch_path:
                 # Original patch_path has 'project\\path\to\yml.yml'
@@ -741,18 +748,18 @@ def add_related_ymls(
                 clean_patch_path = patch_path.relative_to(
                     *patch_path.parts[:1]
                 ).as_posix()
-                for related_yml_file in _discover_prop_files(clean_patch_path):
-                    yml_as_string = related_yml_file.as_posix()
-                    if "target/" not in yml_as_string.lower():
-                        paths_with_missing.add(yml_as_string)
+                for related_yml_file in _discover_prop_files(clean_patch_path, prefix):
+                    paths_with_missing.add(related_yml_file.as_posix())
 
 
-def _discover_sql_files(node):  # type: ignore
-    return Path().glob(f"**/{node.get('original_file_path')}")
+def _discover_sql_files(node, prefix=""):  # type: ignore
+    path = Path(prefix + node.get("original_file_path", ""))
+    return [path] if path.exists() else []
 
 
-def _discover_prop_files(model_path):  # type: ignore
-    return Path().glob(f"**/{model_path}")
+def _discover_prop_files(model_path, prefix=""):  # type: ignore
+    path = Path(prefix + model_path)
+    return [path] if path.exists() else []
 
 
 def get_missing_file_paths(

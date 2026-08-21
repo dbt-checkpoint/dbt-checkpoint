@@ -5,25 +5,25 @@ from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.utils import (
-    CalledProcessError,
-    CompilationException,
-    MacroSchema,
-    Model,
-    ModelSchema,
-    SourceSchema,
-    check_yml_version,
-    cmd_output,
-    extend_dbt_project_dir_flag,
-    get_dbt_catalog,
-    get_dbt_manifest,
-    get_filenames,
-    get_macro_schemas,
-    get_missing_file_paths,
-    get_model_schemas,
-    obj_in_deps,
-    paths_to_dbt_models,
-)
+from dbt_checkpoint.utils import _discover_prop_files
+from dbt_checkpoint.utils import _discover_sql_files
+from dbt_checkpoint.utils import CalledProcessError
+from dbt_checkpoint.utils import check_yml_version
+from dbt_checkpoint.utils import cmd_output
+from dbt_checkpoint.utils import CompilationException
+from dbt_checkpoint.utils import extend_dbt_project_dir_flag
+from dbt_checkpoint.utils import get_dbt_catalog
+from dbt_checkpoint.utils import get_dbt_manifest
+from dbt_checkpoint.utils import get_filenames
+from dbt_checkpoint.utils import get_macro_schemas
+from dbt_checkpoint.utils import get_missing_file_paths
+from dbt_checkpoint.utils import get_model_schemas
+from dbt_checkpoint.utils import MacroSchema
+from dbt_checkpoint.utils import Model
+from dbt_checkpoint.utils import ModelSchema
+from dbt_checkpoint.utils import obj_in_deps
+from dbt_checkpoint.utils import paths_to_dbt_models
+from dbt_checkpoint.utils import SourceSchema
 
 
 def test_cmd_output_error():
@@ -225,6 +225,66 @@ def test_extend_dbt_cmd_flags_with_project_dir():
     result = extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
 
     assert result == expected_result
+
+
+def test_discover_sql_files_direct_path(tmpdir, monkeypatch):
+    """_discover_sql_files finds file by direct path, not recursive glob."""
+    monkeypatch.chdir(tmpdir)
+    sql_dir = Path(str(tmpdir)) / "models" / "staging"
+    sql_dir.mkdir(parents=True)
+    (sql_dir / "orders.sql").write_text("SELECT 1")
+
+    # Decoy in .venv that the old glob would find
+    venv_dir = Path(str(tmpdir)) / ".venv" / "lib" / "models" / "staging"
+    venv_dir.mkdir(parents=True)
+    (venv_dir / "orders.sql").write_text("SELECT 1")
+
+    node = {"original_file_path": "models/staging/orders.sql"}
+    result = list(_discover_sql_files(node))
+    assert len(result) == 1
+    assert result[0] == Path("models/staging/orders.sql")
+
+
+def test_discover_sql_files_missing(tmpdir, monkeypatch):
+    """_discover_sql_files returns empty list for nonexistent file."""
+    monkeypatch.chdir(tmpdir)
+
+    node = {"original_file_path": "models/nonexistent.sql"}
+    result = list(_discover_sql_files(node))
+    assert result == []
+
+
+def test_discover_sql_files_with_prefix(tmpdir, monkeypatch):
+    """_discover_sql_files finds file when dbt project is in a subdirectory."""
+    monkeypatch.chdir(tmpdir)
+    sql_dir = Path(str(tmpdir)) / "dbt_project" / "models"
+    sql_dir.mkdir(parents=True)
+    (sql_dir / "orders.sql").write_text("SELECT 1")
+
+    node = {"original_file_path": "models/orders.sql"}
+    result = list(_discover_sql_files(node, prefix="dbt_project/"))
+    assert len(result) == 1
+    assert result[0] == Path("dbt_project/models/orders.sql")
+
+
+def test_discover_prop_files_direct_path(tmpdir, monkeypatch):
+    """_discover_prop_files finds file by direct path, not recursive glob."""
+    monkeypatch.chdir(tmpdir)
+    yml_dir = Path(str(tmpdir)) / "models" / "staging"
+    yml_dir.mkdir(parents=True)
+    (yml_dir / "_schema.yml").write_text("version: 2")
+
+    result = list(_discover_prop_files("models/staging/_schema.yml"))
+    assert len(result) == 1
+    assert result[0] == Path("models/staging/_schema.yml")
+
+
+def test_discover_prop_files_missing(tmpdir, monkeypatch):
+    """_discover_prop_files returns empty list for nonexistent file."""
+    monkeypatch.chdir(tmpdir)
+
+    result = list(_discover_prop_files("models/nonexistent.yml"))
+    assert result == []
 
 
 def test_extend_dbt_cmd_flags_without_project_dir():
