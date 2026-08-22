@@ -2,6 +2,7 @@ import argparse
 import itertools
 import os
 import time
+from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Set
 
 from dbt_checkpoint.tracking import dbtCheckpointTracking
@@ -25,13 +26,31 @@ def check_argument_desc(
 ) -> Dict[str, Any]:
     status_code = 0
     ymls = get_filenames(paths, [".yml", ".yaml"])
+    sql_inputs = get_filenames(paths, [".sql"])
     sqls = get_macro_sqls(paths, manifest)
     filenames = set(sqls.keys())
+    yaml_only = not sql_inputs and bool(ymls)
+
+    # When only YAML files are passed (no SQL inputs at all), build sqls
+    # lookup from the manifest so macro names can be resolved to file paths
+    if yaml_only:
+        all_macro_sqls = {
+            key.split(".")[-1]: Path(macro["path"])
+            for key, macro in manifest.get("macros", {}).items()
+            if key.startswith("macro.") and macro.get("path")
+        }
+        sqls = all_macro_sqls
+        filenames = set(sqls.keys())
 
     # get manifest macros that pre-commit found as changed
-    macros = get_macros(manifest, filenames)
+    # skip manifest macro lookup in yaml-only mode — only validate what's in the YAML
+    macros = get_macros(manifest, filenames) if not yaml_only else iter([])
     # if user added schema but did not rerun the macro
-    schemas = get_macro_schemas(list(ymls.values()), filenames)
+    # use all_schemas=True when YAML-only so macros in the YAML are validated
+    # even if they don't appear in filenames (e.g., new macro not yet compiled)
+    schemas = get_macro_schemas(
+        list(ymls.values()), filenames, all_schemas=yaml_only
+    )
     missing: Dict[str, Set[str]] = {}
 
     for item in itertools.chain(macros, schemas):
