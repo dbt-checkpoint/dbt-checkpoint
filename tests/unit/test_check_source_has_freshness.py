@@ -203,6 +203,155 @@ sources:
         True,
         0,
     ),
+    # freshness: null at source level, table defines valid freshness — should pass
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness: null
+    tables:
+    -   name: with_description
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+            error_after:
+                count: 24
+                period: hour
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null at table level, source defines valid freshness — should pass
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness:
+        warn_after:
+            count: 12
+            period: hour
+        error_after:
+            count: 24
+            period: hour
+    tables:
+    -   name: with_description
+        freshness: null
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null at source level, table has no freshness key — source opts out all tables
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness: null
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null at both levels — explicit opt-out, should pass
+    (
+        """
+sources:
+-   name: test
+    loaded_at_field: aa
+    freshness: null
+    tables:
+    -   name: with_description
+        freshness: null
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null inside config: at source level, table config has valid freshness — should pass
+    (
+        """
+sources:
+-   name: test
+    config:
+        loaded_at_field: aa
+        freshness: null
+    tables:
+    -   name: with_description
+        config:
+            freshness:
+                warn_after:
+                    count: 12
+                    period: hour
+                error_after:
+                    count: 24
+                    period: hour
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null inside config: at table level, source config has valid freshness — should pass
+    (
+        """
+sources:
+-   name: test
+    config:
+        loaded_at_field: aa
+        freshness:
+            warn_after:
+                count: 12
+                period: hour
+            error_after:
+                count: 24
+                period: hour
+    tables:
+    -   name: with_description
+        config:
+            freshness: null
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null inside config: at source level, table has no freshness — source opts out
+    (
+        """
+sources:
+-   name: test
+    config:
+        loaded_at_field: aa
+        freshness: null
+    tables:
+    -   name: with_description
+    """,
+        True,
+        True,
+        0,
+    ),
+    # freshness: null inside config: at both levels — explicit opt-out, should pass
+    (
+        """
+sources:
+-   name: test
+    config:
+        loaded_at_field: aa
+        freshness: null
+    tables:
+    -   name: with_description
+        config:
+            freshness: null
+    """,
+        True,
+        True,
+        0,
+    ),
 )
 
 
