@@ -374,6 +374,26 @@ MANIFEST = {
             "path": "aa/bb/with_no_contract.sql",
             "root_path": "/path/to/aa",
         },
+        "model.with_group": {
+            "patch_path": "project://bb/with_group.yml",
+            "path": "aa/bb/with_group.sql",
+            "root_path": "/path/to/aa",
+            "config": {"group": "analytics", "materialized": "view"},
+            "group": "analytics",
+        },
+        "model.with_no_group": {
+            "patch_path": "project://bb/with_no_group.yml",
+            "path": "aa/bb/with_no_group.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "view"},
+        },
+        "model.with_invalid_group": {
+            "patch_path": "project://bb/with_invalid_group.yml",
+            "path": "aa/bb/with_invalid_group.sql",
+            "root_path": "/path/to/aa",
+            "config": {"group": "unknown_team", "materialized": "view"},
+            "group": "unknown_team",
+        },
         "model.with_no_constraints": {
             "patch_path": "project://bb/with_no_constraints.yml",
             "path": "aa/bb/with_no_constraints.sql",

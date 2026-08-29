@@ -49,6 +49,12 @@
   entry: check-model-has-contract
   language: python
   types_or: [yaml]
+- id: check-model-has-group
+  name: Check model has group
+  description: Ensures that the model has a group defined.
+  entry: check-model-has-group
+  language: python
+  types_or: [yaml, sql]
 - id: check-model-has-constraints
   name: Check model has specific constraints
   description: Check model has constraints for specific columns
