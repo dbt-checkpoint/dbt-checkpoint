@@ -17,6 +17,7 @@ from dbt_checkpoint.utils import (
     extend_dbt_project_dir_flag,
     get_dbt_catalog,
     get_dbt_manifest,
+    get_disabled,
     get_filenames,
     get_macro_schemas,
     get_missing_file_paths,
@@ -248,6 +249,42 @@ def test_get_dbt_manifest_with_config_project_dir():
             expected_result = {"key": "value"}
             result = get_dbt_manifest(Args())
             assert result == expected_result
+
+
+def test_get_disabled_non_versioned():
+    manifest = {
+        "disabled": {
+            "model.pkg.my_model": [
+                {"name": "my_model", "resource_type": "model"}
+            ]
+        }
+    }
+    assert get_disabled(manifest) == ["my_model"]
+
+
+def test_get_disabled_non_versioned_include_disabled():
+    manifest = {
+        "disabled": {
+            "model.pkg.my_model": [
+                {"name": "my_model", "resource_type": "model"}
+            ]
+        }
+    }
+    assert get_disabled(manifest, include_disabled=True) == []
+
+
+def test_get_disabled_versioned_model():
+    # A versioned+disabled model's manifest key ends in "v{version}"
+    # (e.g. "model.pkg.my_model.v2"), not the real filename -- the disabled
+    # model's filename on disk can be either "my_model" or "my_model_v2".
+    manifest = {
+        "disabled": {
+            "model.pkg.my_model.v2": [
+                {"name": "my_model", "resource_type": "model", "version": 2}
+            ]
+        }
+    }
+    assert set(get_disabled(manifest)) == {"my_model", "my_model_v2"}
 
 
 def test_get_dbt_catalog_with_config_project_dir():

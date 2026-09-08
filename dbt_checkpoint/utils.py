@@ -296,13 +296,25 @@ def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, 
 def get_disabled(manifest: Dict[str, Any], include_disabled: bool = False) -> List[str]:
     output = []
     disabled = manifest.get("disabled", {})
-    for key, node in disabled.items():
+    for key, nodes in disabled.items():
         split_key = key.split(".")
-        filename = split_key[-1]
-        if split_key[0] == "model":
-            if include_disabled:
-                continue
-            output.append(filename)
+        if split_key[0] != "model":
+            continue
+        if include_disabled:
+            continue
+        # manifest["disabled"] maps a unique_id to a *list* of node dicts (a
+        # resource can be disabled/re-defined more than once, e.g. per version).
+        node_list = nodes if isinstance(nodes, list) else [nodes]
+        for node in node_list:
+            version = node.get("version") if isinstance(node, dict) else None
+            if version and split_key[-1] == f"v{version}":
+                # dbt versioned filenames can be either `model_name` or
+                # `model_name_v{version}` -- mirrors get_models() above, which
+                # already builds both candidates for enabled versioned models.
+                output.append(f"{split_key[-2]}")
+                output.append(f"{split_key[-2]}_v{version}")
+            else:
+                output.append(split_key[-1])
 
     return output
 
