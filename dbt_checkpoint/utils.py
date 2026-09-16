@@ -260,9 +260,20 @@ def get_macros(
     macros = manifest.get("macros", {})
     for key, macro in macros.items():
         split_key = key.split(".")
+        if split_key[0] != "macro":
+            continue
         filename = split_key[-1]
-        if filename in filenames and split_key[0] == "macro":
+        if filename in filenames:
             yield Macro(key, macro.get("name"), filename, macro)  # pragma: no mutate
+        else:
+            # Materializations register as macros with generated names
+            # (e.g. materialization_tag_snowflake) that don't match the file
+            # stem. Fall back to matching on the macro's path.
+            macro_path = macro.get("path", "")
+            if macro_path:
+                path_stem = Path(macro_path).stem
+                if path_stem in filenames:
+                    yield Macro(key, macro.get("name"), path_stem, macro)
 
 
 def get_seeds(
