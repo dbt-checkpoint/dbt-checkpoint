@@ -505,6 +505,18 @@ MANIFEST = {
             "description": "test description",
             "path": "macros/aa/with_description.sql",
         },
+        "macro.project.materialization_snowpipe_snowflake": {
+            "name": "materialization_snowpipe_snowflake",
+            "description": "Custom Snowpipe materialization for Snowflake.",
+            "path": "macros/materializations/snowpipe.sql",
+            "arguments": [],
+        },
+        "macro.project.materialization_snowpipe_default": {
+            "name": "materialization_snowpipe_default",
+            "description": "",
+            "path": "macros/materializations/snowpipe.sql",
+            "arguments": [],
+        },
         "macro.with_argument_description": {
             "path": "macros/aa/with_argument_description.sql",
             "arguments": [
