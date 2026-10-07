@@ -5,6 +5,7 @@ from dbt_checkpoint.check_script_has_no_table_name import main
 from dbt_checkpoint.check_script_has_no_table_name import prev_cur_next_iter
 from dbt_checkpoint.check_script_has_no_table_name import replace_comments
 from dbt_checkpoint.check_script_has_no_table_name import replace_string_literals
+from dbt_checkpoint.check_script_has_no_table_name import split_sql
 
 # Input, args, expected return value, expected output
 TESTS = (  # type: ignore
@@ -380,6 +381,58 @@ select * from unioned
         True,
         0,
         {},
+    ),
+    # Double-quoted string literals containing FROM / JOIN must not be
+    # tokenized into phantom table names (issue #379).
+    (
+        """
+    select
+        case
+            when status = 'active' then "Upgraded From Plan A"
+            else "Select Option From List"
+        end as label
+    from {{ ref('my_model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    (
+        """
+    {% set label = "Joined From Elsewhere" %}
+    SELECT "Join Date" AS join_date, "Escaped "" From Here" AS note
+    FROM {{ ref('model') }}
+    """,
+        [],
+        True,
+        True,
+        0,
+        {},
+    ),
+    # Double-quoted identifiers used as tables are still reported, and a
+    # quoted identifier containing whitespace is reported as a whole.
+    (
+        """
+    SELECT * FROM "raw_table"
+    """,
+        [],
+        True,
+        True,
+        1,
+        {'"raw_table"'},
+    ),
+    (
+        """
+    SELECT * FROM "my schema"."my table"
+    LEFT JOIN "Other Table" o ON o.id = t.id
+    """,
+        [],
+        True,
+        True,
+        1,
+        {'"my schema"."my table"', '"other table"'},
     ),
     (
         """
@@ -785,6 +838,47 @@ def test_replace_string_literals():
     # Empty string
     sql = "''"
     assert replace_string_literals(sql) == "''"
+
+
+def test_split_sql():
+    # Plain whitespace splitting, no leading/trailing empty tokens
+    assert split_sql("  SELECT *\n FROM aa ") == ["SELECT", "*", "FROM", "aa"]
+
+    # Double-quoted segments stay together even when they contain whitespace
+    sql = 'then "Upgraded From Plan A" else "Select Option From List"'
+    assert split_sql(sql) == [
+        "then",
+        '"Upgraded From Plan A"',
+        "else",
+        '"Select Option From List"',
+    ]
+
+    # Qualified quoted identifiers and escaped quotes are a single token
+    assert split_sql('FROM "my schema"."my table"') == [
+        "FROM",
+        '"my schema"."my table"',
+    ]
+    assert split_sql('"Escaped "" From Here" AS note') == [
+        '"Escaped "" From Here"',
+        "AS",
+        "note",
+    ]
+
+    # Quotes attached to other characters behave like any other token
+    assert split_sql('source("raw", "customers")') == [
+        'source("raw",',
+        '"customers")',
+    ]
+
+    # Nothing to tokenize
+    assert split_sql("") == []
+    assert split_sql("   \n\t ") == []
+
+
+def test_has_table_name_without_tokens():
+    assert has_table_name("", "test.sql") == (0, set())
+    assert has_table_name("-- only a comment\n", "test.sql") == (0, set())
+    assert has_table_name("{# only a jinja comment #}", "test.sql") == (0, set())
 
 
 def test_context_aware_parsing():
