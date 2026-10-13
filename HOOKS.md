@@ -931,8 +931,8 @@ Ensures the model has a specific number (max/min) of parents or/and children.
 #### Arguments
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--min-parent-cnt`: Minimal number of parent sources and models.
-`--max-parent-cnt`: Maximal number of parent sources and models.
+`--min-parent-cnt`: Minimal number of parent models, sources, seeds and snapshots.
+`--max-parent-cnt`: Maximal number of parent models, sources, seeds and snapshots.
 `--min-child-cnt`: Minimal number of child models.
 `--max-child-cnt`: Maximal number of child models.
 
@@ -966,7 +966,7 @@ You want to find orphaned models (empty file, hard-coded reference, etc.). Or yo
 
 - Hook takes all changed `SQL` files.
 - The model name is obtained from the `SQL` file name.
-- The manifest is scanned for a parent and child models.
+- The manifest is scanned for parents (models, sources, seeds and snapshots) and child models.
 - If any model does not have a number of required parents/children, the hook fails.
 
 ---
