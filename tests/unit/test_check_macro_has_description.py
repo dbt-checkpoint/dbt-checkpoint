@@ -52,3 +52,17 @@ macros:
         ],
     )
     assert result == 0
+
+
+def test_check_macro_description_non_mapping_yml(tmpdir, manifest_path_str):
+    yml_file = tmpdir.join("playbook.yml")
+    yml_file.write("- name: build\n  hosts: all\n")
+    result = main(
+        argv=[
+            "macros/aa/with_description.sql",
+            str(yml_file),
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 0
