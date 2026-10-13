@@ -132,8 +132,11 @@ def paths_to_dbt_models(
 
 
 def checkpoint_safe_load(stream):
-    # FIXME: temporary fix for YAML incompatibility of safe_load with empty files
-    return safe_load(stream) or {}
+    # dbt property files (and the dbt-checkpoint config file) are mappings. A yml
+    # file that is empty, or whose top level is a list or a scalar, like an Ansible
+    # playbook or `.pre-commit-hooks.yaml`, has nothing to check, so it's read as {}
+    content = safe_load(stream)
+    return content if isinstance(content, dict) else {}
 
 
 def get_json(json_filename: str) -> Dict[str, Any]:
