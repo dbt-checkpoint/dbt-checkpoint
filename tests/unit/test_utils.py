@@ -178,6 +178,30 @@ TESTS = (
         "",
         ["aa/bb/with_description.yml", "bb/with_description.sql"],
     ),
+    # dbt project nested two directories below the repository root
+    (
+        ["xx/aa/bb/with_description.yml"],
+        "xx/aa/bb/with_description.sql",
+        True,
+        "",
+        ["xx/aa/bb/with_description.yml", "xx/aa/bb/with_description.sql"],
+    ),
+    # dbt project at the repository root
+    (
+        ["bb/with_description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["bb/with_description.yml", "bb/with_description.sql"],
+    ),
+    # a yml file whose name is only the end of another one's isn't related to it
+    (
+        ["aa/description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["aa/description.yml"],
+    ),
 )
 
 
