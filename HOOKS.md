@@ -204,10 +204,10 @@ Check that column name abides to a contract, as described in [this blog post](ht
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-column-name-contract
-        args: [--pattern, "(is|has|do)_.*", --dtypes, boolean text timestamp, "--"]
+        args: [--pattern, "(is|has|do)_.*", --dtypes, boolean, text, timestamp, "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -297,11 +297,11 @@ By default, it does not allow the columns to have any other meta keys other than
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-columns-have-meta-keys
-   args: ['--meta-keys', 'foo', 'bar', "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-model-columns-have-meta-keys
+        args: ['--meta-keys', 'foo', 'bar', "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -399,7 +399,7 @@ Checks that model's yaml has:
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-has-contract
 ```
@@ -439,8 +439,8 @@ Checks that model's yaml has specific constraints defined, e.g.:
 
 ```yaml
 repos:
-  - repo: https://github.com/xasm83/dbt-checkpoint
-    rev: v1.0.0
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
     hooks:
       - id: check-model-has-contract
       - id: check-model-has-constraints
@@ -475,19 +475,19 @@ Checks that model's yaml has generic constraints defined, eg:
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
-`--constraints`: JSON string escaped by single quotes
+`--constraints`: List of required constraint types (e.g. `primary_key unique`).<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
 
 ```
 repos:
-- repo: https://github.com/xasm83/dbt-checkpoint
-  rev: v1.0.0
-  hooks:
-  - id: check-model-has-contract
-  - id: check-model-has-constraints
-    args: ["--constraints", "primary_key", "unique", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-model-has-contract
+      - id: check-model-has-generic-constraints
+        args: ["--constraints", "primary_key", "unique", "--"]
 ```
 
 #### When to use it
@@ -617,7 +617,7 @@ By default, it does not allow the model to have any other labels keys other than
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-has-labels-keys
         args: ["--labels-keys", "foo", "bar", "--"]
@@ -795,7 +795,7 @@ Ensures that the model has a number of tests from a group of tests.
 
 `--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
 `--tests`: List of test names.<br/>
-`--test_cnt`: Number of tests required across test group.<br/>
+`--test-cnt`: Number of tests required across test group.<br/>
 `--exclude`: Regex pattern to exclude files.
 
 #### Example
@@ -892,7 +892,7 @@ Check that model name abides to a contract (similar to [`check-column-name-contr
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-name-contract
         args: [--pattern, "(base_|stg_).*"]
@@ -919,7 +919,7 @@ You want to make sure your model names follow a naming convention (e.g., staging
 
 - Hook takes all changed `SQL` files.
 - The model name is obtained from the `SQL` file name.
-- The catalog is scanned for a model.
+- The manifest is scanned for a model.
 - If any model does not match the regex pattern, the hook fails.
 
 ---
@@ -987,7 +987,7 @@ Ensures the parent models or sources are from certain database.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-parents-database
         args: ["--blacklist", "SRC", "--"]
@@ -1033,7 +1033,7 @@ Ensures the parent model names have a certain prefix.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-parents-name-prefix
         exclude: ^models/stage/
@@ -1079,7 +1079,7 @@ Ensures the parent models or sources are from certain schema.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-parents-schema
         args: ["--blacklist", "stage", "--"]
@@ -1137,22 +1137,22 @@ repos:
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-tags
-   args: ["--tags", "foo", "bar", "--has-any-tags", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-model-tags
+        args: ["--tags", "foo", "bar", "--has-any-tags", "--"]
 ```
 
 #### Example (has all required tags)
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-model-tags
-   args: ["--tags", "foo", "bar", "--has-all-tags", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-model-tags
+        args: ["--tags", "foo", "bar", "--has-all-tags", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -1193,7 +1193,7 @@ Checks the model materialization based on a given threshold of child models. All
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-materialization-by-childs
 ```
@@ -1259,13 +1259,6 @@ repos:
 #### When to use it
 
 Make sure you did not provide a semicolon at the end of the file.
-
-#### How it works
-
-- Hook takes all changed `SQL` files.
-- It parses `SQL` and finds all sources and refs. If those objects do not exist in `manifest.json`, the hook fails.
-
----
 
 #### Requirements
 
@@ -1409,10 +1402,10 @@ Ensures that the source has a description in the properties file (usually `schem
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-source-has-description
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-source-has-description
 ```
 
 #### When to use it
@@ -1599,7 +1592,7 @@ Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-source-has-labels-keys
         args: ['--labels-keys', 'foo', 'bar', "--"]
@@ -1761,14 +1754,14 @@ Ensures that the source has a number of tests from a group of tests.
 #### Arguments
 
 `--tests`: List of test names.<br/>
-`--test_cnt`: Number of tests required across test group.
+`--test-cnt`: Number of tests required across test group.
 
 #### Example
 
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-source-has-tests-by-group
         args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
@@ -1791,9 +1784,10 @@ You want to make sure that every source has one (or more) of a group of eligible
 
 #### How it works
 
-- Hook takes all changed `SQL` files.
-- The source name is obtained from the `SQL` file name.
-- If any source does not have the number of required tests, the hook fails.
+- Hook takes all changed `yml` and `yaml` files.
+- Sources and tables are read from the properties files.
+- The manifest is scanned for tests attached to each source table.
+- If any source table does not have the number of required tests, the hook fails.
 
 ---
 
@@ -1854,7 +1848,7 @@ Ensures the source has a specific number (max/min) of children.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-source-childs
         args: ["--min-child-cnt", "2", "--"]
@@ -1943,10 +1937,10 @@ Ensures that the macro has arguments with descriptions in the properties file (u
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v0.1.1
- hooks:
- - id: check-macro-arguments-have-desc
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-macro-arguments-have-desc
 ```
 
 #### When to use it
@@ -2321,7 +2315,7 @@ Run the` dbt parse` command. When running dbt >= 1.5, generates `manifest.json` 
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: dbt-parse
 ```
@@ -2331,7 +2325,7 @@ or
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: dbt-parse
         args: ["--cmd-flags", "++profiles-dir", ".", "++project-dir", ".", "--"]
@@ -2635,11 +2629,11 @@ Ensures that the test has only valid tags from the provided list.
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.0.0
- hooks:
- - id: check-test-tags
-   args: ["--tags", "foo", "bar", "--"]
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-test-tags
+        args: ["--tags", "foo", "bar", "--"]
 ```
 
 :warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
@@ -2686,10 +2680,10 @@ Compare manifest and catalog to ensure DB and Schemas have the same casing.
 
 ```
 repos:
-- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
- rev: v1.2.1
- hooks:
- - id: check-database-casing-consistency
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.10
+    hooks:
+      - id: check-database-casing-consistency
 ```
 
 #### When to use it
