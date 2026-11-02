@@ -555,7 +555,7 @@ By default, it does not allow the model to have any other meta keys other than t
 
 #### Arguments
 
-`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file is required by the hook (the file should be present in the repository), however it is not required that the manifest file contains the model in it. **Default: `target/manifest.json`**<br/>
 `--meta-keys`: List of the required keys in the meta part of the model.<br/>
 `--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
@@ -570,7 +570,7 @@ repos:
         args: ["--meta-keys", "foo", "bar", "--"]
 ```
 
-:warning: do not forget to include `--` as the last argument. Otherwise `pre-commit` would not be able to separate a list of files with args.
+:warning: include `--` as the last argument of the hook's `args` list. Otherwise `pre-commit` would not be able to separate a list of files with args.
 
 #### When to use it
 
@@ -578,9 +578,10 @@ If every model needs to have certain meta keys.
 
 #### Requirements
 
-| Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
-| :---------------------------------------------------------: | :--------------------------------------------------------: |
-|   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
+Yes. The hook loads this file before checking metadata.    
+| An existing `manifest.json` file at the configured path     | Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
+| :---------------------------------------------------------: | :---------------------------------------------------------: | :--------------------------------------------------------: |
+| Yes. The hook loads this file before checking metadata.    |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
 
 <sup id="f1">1</sup> It means that you need to run `dbt parse` before run this hook (dbt >= 1.5).<br/>
 <sup id="f2">2</sup> It means that you need to run `dbt docs generate` before run this hook.
