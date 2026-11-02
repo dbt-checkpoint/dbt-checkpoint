@@ -555,7 +555,7 @@ By default, it does not allow the model to have any other meta keys other than t
 
 #### Arguments
 
-`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file is required by the hook (the file should be present in the repository), however it is not required that the manifest file contains the model in it. **Default: `target/manifest.json`**<br/>
+`--manifest`: Location of `manifest.json` file. Usually `target/manifest.json`. This file is required by the hook (the file must exist at the required path). The model being checked does not need to be present in it when its SQL and YAML files are supplied by the hook. **Default: `target/manifest.json`**<br/>
 `--meta-keys`: List of the required keys in the meta part of the model.<br/>
 `--allow-extra-keys`: Whether extra keys are allowed. **Default: `False`**.
 
@@ -577,8 +577,7 @@ repos:
 If every model needs to have certain meta keys.
 
 #### Requirements
-
-Yes. The hook loads this file before checking metadata.    
+   
 | An existing `manifest.json` file at the configured path     | Model exists in `manifest.json` <sup id="a1">[1](#f1)</sup> | Model exists in `catalog.json` <sup id="a2">[2](#f2)</sup> |
 | :---------------------------------------------------------: | :---------------------------------------------------------: | :--------------------------------------------------------: |
 | Yes. The hook loads this file before checking metadata.    |   :x: Not needed since it also validates properties files   |                       :x: Not needed                       |
