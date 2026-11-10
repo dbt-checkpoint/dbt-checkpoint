@@ -360,6 +360,42 @@ def test_discover_prop_files_missing(tmpdir, monkeypatch):
     assert result == []
 
 
+@pytest.mark.parametrize("project_dir", ["", "analytics/dbt/"])
+@pytest.mark.parametrize("changed", ["orders.sql", "_schema.yml"])
+def test_get_missing_file_paths_finds_related_files(
+    project_dir, changed, tmpdir, monkeypatch
+):
+    """A changed SQL file pulls in its properties file and vice versa, with
+    real manifest paths (`path` is relative to model-paths, while
+    `original_file_path` and `patch_path` are relative to the dbt project)."""
+    monkeypatch.chdir(tmpdir)
+    model_dir = Path(project_dir + "models/staging")
+    model_dir.mkdir(parents=True)
+    (model_dir / "orders.sql").write_text("select 1")
+    (model_dir / "_schema.yml").write_text("version: 2")
+    # a model with a similar path that must not be picked up
+    (model_dir / "old_orders.sql").write_text("select 1")
+    manifest = {
+        "nodes": {
+            "model.proj.orders": {
+                "path": "staging/orders.sql",
+                "original_file_path": "models/staging/orders.sql",
+                "patch_path": "proj://models/staging/_schema.yml",
+            },
+            "model.proj.old_orders": {
+                "path": "staging/old_orders.sql",
+                "original_file_path": "models/staging/old_orders.sql",
+                "patch_path": "proj://models/staging/_old_schema.yml",
+            },
+        }
+    }
+    result = get_missing_file_paths([f"{model_dir}/{changed}"], manifest)
+    assert set(result) == {
+        f"{project_dir}models/staging/orders.sql",
+        f"{project_dir}models/staging/_schema.yml",
+    }
+
+
 def test_extend_dbt_cmd_flags_without_project_dir():
     cmd = ["dbt", "run"]
     cmd_flags = ["--target", "dev"]
