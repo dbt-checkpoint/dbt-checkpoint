@@ -13,6 +13,7 @@ from typing import Optional
 from typing import Sequence
 from typing import Set
 from typing import Text
+from typing import Tuple
 from typing import Union
 
 
@@ -286,11 +287,25 @@ def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
         return []
 
 
+def _ends_with_parts(path: Path, parts: Tuple[str, ...]) -> bool:
+    start = len(path.parts) - len(parts)
+    return start >= 0 and path.parts[start:] == parts
+
+
 def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Path]:
     sqls = get_filenames(paths, [".sql"])
-    macro_paths = [m["path"] for m in manifest.get("macros", {}).values()]
-    macro_sqls = get_filenames(macro_paths, extensions=[".sql"])
-    return {k: v for k, v in sqls.items() if k in macro_sqls and v == macro_sqls[k]}
+    # Macro paths in the manifest are relative to the dbt project directory,
+    # which is not necessarily the root of the repository. Several macros
+    # (e.g. from packages) can share the same file name.
+    macro_paths: Dict[str, List[Tuple[str, ...]]] = {}
+    for macro in manifest.get("macros", {}).values():
+        macro_path = Path(macro["path"])
+        macro_paths.setdefault(macro_path.stem, []).append(macro_path.parts)
+    return {
+        k: v
+        for k, v in sqls.items()
+        if any(_ends_with_parts(v, parts) for parts in macro_paths.get(k, []))
+    }
 
 
 def get_disabled(manifest: Dict[str, Any], include_disabled: bool = False) -> List[str]:

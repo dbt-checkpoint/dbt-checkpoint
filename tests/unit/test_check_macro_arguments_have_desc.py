@@ -9,6 +9,19 @@ TESTS = (
     (["macros/aa/without_arguments_description.sql", "--is_test"], True, True, 1),
     (["macros/aa/with_some_argument_description.sql", "--is_test"], True, True, 1),
     (["macros/aa/with_argument_description.sql", "--is_test"], True, False, 0),
+    # dbt project in a subdirectory of the repository
+    (
+        ["project/macros/aa/with_argument_description.sql", "--is_test"],
+        True,
+        True,
+        0,
+    ),
+    (
+        ["project/macros/aa/without_arguments_description.sql", "--is_test"],
+        True,
+        True,
+        1,
+    ),
 )
 
 
