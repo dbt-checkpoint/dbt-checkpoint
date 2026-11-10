@@ -13,6 +13,7 @@ from typing import Optional
 from typing import Sequence
 from typing import Set
 from typing import Text
+from typing import Tuple
 from typing import Union
 
 
@@ -132,8 +133,11 @@ def paths_to_dbt_models(
 
 
 def checkpoint_safe_load(stream):
-    # FIXME: temporary fix for YAML incompatibility of safe_load with empty files
-    return safe_load(stream) or {}
+    # dbt property files (and the dbt-checkpoint config file) are mappings. A yml
+    # file that is empty, or whose top level is a list or a scalar, like an Ansible
+    # playbook or `.pre-commit-hooks.yaml`, has nothing to check, so it's read as {}
+    content = safe_load(stream)
+    return content if isinstance(content, dict) else {}
 
 
 def get_json(json_filename: str) -> Dict[str, Any]:
@@ -286,11 +290,25 @@ def get_flags(flags: Optional[Sequence[str]] = None) -> List[str]:
         return []
 
 
+def _ends_with_parts(path: Path, parts: Tuple[str, ...]) -> bool:
+    start = len(path.parts) - len(parts)
+    return start >= 0 and path.parts[start:] == parts
+
+
 def get_macro_sqls(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Path]:
     sqls = get_filenames(paths, [".sql"])
-    macro_paths = [m["path"] for m in manifest.get("macros", {}).values()]
-    macro_sqls = get_filenames(macro_paths, extensions=[".sql"])
-    return {k: v for k, v in sqls.items() if k in macro_sqls and v == macro_sqls[k]}
+    # Macro paths in the manifest are relative to the dbt project directory,
+    # which is not necessarily the root of the repository. Several macros
+    # (e.g. from packages) can share the same file name.
+    macro_paths: Dict[str, List[Tuple[str, ...]]] = {}
+    for macro in manifest.get("macros", {}).values():
+        macro_path = Path(macro["path"])
+        macro_paths.setdefault(macro_path.stem, []).append(macro_path.parts)
+    return {
+        k: v
+        for k, v in sqls.items()
+        if any(_ends_with_parts(v, parts) for parts in macro_paths.get(k, []))
+    }
 
 
 def get_disabled(manifest: Dict[str, Any], include_disabled: bool = False) -> List[str]:
@@ -428,7 +446,7 @@ def get_parent_childs(
                 if node_type in node_types:
                     if node_type == "test":
                         yield get_test(node_id, manifest)
-                    elif node_type == "model":
+                    elif node_type in ("model", "seed", "snapshot"):
                         node = manifest.get("nodes", {}).get(node_id)
                         yield Model(
                             model_id=node_id,
@@ -698,11 +716,10 @@ def add_related_sqls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
-    yml_path_class = Path(yml_path)
-    yml_path_parts = list(yml_path_class.parts)
-    # Remove the first 'project' component
-    yml_path_parts.pop(0)
-    dbt_patch_path = "/".join(yml_path_parts)
+    # pre-commit passes paths relative to the repository root, while `patch_path`
+    # is relative to the dbt project root (e.g. `project_name://models/schema.yml`),
+    # which can be any number of directories below the repository root
+    yml_posix_path = yml_path.replace("\\", "/")
 
     for key, node in nodes.items():
         if (
@@ -711,7 +728,11 @@ def add_related_sqls(
         ):
             continue
 
-        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+        patch_path = node.get("patch_path")
+        if not patch_path:
+            continue
+        patch_file = patch_path.split("://", 1)[-1].replace("\\", "/")
+        if yml_posix_path == patch_file or yml_posix_path.endswith(f"/{patch_file}"):
             if ".sql" in node.get("original_file_path", "").lower():
                 for related_sql_file in _discover_sql_files(node):
                     sql_as_string = related_sql_file.as_posix()

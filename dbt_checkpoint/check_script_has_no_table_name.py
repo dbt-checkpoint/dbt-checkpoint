@@ -15,7 +15,11 @@ from dbt_checkpoint.utils import (
 )
 
 REGEX_COMMENTS = r"(?<=(\/\*|\{#))((.|[\r\n])+?)(?=(\*+\/|#\}))|[ \t]*--.*"
-REGEX_SPLIT = r"[\s]+"
+# A token is a run of non-whitespace characters, where a double-quoted
+# segment ("...", with "" as an escaped quote) is kept together even if
+# it contains whitespace. This stops words inside double-quoted string
+# literals / identifiers from being tokenized as SQL keywords.
+REGEX_TOKEN = r'(?:"(?:[^"]|"")*"|\S)+'
 IGNORE_WORDS = ["", "(", "{{", "{", "null", "''"]  # pragma: no mutate
 REGEX_PARENTHESIS = r"([\(\)])"  # pragma: no mutate
 REGEX_BRACES = r"([\{\}])"  # pragma: no mutate
@@ -82,6 +86,18 @@ def replace_string_literals(sql: str) -> str:
     return re.sub(REGEX_STRING_LITERALS, "''", sql)
 
 
+def split_sql(sql: str) -> List[str]:
+    """Split SQL into whitespace-separated tokens.
+
+    Double-quoted segments are treated as a single token so that a literal
+    such as ``"Upgraded From Plan A"`` is not split into ``from`` / ``plan``.
+    Unlike single-quoted literals they are not replaced, because in many
+    dialects ``"..."`` is a quoted identifier (e.g. ``FROM "my table"``) that
+    still has to be reported as a hardcoded table name.
+    """
+    return re.findall(REGEX_TOKEN, sql)
+
+
 def has_table_name(
     sql: str,
     filename: str,
@@ -94,9 +110,12 @@ def has_table_name(
     sql_clean = add_space_to_parenthesis(sql_clean)
     sql_clean = add_space_to_braces(sql_clean)
     sql_clean = add_space_to_source_ref(sql_clean)
-    sql_split = re.split(REGEX_SPLIT, sql_clean)
-    tables = set()
+    sql_split = split_sql(sql_clean)
+    tables: Set[str] = set()
     cte = set()
+
+    if not sql_split:
+        return status_code, tables
 
     # Keep track of function context
     inside_function = False

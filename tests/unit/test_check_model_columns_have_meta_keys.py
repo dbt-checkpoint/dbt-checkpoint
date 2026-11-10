@@ -252,6 +252,108 @@ models:
 
 
 @pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_model_columns_meta_keys_in_schema_under_config(
+    extension, tmpdir, manifest_path_str
+):
+    """Column meta declared under config.meta (the dbt >=1.10 convention,
+    since top-level meta on a column is deprecated) must be recognized the
+    same as the legacy top-level meta key."""
+    schema_yml = """
+version: 2
+
+models:
+-   name: in_schema_column_config_meta
+    columns:
+    -   name: test
+        config:
+            meta:
+                foo: foo
+                bar: bar
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_column_config_meta.sql",
+            str(yml_file),
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 0
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_model_columns_meta_keys_split_across_top_level_and_config(
+    extension, tmpdir, manifest_path_str
+):
+    """A column may have some meta keys at the top level and others under
+    config.meta (e.g. mid-migration); both locations are merged."""
+    schema_yml = """
+version: 2
+
+models:
+-   name: in_schema_column_mixed_meta
+    columns:
+    -   name: test
+        meta:
+            foo: foo
+        config:
+            meta:
+                bar: bar
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_column_mixed_meta.sql",
+            str(yml_file),
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 0
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_model_columns_meta_keys_missing_under_config(
+    extension, tmpdir, manifest_path_str
+):
+    """A column with an unrelated key under config (but no config.meta, and
+    no top-level meta) still correctly reports as missing."""
+    schema_yml = """
+version: 2
+
+models:
+-   name: in_schema_column_config_no_meta
+    columns:
+    -   name: test
+        config:
+            tags: ["some_tag"]
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            "in_schema_column_config_no_meta.sql",
+            str(yml_file),
+            "--meta-keys",
+            "foo",
+            "bar",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 1
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
 def test_check_model_columns_meta_keys_and_extra_keys_in_schema(
     extension, tmpdir, manifest_path_str
 ):

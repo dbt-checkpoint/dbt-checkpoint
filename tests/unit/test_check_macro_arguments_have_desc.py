@@ -9,6 +9,19 @@ TESTS = (
     (["macros/aa/without_arguments_description.sql", "--is_test"], True, True, 1),
     (["macros/aa/with_some_argument_description.sql", "--is_test"], True, True, 1),
     (["macros/aa/with_argument_description.sql", "--is_test"], True, False, 0),
+    # dbt project in a subdirectory of the repository
+    (
+        ["project/macros/aa/with_argument_description.sql", "--is_test"],
+        True,
+        True,
+        0,
+    ),
+    (
+        ["project/macros/aa/without_arguments_description.sql", "--is_test"],
+        True,
+        True,
+        1,
+    ),
 )
 
 
@@ -127,6 +140,63 @@ macros:
     result = main(
         argv=[
             "macros/aa/without_arguments_description.sql",
+            str(yml_file),
+            "--manifest",
+            manifest_path_str,
+            "--is_test",
+        ],
+    )
+    assert result == 0
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_macro_arguments_have_desc_yml_only_missing(
+    extension, tmpdir, manifest_path_str
+):
+    """When only a YAML file is passed (no SQL), the hook should still detect
+    arguments with missing descriptions by resolving macros from the manifest."""
+    schema_yml = """
+version: 2
+macros:
+-   name: with_some_argument_description
+    arguments:
+    -   name: test1
+        description: aaa
+    -   name: test2
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
+            str(yml_file),
+            "--manifest",
+            manifest_path_str,
+            "--is_test",
+        ],
+    )
+    assert result == 1
+
+
+@pytest.mark.parametrize("extension", [("yml"), ("yaml")])
+def test_check_macro_arguments_have_desc_yml_only_passing(
+    extension, tmpdir, manifest_path_str
+):
+    """When only a YAML file is passed and all arguments have descriptions,
+    the hook should pass."""
+    schema_yml = """
+version: 2
+macros:
+-   name: with_some_argument_description
+    arguments:
+    -   name: test1
+        description: aaa
+    -   name: test2
+        description: bbb
+    """
+    yml_file = tmpdir.join(f"schema.{extension}")
+    yml_file.write(schema_yml)
+    result = main(
+        argv=[
             str(yml_file),
             "--manifest",
             manifest_path_str,
