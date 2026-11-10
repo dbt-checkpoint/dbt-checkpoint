@@ -195,7 +195,7 @@ pip install pre-commit
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.2.1
+    rev: v2.0.10
     hooks:
       - id: dbt-parse
       - id: dbt-docs-generate
@@ -237,7 +237,7 @@ To be able to run this in GitHub CI you need to modified it to:
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.2.1
+    rev: v2.0.10
     hooks:
       - id: dbt-parse
       - id: check-model-has-tests
