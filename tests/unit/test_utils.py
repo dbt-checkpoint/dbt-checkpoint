@@ -22,6 +22,7 @@ from dbt_checkpoint.utils import (
     get_macro_sqls,
     get_missing_file_paths,
     get_model_schemas,
+    get_source_schemas,
     obj_in_deps,
     paths_to_dbt_models,
 )
@@ -129,6 +130,23 @@ macros:
             prefix="macro",
         )
     ]
+
+
+# yml files that aren't mappings, e.g. an Ansible playbook, have no dbt properties
+NON_MAPPING_YMLS = (
+    "",
+    "- name: build\n  hosts: all\n",
+    "just a string\n",
+)
+
+
+@pytest.mark.parametrize("content", NON_MAPPING_YMLS)
+def test_get_schemas_non_mapping_yml(content, tmpdir):
+    file = Path(tmpdir.join("playbook.yml"))
+    file.write_text(content)
+    assert list(get_model_schemas([file], {"aaa"})) == []
+    assert list(get_macro_schemas([file], {"aaa"})) == []
+    assert list(get_source_schemas([file])) == []
 
 
 @pytest.mark.parametrize(
