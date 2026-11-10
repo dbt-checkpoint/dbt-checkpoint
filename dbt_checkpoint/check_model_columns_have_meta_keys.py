@@ -30,7 +30,8 @@ def get_column_meta_keys(column: Dict[str, Any]) -> Set[str]:
     deprecated in favor of nesting it under ``config``). A column may use
     either location, so both are checked and merged.
     """
-    meta = {**column.get("meta", {}), **column.get("config", {}).get("meta", {})}
+    config = column.get("config") or {}
+    meta = {**(column.get("meta") or {}), **(config.get("meta") or {})}
     return set(meta.keys())
 
 

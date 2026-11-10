@@ -157,3 +157,13 @@ def test_check_model_parents_and_childs(
     yml_file.write(input_schema)
     status_code = main(argv=[str(yml_file), *input_args])
     assert status_code == expected_status_code
+
+
+def test_check_source_childs_custom_tag_yml(tmpdir, manifest_path_str):
+    """Non-dbt yml with custom tags (e.g. `.gitlab-ci.yml`) is skipped."""
+    yml_file = tmpdir.join(".gitlab-ci.yml")
+    yml_file.write("job:\n  script: !reference [.setup, script]\n")
+    result = main(
+        argv=[str(yml_file), "--max-child-cnt", "0", "--manifest", manifest_path_str]
+    )
+    assert result == 0

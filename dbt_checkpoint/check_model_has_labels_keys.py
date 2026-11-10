@@ -55,7 +55,7 @@ def has_labels_key(
 
     in_schemas = set()
     for schema in schemas:
-        schema_config = schema.schema.get("config")
+        schema_config = schema.schema.get("config") or {}
         schema_labels_data = schema_config.get("labels")
         schema_labels = set(schema_labels_data.keys()) if schema_labels_data else set()
 

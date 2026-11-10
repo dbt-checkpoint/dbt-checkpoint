@@ -24,10 +24,10 @@ def validate_tags(
 
     for schema in schemas:
         schema_tags = set(schema.source_schema.get("tags", [])) | set(
-            schema.source_schema.get("config", {}).get("tags", [])
+            (schema.source_schema.get("config") or {}).get("tags") or []
         )
         table_tags = set(schema.table_schema.get("tags", [])) | set(
-            schema.table_schema.get("config", {}).get("tags", [])
+            (schema.table_schema.get("config") or {}).get("tags") or []
         )
         source_tags = schema_tags.union(table_tags)
         valid_tags = set(tags)

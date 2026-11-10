@@ -30,12 +30,12 @@ def has_meta_key(
 
     for schema in schemas:
         schema_meta = {
-            *schema.source_schema.get("meta", {}).keys(),
-            *schema.source_schema.get("config", {}).get("meta", {}).keys()
+            *(schema.source_schema.get("meta") or {}).keys(),
+            *((schema.source_schema.get("config") or {}).get("meta") or {}).keys()
         }
         table_meta = {
-            *schema.table_schema.get("meta", {}).keys(),
-            *schema.table_schema.get("config", {}).get("meta", {}).keys()
+            *(schema.table_schema.get("meta") or {}).keys(),
+            *((schema.table_schema.get("config") or {}).get("meta") or {}).keys()
         }
         if allow_extra_keys:
             diff = not set(meta_keys).issubset(set(schema_meta | table_meta))

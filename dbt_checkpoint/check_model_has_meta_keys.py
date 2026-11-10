@@ -61,8 +61,8 @@ def has_meta_key(
         for schema in schemas
         if validate_keys(
             {
-                *schema.schema.get("meta", {}).keys(),
-                *schema.schema.get("config", {}).get("meta", {}).keys(),
+                *(schema.schema.get("meta") or {}).keys(),
+                *((schema.schema.get("config") or {}).get("meta") or {}).keys(),
             },
             meta_keys,
             allow_extra_keys,

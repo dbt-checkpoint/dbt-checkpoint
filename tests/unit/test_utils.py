@@ -10,6 +10,7 @@ from dbt_checkpoint.utils import (
     _discover_sql_files,
     CalledProcessError,
     CompilationException,
+    checkpoint_safe_load,
     MacroSchema,
     Model,
     ModelSchema,
@@ -149,6 +150,56 @@ def test_get_schemas_non_mapping_yml(content, tmpdir):
     assert list(get_model_schemas([file], {"aaa"})) == []
     assert list(get_macro_schemas([file], {"aaa"})) == []
     assert list(get_source_schemas([file])) == []
+
+
+# yml files with custom tags, e.g. GitLab CI or CloudFormation, aren't dbt files
+CUSTOM_TAG_YMLS = (
+    "job:\n  script: !reference [.setup, script]\n",
+    "Resources:\n  Bucket:\n    Properties:\n      Name: !Ref BucketName\n",
+    "Outputs:\n  Arn: !GetAtt\n    - Bucket\n    - Arn\n",
+    "sensor: !include sensors.yaml\n",
+)
+
+
+@pytest.mark.parametrize("content", CUSTOM_TAG_YMLS)
+def test_get_schemas_custom_tag_yml(content, tmpdir):
+    file = Path(tmpdir.join("ci.yml"))
+    file.write_text(content)
+    assert list(get_model_schemas([file], {"aaa"})) == []
+    assert list(get_macro_schemas([file], {"aaa"})) == []
+    assert list(get_source_schemas([file])) == []
+
+
+def test_checkpoint_safe_load_custom_tag_keeps_value(tmpdir):
+    file = Path(tmpdir.join("template.yml"))
+    file.write_text("a: !Ref Name\nb: !Split [',', x]\nc: !Custom {k: v}\n")
+    with file.open() as stream:
+        assert checkpoint_safe_load(stream) == {
+            "a": "Name",
+            "b": [",", "x"],
+            "c": {"k": "v"},
+        }
+
+
+def test_checkpoint_safe_load_invalid_yaml(tmpdir, capsys):
+    file = Path(tmpdir.join("deployment.yaml"))
+    file.write_text("metadata:\n  name: {{ .Values.name }}\n")
+    with pytest.raises(SystemExit) as exc, file.open() as stream:
+        checkpoint_safe_load(stream)
+    assert exc.value.code == 1
+    out = capsys.readouterr().out
+    assert "deployment.yaml:2:" in out
+    assert "exclude:" in out
+    assert "Traceback" not in out
+
+
+def test_get_source_schemas_null_config(tmpdir):
+    file = Path(tmpdir.join("sources.yml"))
+    file.write_text(
+        "sources:\n- name: src\n  config:\n  tables:\n  - name: tbl\n    config:\n"
+    )
+    schemas = list(get_source_schemas([file]))
+    assert [(s.source_name, s.table_name) for s in schemas] == [("src", "tbl")]
 
 
 @pytest.mark.parametrize(

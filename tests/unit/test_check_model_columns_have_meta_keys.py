@@ -1,6 +1,3 @@
-from unittest.mock import mock_open
-from unittest.mock import patch
-
 import pytest
 
 from dbt_checkpoint.check_model_columns_have_meta_keys import check_column_has_meta_keys
@@ -215,9 +212,6 @@ def test_check_columns_have_meta_keys(
         input_args.extend(["--manifest", manifest_path_str])
     if valid_config:
         input_args.extend(["--config", config_path_str])
-    with patch("builtins.open", mock_open(read_data="data")):
-        with patch("dbt_checkpoint.utils.safe_load") as mock_safe_load:
-            mock_safe_load.return_value = schema
     status_code = main(input_args)
     assert status_code == expected_status_code
 

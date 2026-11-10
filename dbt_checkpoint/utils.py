@@ -16,7 +16,8 @@ from typing import Text
 from typing import Tuple
 from typing import Union
 
-from yaml import safe_load
+import yaml
+from yaml import SafeLoader
 
 DEFAULT_MANIFEST_PATH = "target/manifest.json"
 DEFAULT_CATALOG_PATH = "target/catalog.json"
@@ -131,11 +132,47 @@ def paths_to_dbt_models(
     return [prefix + Path(path).stem + postfix for path in paths]
 
 
-def checkpoint_safe_load(stream):
+class _CheckpointLoader(SafeLoader):
+    """SafeLoader that reads unknown tags (e.g. GitLab's `!reference`,
+    CloudFormation's `!Ref`) as the plain value they're attached to.
+
+    Hooks receive every yml file in the repository, not only dbt property files,
+    and dbt property files never use custom tags, so the tag can be dropped."""
+
+
+def _construct_untagged(
+    loader: SafeLoader, tag_suffix: str, node: yaml.Node
+) -> Any:
+    if isinstance(node, yaml.MappingNode):
+        return loader.construct_mapping(node)
+    if isinstance(node, yaml.SequenceNode):
+        return loader.construct_sequence(node)
+    return loader.construct_scalar(node)
+
+
+_CheckpointLoader.add_multi_constructor("!", _construct_untagged)
+
+
+def checkpoint_safe_load(stream: Any) -> Dict[str, Any]:
     # dbt property files (and the dbt-checkpoint config file) are mappings. A yml
     # file that is empty, or whose top level is a list or a scalar, like an Ansible
     # playbook or `.pre-commit-hooks.yaml`, has nothing to check, so it's read as {}
-    content = safe_load(stream)
+    try:
+        content = yaml.load(stream, Loader=_CheckpointLoader)
+    except yaml.YAMLError as e:
+        # A yml file that isn't valid YAML, like a Helm template, can't be checked.
+        # Fail with a readable message instead of a traceback, since it may be a
+        # broken dbt property file
+        name = getattr(stream, "name", "<yaml>")
+        mark = getattr(e, "problem_mark", None)
+        where = f":{mark.line + 1}:{mark.column + 1}" if mark else ""
+        problem = getattr(e, "problem", None) or str(e)
+        print(
+            f"{red(f'{name}{where}')}: unable to parse YAML ({problem}). "
+            "If this isn't a dbt file, add it to the hook's `exclude:` in "
+            "`.pre-commit-config.yaml`."
+        )
+        raise SystemExit(1)
     return content if isinstance(content, dict) else {}
 
 
@@ -379,7 +416,7 @@ def get_source_schemas(
     for yml_file in yml_files:
         schema = checkpoint_safe_load(yml_file.open())
         for source in schema.get("sources", []):
-            if not include_disabled and not source.get("config", {}).get(
+            if not include_disabled and not (source.get("config") or {}).get(
                 "enabled", True
             ):
                 continue
@@ -879,7 +916,7 @@ def validate_meta_keys(
     meta_set: Set[str],
     allow_extra_keys: bool,
 ) -> int:
-    meta = set(obj.schema.get("meta", {}).keys())
+    meta = set((obj.schema.get("meta") or {}).keys())
     if allow_extra_keys:
         diff = not meta_set.issubset(meta)
     else:
