@@ -19,6 +19,7 @@ from dbt_checkpoint.utils import (
     get_dbt_manifest,
     get_filenames,
     get_macro_schemas,
+    get_macro_sqls,
     get_missing_file_paths,
     get_model_schemas,
     get_source_schemas,
@@ -148,6 +149,34 @@ def test_get_schemas_non_mapping_yml(content, tmpdir):
     assert list(get_source_schemas([file])) == []
 
 
+@pytest.mark.parametrize(
+    "paths,expected",
+    [
+        # dbt project at the root of the repository
+        (["macros/aa/my_macro.sql"], {"my_macro"}),
+        # dbt project in a subdirectory of the repository
+        (["project/macros/aa/my_macro.sql"], {"my_macro"}),
+        (["/abs/repo/project/macros/aa/my_macro.sql"], {"my_macro"}),
+        # macro defined in another package with the same file name
+        (["project/macros/other.sql"], {"other"}),
+        # same file name but not a macro file
+        (["project/models/aa/my_macro.sql"], set()),
+        (["aa/my_macro.sql"], set()),
+        (["macros/aa/my_macro.yml"], set()),
+    ],
+)
+def test_get_macro_sqls(paths, expected):
+    manifest = {
+        "macros": {
+            "macro.project.my_macro": {"path": "macros/aa/my_macro.sql"},
+            "macro.project.other": {"path": "macros/other.sql"},
+            "macro.package.other": {"path": "macros/sql/other.sql"},
+        }
+    }
+    result = get_macro_sqls(paths, manifest)
+    assert set(result.keys()) == expected
+
+
 def test_check_yml_version_without_version():
     yaml_dct = {"test": "test"}
     with pytest.raises(CompilationException):
@@ -195,6 +224,30 @@ TESTS = (
         True,
         "",
         ["aa/bb/with_description.yml", "bb/with_description.sql"],
+    ),
+    # dbt project nested two directories below the repository root
+    (
+        ["xx/aa/bb/with_description.yml"],
+        "xx/aa/bb/with_description.sql",
+        True,
+        "",
+        ["xx/aa/bb/with_description.yml", "xx/aa/bb/with_description.sql"],
+    ),
+    # dbt project at the repository root
+    (
+        ["bb/with_description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["bb/with_description.yml", "bb/with_description.sql"],
+    ),
+    # a yml file whose name is only the end of another one's isn't related to it
+    (
+        ["aa/description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["aa/description.yml"],
     ),
 )
 

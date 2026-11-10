@@ -424,6 +424,26 @@ MANIFEST = {
                 "materialized": "snapshot",
             },
         },
+        "seed.test.some_seed": {
+            "name": "some_seed",
+            "path": "some_seed.csv",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "seed",
+            },
+        },
+        "model.seed_parent_child": {
+            "name": "seed_parent_child",
+            "patch_path": "project://bb/seed_parent_child.yml",
+            "path": "aa/bb/seed_parent_child.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.snapshot_parent_child": {
+            "name": "snapshot_parent_child",
+            "patch_path": "project://bb/snapshot_parent_child.yml",
+            "path": "aa/bb/snapshot_parent_child.sql",
+            "root_path": "/path/to/aa",
+        },
         "model.test.with_boolean_column_with_prefix": {
             "name": "with_boolean_column_with_prefix",
             "patch_path": "project://bb/with_boolean_column_with_prefix.yml",
@@ -552,7 +572,12 @@ MANIFEST = {
             "model.ref1",
             "model.without_tags",
             "bbb.ccc.ddd",
-        ]
+        ],
+        "model.seed_parent_child": ["seed.test.some_seed"],
+        "model.snapshot_parent_child": [
+            "snapshot.some_snapshot",
+            "seed.test.some_seed",
+        ],
     },
 }
 
