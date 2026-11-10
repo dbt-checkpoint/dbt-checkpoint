@@ -1,3 +1,39 @@
+# 2.0.11 - 2026-11-10
+
+**Breaking Changes:**
+* Require Python >= 3.10 (drop 3.8 and 3.9) and support Python 3.13 and 3.14. Pin `mixpanel>=4.10.1,<5`, which fixes installation on 3.14, and import it only when tracking is enabled by @k0x2e in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/390
+
+**Enhancements:**
+* New hook `check-model-has-group` by @mishbahr in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/364
+* Much faster related-file discovery: direct path lookup instead of a recursive glob (fixes #349) by @mishbahr in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/365
+
+**Fixes:**
+* `check-script-has-no-table-name`: no false positives from double-quoted string literals (fixes #379) by @DG47 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/380
+* Macro hooks find macro files when the dbt project is in a subdirectory (fixes #321) by @DG47 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/381
+* `check-model-parents-and-childs` counts seeds and snapshots as parents (fixes #153) by @DG47 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/384
+* Relate yml files to their models when the dbt project is nested more than one directory deep by @manan28025 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/382
+* Skip yml files whose top level isn't a mapping instead of crashing (fixes #348) by @manan28025 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/383
+* `check-macro-arguments-have-desc` checks argument descriptions when only the YAML file is passed by @david-hong-invitae in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/370
+* `check-model-columns-have-meta-keys` reads column `meta` under `config` by @TomWalsh11 in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/376
+* `check-source-has-freshness` treats `freshness: null` as an explicit opt-out by @kempspo in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/367
+* `--max-child-cnt 0` / `--max-parent-cnt 0` are enforced, and `check-source-childs` runs on yml files (fixes #85, #126) by @k0x2e in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/387
+* yaml hooks no longer crash on non-dbt yaml (custom tags such as `!reference`/`!Ref`, or invalid YAML) or on empty keys such as `config:` (fixes #388) by @k0x2e in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/389
+* `replace-script-table-names` replaces every occurrence of a table name, case-insensitively by @k0x2e in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/391
+
+**Docs:**
+* Fix hook configuration examples that couldn't be used as written by @dajiaohuang in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/385
+* Clarify manifest requirements for `check-model-has-meta-keys` by @werderame in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/386
+
+## New Contributors
+* @david-hong-invitae made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/370
+* @TomWalsh11 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/376
+* @DG47 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/380
+* @manan28025 made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/382
+* @dajiaohuang made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/385
+* @werderame made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/386
+
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.10...v2.0.11
+
 # 2.0.7 - 2025-05-08
 
 **Fixes:**
