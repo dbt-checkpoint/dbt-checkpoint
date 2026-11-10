@@ -4,6 +4,34 @@ from dbt_checkpoint.replace_script_table_names import get_source_from_name, main
 
 # Input, expected return value, expected output
 TESTS = (  # type: ignore
+    # every occurrence is replaced (re.IGNORECASE used to be passed as count=2)
+    (
+        """
+    SELECT * FROM replaced_model a
+    JOIN replaced_model b ON a.id = b.id
+    JOIN replaced_model c ON a.id = c.id
+    """,
+        1,
+        """
+    SELECT * FROM {{ ref('replaced_model') }} a
+    JOIN {{ ref('replaced_model') }} b ON a.id = b.id
+    JOIN {{ ref('replaced_model') }} c ON a.id = c.id
+    """,
+        True,
+        True,
+    ),
+    # table names are matched case-insensitively
+    (
+        """
+    SELECT * FROM Replaced_Model
+    """,
+        1,
+        """
+    SELECT * FROM {{ ref('replaced_model') }}
+    """,
+        True,
+        True,
+    ),
     (
         """
     SELECT *, bb.replaced_model, replaced_model.aa FROM replaced_model

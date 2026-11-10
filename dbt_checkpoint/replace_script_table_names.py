@@ -92,9 +92,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 get_unknown_source(tables),
             )
             for replacement in to_replace:
-                old = r"([\\\s\n\r\t])" + replacement[0] + r"([\\\s\n\r\t])"
-                new = r"\1" + replacement[1] + r"\2"
-                sql = re.sub(old, new, sql, re.IGNORECASE)
+                old = (
+                    r"([\\\s\n\r\t])" + re.escape(replacement[0]) + r"([\\\s\n\r\t])"
+                )
+                new = r"\1" + replacement[1].replace("\\", r"\\") + r"\2"
+                sql = re.sub(old, new, sql, flags=re.IGNORECASE)
             file.write_text(sql, encoding="utf-8")
     end_time = time.time()
     script_args = vars(args)
