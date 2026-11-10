@@ -22,6 +22,18 @@ from dbt_checkpoint.utils import red
 from dbt_checkpoint.utils import yellow
 
 
+def get_column_meta_keys(column: Dict[str, Any]) -> Set[str]:
+    """Return a column's meta keys.
+
+    Checks both the legacy top-level ``meta`` key and the ``config.meta``
+    location (the dbt >=1.10 convention: top-level ``meta`` on a column is
+    deprecated in favor of nesting it under ``config``). A column may use
+    either location, so both are checked and merged.
+    """
+    meta = {**column.get("meta", {}), **column.get("config", {}).get("meta", {})}
+    return set(meta.keys())
+
+
 def validate_meta_keys(
     meta: Sequence[str],
     meta_set: Set[str],
@@ -81,7 +93,7 @@ def check_column_has_meta_keys(
             column.get("name")
             for column in columns
             if not validate_meta_keys(
-                column.get("meta", {}).keys(),
+                get_column_meta_keys(column),
                 meta_set,
                 allow_extra_keys,
                 model_name,
@@ -99,7 +111,7 @@ def check_column_has_meta_keys(
             for column_name, column_config in model.node.get("columns", {}).items()
             if (
                 not validate_meta_keys(
-                    column_config.get("meta", {}).keys(),
+                    get_column_meta_keys(column_config),
                     meta_set,
                     allow_extra_keys,
                     model_name,
