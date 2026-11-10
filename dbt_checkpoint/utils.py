@@ -145,9 +145,9 @@ def _construct_untagged(
     loader: SafeLoader, tag_suffix: str, node: yaml.Node
 ) -> Any:
     if isinstance(node, yaml.MappingNode):
-        return loader.construct_mapping(node)
+        return loader.construct_mapping(node, deep=True)
     if isinstance(node, yaml.SequenceNode):
-        return loader.construct_sequence(node)
+        return loader.construct_sequence(node, deep=True)
     return loader.construct_scalar(cast(yaml.ScalarNode, node))
 
 
