@@ -374,6 +374,26 @@ MANIFEST = {
             "path": "aa/bb/with_no_contract.sql",
             "root_path": "/path/to/aa",
         },
+        "model.with_group": {
+            "patch_path": "project://bb/with_group.yml",
+            "path": "aa/bb/with_group.sql",
+            "root_path": "/path/to/aa",
+            "config": {"group": "analytics", "materialized": "view"},
+            "group": "analytics",
+        },
+        "model.with_no_group": {
+            "patch_path": "project://bb/with_no_group.yml",
+            "path": "aa/bb/with_no_group.sql",
+            "root_path": "/path/to/aa",
+            "config": {"materialized": "view"},
+        },
+        "model.with_invalid_group": {
+            "patch_path": "project://bb/with_invalid_group.yml",
+            "path": "aa/bb/with_invalid_group.sql",
+            "root_path": "/path/to/aa",
+            "config": {"group": "unknown_team", "materialized": "view"},
+            "group": "unknown_team",
+        },
         "model.with_no_constraints": {
             "patch_path": "project://bb/with_no_constraints.yml",
             "path": "aa/bb/with_no_constraints.sql",
@@ -423,6 +443,26 @@ MANIFEST = {
             "config": {
                 "materialized": "snapshot",
             },
+        },
+        "seed.test.some_seed": {
+            "name": "some_seed",
+            "path": "some_seed.csv",
+            "root_path": "/path/to/aa",
+            "config": {
+                "materialized": "seed",
+            },
+        },
+        "model.seed_parent_child": {
+            "name": "seed_parent_child",
+            "patch_path": "project://bb/seed_parent_child.yml",
+            "path": "aa/bb/seed_parent_child.sql",
+            "root_path": "/path/to/aa",
+        },
+        "model.snapshot_parent_child": {
+            "name": "snapshot_parent_child",
+            "patch_path": "project://bb/snapshot_parent_child.yml",
+            "path": "aa/bb/snapshot_parent_child.sql",
+            "root_path": "/path/to/aa",
         },
         "model.test.with_boolean_column_with_prefix": {
             "name": "with_boolean_column_with_prefix",
@@ -552,7 +592,12 @@ MANIFEST = {
             "model.ref1",
             "model.without_tags",
             "bbb.ccc.ddd",
-        ]
+        ],
+        "model.seed_parent_child": ["seed.test.some_seed"],
+        "model.snapshot_parent_child": [
+            "snapshot.some_snapshot",
+            "seed.test.some_seed",
+        ],
     },
 }
 

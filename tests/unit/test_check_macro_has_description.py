@@ -8,6 +8,9 @@ TESTS = (
     (["macros/aa/with_description.sql", "--is_test"], False, True, 1),
     (["macros/aa/without_description.sql", "--is_test"], True, True, 1),
     (["macros/aa/with_description.sql", "--is_test"], True, False, 0),
+    # dbt project in a subdirectory of the repository
+    (["project/macros/aa/with_description.sql", "--is_test"], True, True, 0),
+    (["project/macros/aa/without_description.sql", "--is_test"], True, True, 1),
 )
 
 
@@ -46,6 +49,20 @@ macros:
     result = main(
         argv=[
             "in_schema_desc.sql",
+            str(yml_file),
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 0
+
+
+def test_check_macro_description_non_mapping_yml(tmpdir, manifest_path_str):
+    yml_file = tmpdir.join("playbook.yml")
+    yml_file.write("- name: build\n  hosts: all\n")
+    result = main(
+        argv=[
+            "macros/aa/with_description.sql",
             str(yml_file),
             "--manifest",
             manifest_path_str,

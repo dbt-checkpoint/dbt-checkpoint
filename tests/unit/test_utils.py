@@ -5,25 +5,29 @@ from unittest.mock import patch
 
 import pytest
 
-from dbt_checkpoint.utils import _discover_prop_files
-from dbt_checkpoint.utils import _discover_sql_files
-from dbt_checkpoint.utils import CalledProcessError
-from dbt_checkpoint.utils import check_yml_version
-from dbt_checkpoint.utils import cmd_output
-from dbt_checkpoint.utils import CompilationException
-from dbt_checkpoint.utils import extend_dbt_project_dir_flag
-from dbt_checkpoint.utils import get_dbt_catalog
-from dbt_checkpoint.utils import get_dbt_manifest
-from dbt_checkpoint.utils import get_filenames
-from dbt_checkpoint.utils import get_macro_schemas
-from dbt_checkpoint.utils import get_missing_file_paths
-from dbt_checkpoint.utils import get_model_schemas
-from dbt_checkpoint.utils import MacroSchema
-from dbt_checkpoint.utils import Model
-from dbt_checkpoint.utils import ModelSchema
-from dbt_checkpoint.utils import obj_in_deps
-from dbt_checkpoint.utils import paths_to_dbt_models
-from dbt_checkpoint.utils import SourceSchema
+from dbt_checkpoint.utils import (
+    _discover_prop_files,
+    _discover_sql_files,
+    CalledProcessError,
+    CompilationException,
+    MacroSchema,
+    Model,
+    ModelSchema,
+    SourceSchema,
+    check_yml_version,
+    cmd_output,
+    extend_dbt_project_dir_flag,
+    get_dbt_catalog,
+    get_dbt_manifest,
+    get_filenames,
+    get_macro_schemas,
+    get_macro_sqls,
+    get_missing_file_paths,
+    get_model_schemas,
+    get_source_schemas,
+    obj_in_deps,
+    paths_to_dbt_models,
+)
 
 
 def test_cmd_output_error():
@@ -130,6 +134,51 @@ macros:
     ]
 
 
+# yml files that aren't mappings, e.g. an Ansible playbook, have no dbt properties
+NON_MAPPING_YMLS = (
+    "",
+    "- name: build\n  hosts: all\n",
+    "just a string\n",
+)
+
+
+@pytest.mark.parametrize("content", NON_MAPPING_YMLS)
+def test_get_schemas_non_mapping_yml(content, tmpdir):
+    file = Path(tmpdir.join("playbook.yml"))
+    file.write_text(content)
+    assert list(get_model_schemas([file], {"aaa"})) == []
+    assert list(get_macro_schemas([file], {"aaa"})) == []
+    assert list(get_source_schemas([file])) == []
+
+
+@pytest.mark.parametrize(
+    "paths,expected",
+    [
+        # dbt project at the root of the repository
+        (["macros/aa/my_macro.sql"], {"my_macro"}),
+        # dbt project in a subdirectory of the repository
+        (["project/macros/aa/my_macro.sql"], {"my_macro"}),
+        (["/abs/repo/project/macros/aa/my_macro.sql"], {"my_macro"}),
+        # macro defined in another package with the same file name
+        (["project/macros/other.sql"], {"other"}),
+        # same file name but not a macro file
+        (["project/models/aa/my_macro.sql"], set()),
+        (["aa/my_macro.sql"], set()),
+        (["macros/aa/my_macro.yml"], set()),
+    ],
+)
+def test_get_macro_sqls(paths, expected):
+    manifest = {
+        "macros": {
+            "macro.project.my_macro": {"path": "macros/aa/my_macro.sql"},
+            "macro.project.other": {"path": "macros/other.sql"},
+            "macro.package.other": {"path": "macros/sql/other.sql"},
+        }
+    }
+    result = get_macro_sqls(paths, manifest)
+    assert set(result.keys()) == expected
+
+
 def test_check_yml_version_without_version():
     yaml_dct = {"test": "test"}
     with pytest.raises(CompilationException):
@@ -177,6 +226,30 @@ TESTS = (
         True,
         "",
         ["aa/bb/with_description.yml", "bb/with_description.sql"],
+    ),
+    # dbt project nested two directories below the repository root
+    (
+        ["xx/aa/bb/with_description.yml"],
+        "xx/aa/bb/with_description.sql",
+        True,
+        "",
+        ["xx/aa/bb/with_description.yml", "xx/aa/bb/with_description.sql"],
+    ),
+    # dbt project at the repository root
+    (
+        ["bb/with_description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["bb/with_description.yml", "bb/with_description.sql"],
+    ),
+    # a yml file whose name is only the end of another one's isn't related to it
+    (
+        ["aa/description.yml"],
+        "bb/with_description.sql",
+        True,
+        "",
+        ["aa/description.yml"],
     ),
 )
 

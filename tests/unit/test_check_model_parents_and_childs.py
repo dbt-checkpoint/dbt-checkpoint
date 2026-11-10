@@ -66,6 +66,34 @@ TESTS = (  # type: ignore
         False,
         0,
     ),
+    (
+        ["aa/bb/seed_parent_child.sql", "--is_test"],
+        ["--min-parent-cnt", "1"],
+        True,
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/seed_parent_child.sql", "--is_test"],
+        ["--min-parent-cnt", "2"],
+        True,
+        True,
+        1,
+    ),
+    (
+        ["aa/bb/snapshot_parent_child.sql", "--is_test"],
+        ["--min-parent-cnt", "2", "--max-parent-cnt", "2"],
+        True,
+        True,
+        0,
+    ),
+    (
+        ["aa/bb/snapshot_parent_child.sql", "--is_test"],
+        ["--min-parent-cnt", "3"],
+        True,
+        True,
+        1,
+    ),
 )
 
 

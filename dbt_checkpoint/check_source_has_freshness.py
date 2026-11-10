@@ -29,6 +29,17 @@ def has_freshness(
         table = schema.table_schema
         source_config = source.get("config") or {}
         table_config = table.get("config") or {}
+        table_freshness_null = (
+            ("freshness" in table and table["freshness"] is None)
+            or ("freshness" in table_config and table_config["freshness"] is None)
+        )
+        source_freshness_null = (
+            ("freshness" in source and source["freshness"] is None)
+            or ("freshness" in source_config and source_config["freshness"] is None)
+        )
+        table_has_own_freshness = "freshness" in table or "freshness" in table_config
+        if table_freshness_null or (source_freshness_null and not table_has_own_freshness):
+            continue
         merged = {
             **(source_config.get("freshness") or {}),
             **(source.get("freshness") or {}),
