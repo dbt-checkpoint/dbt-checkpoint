@@ -5,7 +5,8 @@ from dbt_checkpoint.check_source_childs import main
 # Input schema, input_args, valid_manifest, expected return value
 # Input args, valid manifest, expected return value
 TESTS = (  # type: ignore
-    # --max-child-cnt 0 must be enforced (0 is falsy)
+    # --max-child-cnt 0 must be enforced (0 is falsy); table1 is in the
+    # manifest but has no children
     (
         """
 sources:
@@ -22,9 +23,9 @@ sources:
     (
         """
 sources:
--   name: parent_child
+-   name: source1
     tables:
-    -   name: table_without_childs
+    -   name: table1
         description: test description
     """,
         ["--max-child-cnt", "0", "--is_test"],

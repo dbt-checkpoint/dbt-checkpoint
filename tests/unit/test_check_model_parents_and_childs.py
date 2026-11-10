@@ -29,6 +29,8 @@ TESTS = (  # type: ignore
         True,
         0,
     ),
+    # --max-parent-cnt 0 is enforced the same way
+    (["aa/bb/parent_child.sql", "--is_test"], ["--max-parent-cnt", "0"], True, True, 1),
     (
         ["aa/bb/parent_child.sql", "--is_test"],
         [
