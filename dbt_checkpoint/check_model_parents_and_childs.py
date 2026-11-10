@@ -52,7 +52,7 @@ def check_child_parent_cnt(
             req_type = required.get("type")  # pragma: no mutate
             req_dep = required.get("dep", "")  # pragma: no mutate
             real_value = real_cnt.get(req_dep)
-            if req_cnt and req_operator(real_value, req_cnt):
+            if req_cnt is not None and req_operator(real_value, req_cnt):
                 status_code = 1
                 print(
                     f"{model.model_name}: "

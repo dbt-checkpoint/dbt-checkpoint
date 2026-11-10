@@ -20,6 +20,17 @@ TESTS = (  # type: ignore
     (["aa/bb/parent_child.sql", "--is_test"], ["--max-child-cnt", "1"], True, True, 1),
     (["aa/bb/parent_child.sql", "--is_test"], ["--min-child-cnt", "5"], True, True, 1),
     (["aa/bb/parent_child.sql", "--is_test"], ["--max-child-cnt", "5"], True, True, 0),
+    # --max-child-cnt 0 must be enforced (0 is falsy), e.g. for leaf/mart models
+    (["aa/bb/parent_child.sql", "--is_test"], ["--max-child-cnt", "0"], True, True, 1),
+    (
+        ["aa/bb/seed_parent_child.sql", "--is_test"],
+        ["--max-child-cnt", "0"],
+        True,
+        True,
+        0,
+    ),
+    # --max-parent-cnt 0 is enforced the same way
+    (["aa/bb/parent_child.sql", "--is_test"], ["--max-parent-cnt", "0"], True, True, 1),
     (
         ["aa/bb/parent_child.sql", "--is_test"],
         [
