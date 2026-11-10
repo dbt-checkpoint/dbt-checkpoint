@@ -430,7 +430,7 @@ Ensures that the model has a [group](https://docs.getdbt.com/docs/build/groups) 
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-has-group
 ```
@@ -440,7 +440,7 @@ With allowed groups:
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v2.0.10
     hooks:
       - id: check-model-has-group
         args: ["--groups", "analytics", "finance", "engineering", "--"]
