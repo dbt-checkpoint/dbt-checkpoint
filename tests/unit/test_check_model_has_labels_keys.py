@@ -1,6 +1,3 @@
-from unittest.mock import mock_open
-from unittest.mock import patch
-
 import pytest
 
 from dbt_checkpoint.check_model_has_labels_keys import main
@@ -77,9 +74,6 @@ def test_check_model_labels_keys(
         input_args.extend(["--manifest", manifest_path_str])
     if valid_config:
         input_args.extend(["--config", config_path_str])
-    with patch("builtins.open", mock_open(read_data="data")):
-        with patch("dbt_checkpoint.utils.safe_load") as mock_safe_load:
-            mock_safe_load.return_value = schema
     status_code = main(input_args)
     assert status_code == expected_status_code
 
@@ -111,3 +105,22 @@ models:
         ],
     )
     assert result == 0
+
+
+@pytest.mark.parametrize("config", ["", "    config:\n"])
+def test_check_model_labels_keys_without_config(config, tmpdir, manifest_path_str):
+    """A model with no `config:` (or an empty one) is reported as missing the
+    labels keys instead of crashing."""
+    yml_file = tmpdir.join("schema.yml")
+    yml_file.write(f"version: 2\n\nmodels:\n-   name: in_schema_labels\n{config}")
+    result = main(
+        argv=[
+            "in_schema_labels.sql",
+            str(yml_file),
+            "--labels-keys",
+            "foo",
+            "--manifest",
+            manifest_path_str,
+        ],
+    )
+    assert result == 1

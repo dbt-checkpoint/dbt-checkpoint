@@ -120,6 +120,21 @@ sources:
         False,
         0,
     ),
+    # empty `labels:` is reported as missing keys, not a crash
+    (
+        """
+sources:
+-   name: src
+    loader: test
+    labels:
+    tables:
+    -   name: test
+        labels:
+    """,
+        True,
+        True,
+        1,
+    ),
 )
 
 
