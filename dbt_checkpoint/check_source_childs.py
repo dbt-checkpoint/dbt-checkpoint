@@ -40,11 +40,11 @@ def check_child_parent_cnt(
             req_cnt = required.get("cnt")
             req_operator = required.get("operator", operator.lt)
             req_type = required.get("type")  # pragma: no mutate
-            if req_cnt and req_operator(real_value, req_cnt):
+            if req_cnt is not None and req_operator(real_value, req_cnt):
                 status_code = 1
                 print(
                     f"{schema.source_name}.{schema.table_name}: "
-                    f"has {real_value} {req_type}, but {req_type} {req_cnt}"
+                    f"has {real_value} {req_type}, but {req_type} {req_cnt} "
                     f"is/are required.",
                 )
 
