@@ -698,11 +698,10 @@ def add_related_sqls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
-    yml_path_class = Path(yml_path)
-    yml_path_parts = list(yml_path_class.parts)
-    # Remove the first 'project' component
-    yml_path_parts.pop(0)
-    dbt_patch_path = "/".join(yml_path_parts)
+    # pre-commit passes paths relative to the repository root, while `patch_path`
+    # is relative to the dbt project root (e.g. `project_name://models/schema.yml`),
+    # which can be any number of directories below the repository root
+    yml_posix_path = yml_path.replace("\\", "/")
 
     for key, node in nodes.items():
         if (
@@ -711,7 +710,11 @@ def add_related_sqls(
         ):
             continue
 
-        if node.get("patch_path") and dbt_patch_path in node.get("patch_path"):
+        patch_path = node.get("patch_path")
+        if not patch_path:
+            continue
+        patch_file = patch_path.split("://", 1)[-1].replace("\\", "/")
+        if yml_posix_path == patch_file or yml_posix_path.endswith(f"/{patch_file}"):
             if ".sql" in node.get("original_file_path", "").lower():
                 for related_sql_file in _discover_sql_files(node):
                     sql_as_string = related_sql_file.as_posix()
