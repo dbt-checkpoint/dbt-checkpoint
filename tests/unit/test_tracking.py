@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from unittest.mock import patch
 
 import mixpanel
@@ -28,6 +30,17 @@ class TestDbtCheckpointTracking:
             # call your function that uses Mixpanel's track function
             with pytest.raises(Exception):
                 tracker.track_hook_event("name", {}, {})
+
+    def test_mixpanel_not_imported_when_tracking_disabled(self, config_path_str):
+        # run in a fresh interpreter, since this module imports mixpanel itself
+        code = (
+            "import sys\n"
+            "from dbt_checkpoint.tracking import dbtCheckpointTracking\n"
+            f"tracker = dbtCheckpointTracking({{'config': {config_path_str!r}}})\n"
+            "tracker.track_hook_event('name', {}, {})\n"
+            "assert 'mixpanel' not in sys.modules, 'mixpanel was imported'\n"
+        )
+        subprocess.run([sys.executable, "-c", code], check=True)
 
     def test_init_raises_value_error_if_config_path_not_str(self):
         with pytest.raises(ValueError):

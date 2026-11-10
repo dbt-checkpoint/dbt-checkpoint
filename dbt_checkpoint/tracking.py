@@ -4,8 +4,6 @@ from typing import Dict
 from typing import NoReturn
 from typing import Optional
 
-from mixpanel import Mixpanel
-
 from dbt_checkpoint.utils import get_config_file
 
 MIXPANEL_DEV_ENV = "34ffa16dc37f248c18ad6d1b9ea9c3a8"
@@ -40,6 +38,9 @@ class dbtCheckpointTracking:
                 dbt_metadata, event_properties
             )
             try:
+                # imported here so mixpanel isn't loaded when tracking is disabled
+                from mixpanel import Mixpanel
+
                 mixpanel = Mixpanel(token=self.token)
                 mixpanel.track(
                     distinct_id=distinct_id,
