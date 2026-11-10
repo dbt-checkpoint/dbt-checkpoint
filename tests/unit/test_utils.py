@@ -6,6 +6,8 @@ from unittest.mock import patch
 import pytest
 
 from dbt_checkpoint.utils import (
+    _discover_prop_files,
+    _discover_sql_files,
     CalledProcessError,
     CompilationException,
     MacroSchema,
@@ -296,6 +298,102 @@ def test_extend_dbt_cmd_flags_with_project_dir():
     result = extend_dbt_project_dir_flag(cmd, cmd_flags, dbt_project_dir)
 
     assert result == expected_result
+
+
+def test_discover_sql_files_direct_path(tmpdir, monkeypatch):
+    """_discover_sql_files finds file by direct path, not recursive glob."""
+    monkeypatch.chdir(tmpdir)
+    sql_dir = Path(str(tmpdir)) / "models" / "staging"
+    sql_dir.mkdir(parents=True)
+    (sql_dir / "orders.sql").write_text("SELECT 1")
+
+    # Decoy in .venv that the old glob would find
+    venv_dir = Path(str(tmpdir)) / ".venv" / "lib" / "models" / "staging"
+    venv_dir.mkdir(parents=True)
+    (venv_dir / "orders.sql").write_text("SELECT 1")
+
+    node = {"original_file_path": "models/staging/orders.sql"}
+    result = list(_discover_sql_files(node))
+    assert len(result) == 1
+    assert result[0] == Path("models/staging/orders.sql")
+
+
+def test_discover_sql_files_missing(tmpdir, monkeypatch):
+    """_discover_sql_files returns empty list for nonexistent file."""
+    monkeypatch.chdir(tmpdir)
+
+    node = {"original_file_path": "models/nonexistent.sql"}
+    result = list(_discover_sql_files(node))
+    assert result == []
+
+
+def test_discover_sql_files_with_prefix(tmpdir, monkeypatch):
+    """_discover_sql_files finds file when dbt project is in a subdirectory."""
+    monkeypatch.chdir(tmpdir)
+    sql_dir = Path(str(tmpdir)) / "dbt_project" / "models"
+    sql_dir.mkdir(parents=True)
+    (sql_dir / "orders.sql").write_text("SELECT 1")
+
+    node = {"original_file_path": "models/orders.sql"}
+    result = list(_discover_sql_files(node, prefix="dbt_project/"))
+    assert len(result) == 1
+    assert result[0] == Path("dbt_project/models/orders.sql")
+
+
+def test_discover_prop_files_direct_path(tmpdir, monkeypatch):
+    """_discover_prop_files finds file by direct path, not recursive glob."""
+    monkeypatch.chdir(tmpdir)
+    yml_dir = Path(str(tmpdir)) / "models" / "staging"
+    yml_dir.mkdir(parents=True)
+    (yml_dir / "_schema.yml").write_text("version: 2")
+
+    result = list(_discover_prop_files("models/staging/_schema.yml"))
+    assert len(result) == 1
+    assert result[0] == Path("models/staging/_schema.yml")
+
+
+def test_discover_prop_files_missing(tmpdir, monkeypatch):
+    """_discover_prop_files returns empty list for nonexistent file."""
+    monkeypatch.chdir(tmpdir)
+
+    result = list(_discover_prop_files("models/nonexistent.yml"))
+    assert result == []
+
+
+@pytest.mark.parametrize("project_dir", ["", "analytics/dbt/"])
+@pytest.mark.parametrize("changed", ["orders.sql", "_schema.yml"])
+def test_get_missing_file_paths_finds_related_files(
+    project_dir, changed, tmpdir, monkeypatch
+):
+    """A changed SQL file pulls in its properties file and vice versa, with
+    real manifest paths (`path` is relative to model-paths, while
+    `original_file_path` and `patch_path` are relative to the dbt project)."""
+    monkeypatch.chdir(tmpdir)
+    model_dir = Path(project_dir + "models/staging")
+    model_dir.mkdir(parents=True)
+    (model_dir / "orders.sql").write_text("select 1")
+    (model_dir / "_schema.yml").write_text("version: 2")
+    # a model with a similar path that must not be picked up
+    (model_dir / "old_orders.sql").write_text("select 1")
+    manifest = {
+        "nodes": {
+            "model.proj.orders": {
+                "path": "staging/orders.sql",
+                "original_file_path": "models/staging/orders.sql",
+                "patch_path": "proj://models/staging/_schema.yml",
+            },
+            "model.proj.old_orders": {
+                "path": "staging/old_orders.sql",
+                "original_file_path": "models/staging/old_orders.sql",
+                "patch_path": "proj://models/staging/_old_schema.yml",
+            },
+        }
+    }
+    result = get_missing_file_paths([f"{model_dir}/{changed}"], manifest)
+    assert set(result) == {
+        f"{project_dir}models/staging/orders.sql",
+        f"{project_dir}models/staging/_schema.yml",
+    }
 
 
 def test_extend_dbt_cmd_flags_without_project_dir():

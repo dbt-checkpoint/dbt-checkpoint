@@ -16,7 +16,6 @@ from typing import Text
 from typing import Tuple
 from typing import Union
 
-
 from yaml import safe_load
 
 DEFAULT_MANIFEST_PATH = "target/manifest.json"
@@ -731,13 +730,12 @@ def add_related_sqls(
         patch_path = node.get("patch_path")
         if not patch_path:
             continue
-        patch_file = patch_path.split("://", 1)[-1].replace("\\", "/")
-        if yml_posix_path == patch_file or yml_posix_path.endswith(f"/{patch_file}"):
-            if ".sql" in node.get("original_file_path", "").lower():
-                for related_sql_file in _discover_sql_files(node):
-                    sql_as_string = related_sql_file.as_posix()
-                    if "target/" not in sql_as_string.lower():
-                        paths_with_missing.add(sql_as_string)
+        prefix = _project_prefix(yml_posix_path, _clean_patch_path(patch_path))
+        if prefix is None:
+            continue
+        if ".sql" in node.get("original_file_path", "").lower():
+            for related_sql_file in _discover_sql_files(node, prefix):
+                paths_with_missing.add(related_sql_file.as_posix())
 
 
 def add_related_ymls(
@@ -746,6 +744,8 @@ def add_related_ymls(
     paths_with_missing: Set[str],
     include_ephemeral: bool = False,
 ) -> None:
+    sql_posix_path = sql_path.replace("\\", "/")
+
     for key, node in nodes.items():
         if (
             not include_ephemeral
@@ -753,27 +753,46 @@ def add_related_ymls(
         ):
             continue
 
-        if node.get("path") and (node.get("path") in sql_path):
-            patch_path = node.get("patch_path", None)
-            if patch_path:
-                # Original patch_path has 'project\\path\to\yml.yml'
-                # Remove `project_name\\` from patch_path
-                patch_path = Path(patch_path)
-                clean_patch_path = patch_path.relative_to(
-                    *patch_path.parts[:1]
-                ).as_posix()
-                for related_yml_file in _discover_prop_files(clean_patch_path):
-                    yml_as_string = related_yml_file.as_posix()
-                    if "target/" not in yml_as_string.lower():
-                        paths_with_missing.add(yml_as_string)
+        # `original_file_path` is relative to the dbt project root, whereas
+        # `path` is relative to the model-paths directory, so only the former
+        # tells us where the dbt project sits within the repository
+        original_file_path = node.get("original_file_path", "").replace("\\", "/")
+        patch_path = node.get("patch_path")
+        if not original_file_path or not patch_path:
+            continue
+        prefix = _project_prefix(sql_posix_path, original_file_path)
+        if prefix is None:
+            continue
+        for related_yml_file in _discover_prop_files(
+            _clean_patch_path(patch_path), prefix
+        ):
+            paths_with_missing.add(related_yml_file.as_posix())
 
 
-def _discover_sql_files(node):  # type: ignore
-    return Path().glob(f"**/{node.get('original_file_path')}")
+def _clean_patch_path(patch_path: str) -> str:
+    # `project_name://models/schema.yml` -> `models/schema.yml`
+    return patch_path.split("://", 1)[-1].replace("\\", "/")
 
 
-def _discover_prop_files(model_path):  # type: ignore
-    return Path().glob(f"**/{model_path}")
+def _project_prefix(repo_path: str, project_path: str) -> Optional[str]:
+    """Return the dbt project's directory within the repository (with trailing
+    slash, or "" at the root) when `repo_path` is the file at `project_path`
+    relative to the dbt project; otherwise None."""
+    if repo_path == project_path:
+        return ""
+    if repo_path.endswith(f"/{project_path}"):
+        return repo_path[: -len(project_path)]
+    return None
+
+
+def _discover_sql_files(node, prefix=""):  # type: ignore
+    path = Path(prefix + node.get("original_file_path", ""))
+    return [path] if path.exists() else []
+
+
+def _discover_prop_files(model_path, prefix=""):  # type: ignore
+    path = Path(prefix + model_path)
+    return [path] if path.exists() else []
 
 
 def get_missing_file_paths(
