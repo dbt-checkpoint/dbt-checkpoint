@@ -1,3 +1,4 @@
+import io
 import unittest
 from dataclasses import dataclass
 from pathlib import Path
@@ -191,6 +192,52 @@ def test_checkpoint_safe_load_invalid_yaml(tmpdir, capsys):
     assert "deployment.yaml:2:" in out
     assert "exclude:" in out
     assert "Traceback" not in out
+
+
+def test_checkpoint_safe_load_invalid_yaml_without_file_name(capsys):
+    with pytest.raises(SystemExit):
+        checkpoint_safe_load(io.StringIO("a: {{ b }}\n"))
+    assert "<yaml>:1:" in capsys.readouterr().out
+
+
+def test_checkpoint_safe_load_empty_keys():
+    content = checkpoint_safe_load(
+        io.StringIO(
+            "models:\n"
+            "- name: m\n  config:\n  meta:\n  columns:\n"
+            "sources:\n"
+            "- name: s\n  freshness:\n  tables:\n"
+            "- name: t\n  tags:\n  labels:\n  description:\n"
+        )
+    )
+    assert content["models"] == [{"name": "m", "config": {}, "meta": {}, "columns": []}]
+    # keys where null has a meaning, or that aren't containers, keep None
+    assert content["sources"][0] == {"name": "s", "freshness": None, "tables": []}
+    assert content["sources"][1] == {
+        "name": "t",
+        "tags": [],
+        "labels": {},
+        "description": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "models:\n",
+        "macros:\n",
+        "sources:\n- name: s\n  tables:\n",
+        "sources:\n- name: s\n  config:\n  tables:\n  - name: t\n    config:\n",
+        "sources: [foo]\n",
+        "sources:\n- name: s\n  tables: [foo]\n",
+    ],
+)
+def test_get_schemas_empty_or_odd_keys(content, tmpdir):
+    file = Path(tmpdir.join("schema.yml"))
+    file.write_text(content)
+    list(get_model_schemas([file], {"m"}, all_schemas=True))
+    list(get_macro_schemas([file], {"m"}, all_schemas=True))
+    list(get_source_schemas([file]))
 
 
 def test_get_source_schemas_null_config(tmpdir):

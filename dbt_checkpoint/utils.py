@@ -14,6 +14,7 @@ from typing import Sequence
 from typing import Set
 from typing import Text
 from typing import Tuple
+from typing import cast
 from typing import Union
 
 import yaml
@@ -147,10 +148,45 @@ def _construct_untagged(
         return loader.construct_mapping(node)
     if isinstance(node, yaml.SequenceNode):
         return loader.construct_sequence(node)
-    return loader.construct_scalar(node)
+    return loader.construct_scalar(cast(yaml.ScalarNode, node))
 
 
 _CheckpointLoader.add_multi_constructor("!", _construct_untagged)
+
+# Keys that hooks read as a mapping or a list. A key with no value (`config:`)
+# loads as None, so it's replaced by an empty one. Other keys keep None, which can
+# be meaningful (e.g. `freshness: null` opts a source out of freshness)
+_EMPTY_AS_MAPPING = frozenset({"config", "meta", "labels"})
+_EMPTY_AS_LIST = frozenset(
+    {
+        "models",
+        "sources",
+        "macros",
+        "exposures",
+        "seeds",
+        "snapshots",
+        "tables",
+        "columns",
+        "arguments",
+        "tags",
+        "tests",
+        "data_tests",
+    }
+)
+
+
+def _fill_empty_keys(content: Any) -> None:
+    if isinstance(content, dict):
+        for key, value in content.items():
+            if value is None and key in _EMPTY_AS_MAPPING:
+                content[key] = {}
+            elif value is None and key in _EMPTY_AS_LIST:
+                content[key] = []
+            else:
+                _fill_empty_keys(value)
+    elif isinstance(content, list):
+        for item in content:
+            _fill_empty_keys(item)
 
 
 def checkpoint_safe_load(stream: Any) -> Dict[str, Any]:
@@ -173,7 +209,10 @@ def checkpoint_safe_load(stream: Any) -> Dict[str, Any]:
             "`.pre-commit-config.yaml`."
         )
         raise SystemExit(1)
-    return content if isinstance(content, dict) else {}
+    if not isinstance(content, dict):
+        return {}
+    _fill_empty_keys(content)
+    return content
 
 
 def get_json(json_filename: str) -> Dict[str, Any]:
@@ -416,14 +455,18 @@ def get_source_schemas(
     for yml_file in yml_files:
         schema = checkpoint_safe_load(yml_file.open())
         for source in schema.get("sources", []):
-            if not include_disabled and not (source.get("config") or {}).get(
+            if not isinstance(source, dict):
+                continue
+            if not include_disabled and not source.get("config", {}).get(
                 "enabled", True
             ):
                 continue
-            source_name = source.get("name")
+            source_name = source.get("name", "")
             tables = source.pop("tables", [])
             for table in tables:
-                table_name = table.get("name")
+                if not isinstance(table, dict):
+                    continue
+                table_name = table.get("name", "")
                 yield SourceSchema(
                     source_name=source_name,
                     table_name=table_name,
@@ -916,7 +959,7 @@ def validate_meta_keys(
     meta_set: Set[str],
     allow_extra_keys: bool,
 ) -> int:
-    meta = set((obj.schema.get("meta") or {}).keys())
+    meta = set(obj.schema.get("meta", {}).keys())
     if allow_extra_keys:
         diff = not meta_set.issubset(meta)
     else:

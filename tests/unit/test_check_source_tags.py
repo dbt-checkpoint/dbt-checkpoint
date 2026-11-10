@@ -198,6 +198,22 @@ sources:
         True,
         0,
     ),
+    # empty `tags:` means no tags, not a crash
+    (
+        """
+sources:
+-   name: test
+    tags:
+    tables:
+    -   name: with_description
+        tags:
+        config:
+            tags:
+    """,
+        True,
+        True,
+        0,
+    ),
 )
 
 
