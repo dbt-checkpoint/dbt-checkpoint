@@ -15,20 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         name:
-          - "ubuntu-py38"
-          - "ubuntu-py39"
           - "ubuntu-py310"
           - "ubuntu-py311"
           - "ubuntu-py312"
+          - "ubuntu-py313"
+          - "ubuntu-py314"
         include:
-          - name: "ubuntu-py38"
-            python: "3.8"
-            os: ubuntu-latest
-            tox_env: "py38"
-          - name: "ubuntu-py39"
-            python: "3.9"
-            os: ubuntu-latest
-            tox_env: "py39"
           - name: "ubuntu-py310"
             python: "3.10"
             os: ubuntu-latest
@@ -41,6 +33,14 @@ jobs:
             python: "3.12"
             os: ubuntu-latest
             tox_env: "py312"
+          - name: "ubuntu-py313"
+            python: "3.13"
+            os: ubuntu-latest
+            tox_env: "py313"
+          - name: "ubuntu-py314"
+            python: "3.14"
+            os: ubuntu-latest
+            tox_env: "py314"
 
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
       - uses: "actions/checkout@v4"
       - uses: "actions/setup-python@v5"
         with:
-          python-version: "3.8"
+          python-version: "3.14"
 
       - name: "Install build, check-wheel-content, and twine"
         run: "python -m pip install build twine check-wheel-contents"
@@ -94,7 +94,7 @@ jobs:
       - uses: "actions/checkout@v4"
       - uses: "actions/setup-python@v5"
         with:
-          python-version: "3.8"
+          python-version: "3.14"
       - name: "Install in dev mode"
         run: "python -m pip install -e .[dev]"
       - name: "Import package"
