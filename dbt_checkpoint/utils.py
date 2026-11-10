@@ -428,7 +428,7 @@ def get_parent_childs(
                 if node_type in node_types:
                     if node_type == "test":
                         yield get_test(node_id, manifest)
-                    elif node_type == "model":
+                    elif node_type in ("model", "seed", "snapshot"):
                         node = manifest.get("nodes", {}).get(node_id)
                         yield Model(
                             model_id=node_id,
