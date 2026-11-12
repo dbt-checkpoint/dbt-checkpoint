@@ -205,7 +205,7 @@ Check that column name abides to a contract, as described in [this blog post](ht
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-column-name-contract
         args: [--pattern, "(is|has|do)_.*", --dtypes, boolean, text, timestamp, "--"]
@@ -299,7 +299,7 @@ By default, it does not allow the columns to have any other meta keys other than
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-columns-have-meta-keys
         args: ['--meta-keys', 'foo', 'bar', "--"]
@@ -400,7 +400,7 @@ Checks that model's yaml has:
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-has-contract
 ```
@@ -430,7 +430,7 @@ Ensures that the model has a [group](https://docs.getdbt.com/docs/build/groups) 
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-has-group
 ```
@@ -440,7 +440,7 @@ With allowed groups:
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-has-group
         args: ["--groups", "analytics", "finance", "engineering", "--"]
@@ -495,7 +495,7 @@ Checks that model's yaml has specific constraints defined, e.g.:
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-has-contract
       - id: check-model-has-constraints
@@ -538,7 +538,7 @@ Checks that model's yaml has generic constraints defined, eg:
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-has-contract
       - id: check-model-has-generic-constraints
@@ -672,7 +672,7 @@ By default, it does not allow the model to have any other labels keys other than
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-has-labels-keys
         args: ["--labels-keys", "foo", "bar", "--"]
@@ -947,7 +947,7 @@ Check that model name abides to a contract (similar to [`check-column-name-contr
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-name-contract
         args: [--pattern, "(base_|stg_).*"]
@@ -1042,7 +1042,7 @@ Ensures the parent models or sources are from certain database.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-parents-database
         args: ["--blacklist", "SRC", "--"]
@@ -1088,7 +1088,7 @@ Ensures the parent model names have a certain prefix.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-parents-name-prefix
         exclude: ^models/stage/
@@ -1134,7 +1134,7 @@ Ensures the parent models or sources are from certain schema.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-parents-schema
         args: ["--blacklist", "stage", "--"]
@@ -1193,7 +1193,7 @@ repos:
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-tags
         args: ["--tags", "foo", "bar", "--has-any-tags", "--"]
@@ -1204,7 +1204,7 @@ repos:
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-tags
         args: ["--tags", "foo", "bar", "--has-all-tags", "--"]
@@ -1248,7 +1248,7 @@ Checks the model materialization based on a given threshold of child models. All
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-model-materialization-by-childs
 ```
@@ -1458,7 +1458,7 @@ Ensures that the source has a description in the properties file (usually `schem
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-source-has-description
 ```
@@ -1647,7 +1647,7 @@ Ensures that the source has a list of valid labels keys. (usually `schema.yml`).
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-source-has-labels-keys
         args: ['--labels-keys', 'foo', 'bar', "--"]
@@ -1816,7 +1816,7 @@ Ensures that the source has a number of tests from a group of tests.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-source-has-tests-by-group
         args: ["--tests", "unique", "unique_where", "--test-cnt", "1", "--"]
@@ -1903,7 +1903,7 @@ Ensures the source has a specific number (max/min) of children.
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-source-childs
         args: ["--min-child-cnt", "2", "--"]
@@ -1993,7 +1993,7 @@ Ensures that the macro has arguments with descriptions in the properties file (u
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-macro-arguments-have-desc
 ```
@@ -2370,7 +2370,7 @@ Run the` dbt parse` command. When running dbt >= 1.5, generates `manifest.json` 
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: dbt-parse
 ```
@@ -2380,7 +2380,7 @@ or
 ```yaml
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: dbt-parse
         args: ["--cmd-flags", "++profiles-dir", ".", "++project-dir", ".", "--"]
@@ -2685,7 +2685,7 @@ Ensures that the test has only valid tags from the provided list.
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-test-tags
         args: ["--tags", "foo", "bar", "--"]
@@ -2736,7 +2736,7 @@ Compare manifest and catalog to ensure DB and Schemas have the same casing.
 ```
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.10
+    rev: v2.1.0
     hooks:
       - id: check-database-casing-consistency
 ```
