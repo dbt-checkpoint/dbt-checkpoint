@@ -1,6 +1,6 @@
 # dbt-checkpoint
 
-A Python package providing pre-commit hooks that enforce quality standards in dbt (data build tool) projects. Maintained by Datacoves. Current version: 2.0.11.
+A Python package providing pre-commit hooks that enforce quality standards in dbt (data build tool) projects. Maintained by Datacoves. Current version: 2.1.0.
 
 ## Project Layout
 

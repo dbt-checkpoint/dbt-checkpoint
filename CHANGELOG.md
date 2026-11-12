@@ -1,4 +1,4 @@
-# 2.0.11 - 2026-11-10
+# 2.1.0 - 2026-11-12
 
 **Breaking Changes:**
 * Require Python >= 3.10 (drop 3.8 and 3.9) and support Python 3.13 and 3.14. Pin `mixpanel>=4.10.1,<5`, which fixes installation on 3.14, and import it only when tracking is enabled by @k0x2e in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/390
@@ -32,7 +32,7 @@
 * @dajiaohuang made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/385
 * @werderame made their first contribution in https://github.com/dbt-checkpoint/dbt-checkpoint/pull/386
 
-**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.10...v2.0.11
+**Full Changelog**: https://github.com/dbt-checkpoint/dbt-checkpoint/compare/v2.0.10...v2.1.0
 
 # 2.0.7 - 2025-05-08
 
